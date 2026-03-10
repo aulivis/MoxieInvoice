@@ -11,27 +11,27 @@ beforeAll(() => {
 const { encrypt, decrypt } = await import('../crypto');
 
 describe('encrypt / decrypt', () => {
-  it('round-trips a simple string', () => {
+  it('round-trips a simple string', async () => {
     const original = 'my-secret-api-key';
-    expect(decrypt(encrypt(original))).toBe(original);
+    expect(await decrypt(await encrypt(original))).toBe(original);
   });
 
-  it('round-trips a JSON credentials blob', () => {
+  it('round-trips a JSON credentials blob', async () => {
     const creds = JSON.stringify({ apiKey: 'abc123', username: 'user' });
-    expect(decrypt(encrypt(creds))).toBe(creds);
+    expect(await decrypt(await encrypt(creds))).toBe(creds);
   });
 
-  it('round-trips an empty string', () => {
-    expect(decrypt(encrypt(''))).toBe('');
+  it('round-trips an empty string', async () => {
+    expect(await decrypt(await encrypt(''))).toBe('');
   });
 
-  it('round-trips unicode content', () => {
+  it('round-trips unicode content', async () => {
     const text = 'Árvíztűrő tükörfúrógép 🔑';
-    expect(decrypt(encrypt(text))).toBe(text);
+    expect(await decrypt(await encrypt(text))).toBe(text);
   });
 
-  it('produces ciphertext in iv:authTag:data hex format', () => {
-    const encrypted = encrypt('test');
+  it('produces ciphertext in iv:authTag:data hex format', async () => {
+    const encrypted = await encrypt('test');
     const parts = encrypted.split(':');
     expect(parts).toHaveLength(3);
     expect(parts[0]).toMatch(/^[0-9a-f]{32}$/i); // 16-byte IV = 32 hex chars
@@ -39,31 +39,31 @@ describe('encrypt / decrypt', () => {
     expect(parts[2]).toMatch(/^[0-9a-f]+$/i);    // ciphertext
   });
 
-  it('produces different ciphertext each call (random IV)', () => {
-    const a = encrypt('same string');
-    const b = encrypt('same string');
+  it('produces different ciphertext each call (random IV)', async () => {
+    const a = await encrypt('same string');
+    const b = await encrypt('same string');
     expect(a).not.toBe(b);
   });
 
-  it('backward compat: returns plaintext if not in encrypted format', () => {
-    expect(decrypt('old-plaintext-key')).toBe('old-plaintext-key');
+  it('backward compat: returns plaintext if not in encrypted format', async () => {
+    expect(await decrypt('old-plaintext-key')).toBe('old-plaintext-key');
   });
 
-  it('backward compat: returns plaintext for URL-like strings', () => {
-    expect(decrypt('https://api.example.com/key')).toBe('https://api.example.com/key');
+  it('backward compat: returns plaintext for URL-like strings', async () => {
+    expect(await decrypt('https://api.example.com/key')).toBe('https://api.example.com/key');
   });
 
-  it('throws if ENCRYPTION_KEY is missing', () => {
+  it('throws if ENCRYPTION_KEY is missing', async () => {
     const saved = process.env.ENCRYPTION_KEY;
     delete process.env.ENCRYPTION_KEY;
-    expect(() => encrypt('test')).toThrow('ENCRYPTION_KEY');
+    await expect(encrypt('test')).rejects.toThrow('ENCRYPTION_KEY');
     process.env.ENCRYPTION_KEY = saved;
   });
 
-  it('throws if ENCRYPTION_KEY is wrong length', () => {
+  it('throws if ENCRYPTION_KEY is wrong length', async () => {
     const saved = process.env.ENCRYPTION_KEY;
     process.env.ENCRYPTION_KEY = 'tooshort';
-    expect(() => encrypt('test')).toThrow('ENCRYPTION_KEY');
+    await expect(encrypt('test')).rejects.toThrow('ENCRYPTION_KEY');
     process.env.ENCRYPTION_KEY = saved;
   });
 });

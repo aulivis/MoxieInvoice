@@ -35,7 +35,7 @@ export type CreateInvoiceOutput =
   | { success: false; errorMessage: string };
 
 function needsBillingoDefaults(request: NormalizedInvoiceRequest): boolean {
-  const hasBlockId = request.blockId != null && request.blockId !== '' && Number(request.blockId) >= 1;
+  const hasBlockId = request.blockId != null && request.blockId >= 1;
   const hasLanguage = (request.language?.trim() ?? '').length > 0;
   const hasPaymentMethod = (request.paymentMethod?.trim() ?? '').length > 0;
   return !hasBlockId || !hasLanguage || !hasPaymentMethod;
