@@ -162,6 +162,52 @@
     "portalFailed": "Az előfizetés kezelő megnyitása sikertelen. Próbáld újra.",
     "noSubscription": "Még nincs előfizetésed. Először fizess elő."
   },
+  "billingoValidation": {
+    "blocked": "A számla generálását a Billingo követelményei miatt blokkoltuk, mert egy vagy több adat hiányzik vagy érvénytelen.",
+    "missingField": "A következő kötelező mező hiányzik: {field}.",
+    "invalidValue": "A(z) „{field}” mező értéke nem megfelelő.",
+    "invalidValueWithDetail": "A(z) „{field}” mező értéke nem megfelelő (tétel {value}).",
+    "fixAndRetry": "Ha kijavítod az adatokat, a számla újra beküldhető (pl. a Moxie-ban a számlát Sent-re állítva, vagy az Új számla űrlapról).",
+    "fields": {
+      "buyerName": "vevő neve",
+      "postCode": "irányítószám",
+      "city": "város",
+      "address": "cím",
+      "countryCode": "ország kód",
+      "fulfillmentDate": "teljesítés dátuma",
+      "dueDate": "fizetési határidő",
+      "currency": "pénznem",
+      "paymentMethod": "fizetési mód",
+      "items": "tételek",
+      "itemName": "tétel megnevezése",
+      "quantity": "mennyiség",
+      "netUnitPrice": "nettó egységár",
+      "vatPercent": "ÁFA százalék"
+    }
+  },
+  "szamlazzValidation": {
+    "blocked": "A számla generálását a Számlázz.hu követelményei miatt blokkoltuk, mert egy vagy több adat hiányzik vagy érvénytelen.",
+    "missingField": "A következő kötelező mező hiányzik: {field}.",
+    "invalidValue": "A(z) „{field}” mező értéke nem megfelelő.",
+    "invalidValueWithDetail": "A(z) „{field}” mező értéke nem megfelelő (tétel {value}).",
+    "fixAndRetry": "Ha kijavítod az adatokat, a számla újra beküldhető (pl. a Moxie-ban a számlát Sent-re állítva, vagy az Új számla űrlapról).",
+    "fields": {
+      "buyerName": "vevő neve",
+      "postCode": "irányítószám",
+      "city": "város",
+      "address": "cím",
+      "countryCode": "ország kód",
+      "fulfillmentDate": "teljesítés dátuma",
+      "dueDate": "fizetési határidő",
+      "currency": "pénznem",
+      "paymentMethod": "fizetési mód",
+      "items": "tételek",
+      "itemName": "tétel megnevezése",
+      "quantity": "mennyiség",
+      "netUnitPrice": "nettó egységár",
+      "vatPercent": "ÁFA százalék"
+    }
+  },
   "billing": {
     "provider": "Számlázó",
     "apiKey": "Billingo API kulcs",
@@ -170,7 +216,9 @@
     "usernamePlaceholder": "Felhasználónév (ha nincs Agent kulcs)",
     "passwordPlaceholder": "Jelszó (ha nincs Agent kulcs)",
     "sellerName": "Eladó neve (opcionális)",
-    "saved": "Mentve."
+    "saved": "Mentve.",
+    "statusNotConfigured": "Nincs beállítva",
+    "statusLive": "Él"
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF konverzió",

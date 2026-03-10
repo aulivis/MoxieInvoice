@@ -94,6 +94,7 @@ export async function GET(request: Request) {
       moxieInvoiceId: payload.moxieInvoiceId,
       moxieBaseUrl: moxie?.base_url,
       moxieApiKey,
+      locale: 'hu',
     });
 
     if (result.success) {

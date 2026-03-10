@@ -5,7 +5,8 @@
 
 import type { NormalizedInvoiceRequest, InvoiceResult } from './types';
 
-const BILLINGO_API_BASE = 'https://api.billingo.hu/api/v3';
+/** Billingo API v3 base; use /v3 not /api/v3 (404 on wrong path). */
+const BILLINGO_API_BASE = 'https://api.billingo.hu/v3';
 
 export interface BillingoCredentials {
   apiKey: string;

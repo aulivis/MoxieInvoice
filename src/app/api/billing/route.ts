@@ -9,16 +9,17 @@ export async function GET() {
   if (!auth.ok) return auth.response;
   const { supabase, orgId } = auth;
 
-  // Never select credentials_encrypted – do not expose to client
+  // Select credentials_encrypted only to derive hasCredentials; never expose to client
   const { data } = await supabase
     .from('billing_providers')
-    .select('id, provider, seller_name')
+    .select('id, provider, seller_name, credentials_encrypted')
     .eq('org_id', orgId)
     .maybeSingle();
 
   return NextResponse.json({
     provider: data?.provider ?? null,
     sellerName: data?.seller_name ?? null,
+    hasCredentials: !!data?.credentials_encrypted,
   });
 }
 

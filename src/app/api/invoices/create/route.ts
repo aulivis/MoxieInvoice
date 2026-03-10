@@ -72,6 +72,7 @@ export async function POST(request: Request) {
     .eq('org_id', profile.organization_id)
     .maybeSingle();
 
+  const locale = body.locale === 'en' ? 'en' : 'hu';
   const result = await createInvoice({
     orgId: profile.organization_id,
     provider: billing.provider,
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
     request: body.request,
     moxieBaseUrl: moxie?.base_url ?? undefined,
     moxieApiKey: moxie?.api_key_encrypted ? await decrypt(moxie.api_key_encrypted) : undefined,
+    locale,
   });
 
   if (!result.success) {

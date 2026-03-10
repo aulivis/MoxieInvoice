@@ -102,6 +102,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, skipped: 'No invoice data' });
   }
 
+  const locale = (request.headers.get('Accept-Language')?.toLowerCase().startsWith('en') ? 'en' : 'hu') as 'hu' | 'en';
   const result = await createInvoice({
     orgId,
     provider: billing.provider,
@@ -110,6 +111,7 @@ export async function POST(request: NextRequest) {
     moxieInvoiceId: normalized.moxieInvoiceId,
     moxieBaseUrl: moxie.base_url,
     moxieApiKey,
+    locale,
   });
 
   if (!result.success) {

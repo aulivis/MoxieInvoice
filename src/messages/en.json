@@ -162,6 +162,52 @@
     "portalFailed": "Failed to open subscription management. Please try again.",
     "noSubscription": "No subscription found. Please subscribe first."
   },
+  "billingoValidation": {
+    "blocked": "Invoice generation was blocked because of Billingo requirements: one or more fields are missing or invalid.",
+    "missingField": "The following required field is missing: {field}.",
+    "invalidValue": "The \"{field}\" field has an invalid value.",
+    "invalidValueWithDetail": "The \"{field}\" field has an invalid value (item {value}).",
+    "fixAndRetry": "If you fix the data, you can try again (e.g. set the invoice to Sent in Moxie, or use the New invoice form).",
+    "fields": {
+      "buyerName": "buyer name",
+      "postCode": "postal code",
+      "city": "city",
+      "address": "address",
+      "countryCode": "country code",
+      "fulfillmentDate": "fulfillment date",
+      "dueDate": "due date",
+      "currency": "currency",
+      "paymentMethod": "payment method",
+      "items": "items",
+      "itemName": "item description",
+      "quantity": "quantity",
+      "netUnitPrice": "net unit price",
+      "vatPercent": "VAT percent"
+    }
+  },
+  "szamlazzValidation": {
+    "blocked": "Invoice generation was blocked because of Számlázz.hu requirements: one or more fields are missing or invalid.",
+    "missingField": "The following required field is missing: {field}.",
+    "invalidValue": "The \"{field}\" field has an invalid value.",
+    "invalidValueWithDetail": "The \"{field}\" field has an invalid value (item {value}).",
+    "fixAndRetry": "If you fix the data, you can try again (e.g. set the invoice to Sent in Moxie, or use the New invoice form).",
+    "fields": {
+      "buyerName": "buyer name",
+      "postCode": "postal code",
+      "city": "city",
+      "address": "address",
+      "countryCode": "country code",
+      "fulfillmentDate": "fulfillment date",
+      "dueDate": "due date",
+      "currency": "currency",
+      "paymentMethod": "payment method",
+      "items": "items",
+      "itemName": "item description",
+      "quantity": "quantity",
+      "netUnitPrice": "net unit price",
+      "vatPercent": "VAT percent"
+    }
+  },
   "billing": {
     "provider": "Billing provider",
     "apiKey": "Billingo API key",
@@ -170,7 +216,9 @@
     "usernamePlaceholder": "Username (if no Agent key)",
     "passwordPlaceholder": "Password (if no Agent key)",
     "sellerName": "Seller name (optional)",
-    "saved": "Saved."
+    "saved": "Saved.",
+    "statusNotConfigured": "Not configured",
+    "statusLive": "Live"
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF conversion",

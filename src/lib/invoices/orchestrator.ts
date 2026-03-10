@@ -5,6 +5,14 @@
 import type { NormalizedInvoiceRequest, InvoiceResult } from './types';
 import { createBillingoInvoice } from './billingo';
 import { createSzamlazzInvoice } from './szamlazz';
+import {
+  validateBillingoRequest,
+  buildBillingoValidationMessage,
+} from './billingo-validate';
+import {
+  validateSzamlazzRequest,
+  buildSzamlazzValidationMessage,
+} from './szamlazz-validate';
 import type { BillingProviderType } from '@/types/database';
 
 export interface CreateInvoiceInput {
@@ -15,6 +23,8 @@ export interface CreateInvoiceInput {
   moxieInvoiceId?: string;
   moxieBaseUrl?: string;
   moxieApiKey?: string;
+  /** Locale for validation error messages (Billingo / Számlázz.hu) (default 'hu'). */
+  locale?: 'hu' | 'en';
 }
 
 export type CreateInvoiceOutput =
@@ -22,8 +32,27 @@ export type CreateInvoiceOutput =
   | { success: false; errorMessage: string };
 
 export async function createInvoice(input: CreateInvoiceInput): Promise<CreateInvoiceOutput> {
-  const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieBaseUrl, moxieApiKey } = input;
+  const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieBaseUrl, moxieApiKey, locale = 'hu' } = input;
   const request = rawRequest;
+
+  if (provider === 'billingo') {
+    const validation = validateBillingoRequest(request);
+    if (!validation.valid) {
+      return {
+        success: false,
+        errorMessage: buildBillingoValidationMessage(validation.errors, locale),
+      };
+    }
+  }
+  if (provider === 'szamlazz') {
+    const validation = validateSzamlazzRequest(request);
+    if (!validation.valid) {
+      return {
+        success: false,
+        errorMessage: buildSzamlazzValidationMessage(validation.errors, locale),
+      };
+    }
+  }
 
   let result: InvoiceResult;
   try {

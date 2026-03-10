@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useActionState } from 'react';
+import { useState, useEffect, useActionState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { saveBillingAction, type SettingsState } from '@/app/actions/settings';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
+import { Badge } from '@/components/ui/Badge';
 
 const disabledInputClass =
   'disabled:opacity-60 disabled:cursor-not-allowed';
@@ -12,6 +13,8 @@ const disabledInputClass =
 export function BillingProviderForm({ hasSubscription = true }: { hasSubscription?: boolean }) {
   const [provider, setProvider] = useState<'billingo' | 'szamlazz'>('billingo');
   const [sellerName, setSellerName] = useState('');
+  const [hasCredentials, setHasCredentials] = useState(false);
+  const [fetched, setFetched] = useState(false);
   const [state, formAction] = useActionState<SettingsState | null, FormData>(saveBillingAction, null);
   const t = useTranslations('billing');
   const tCommon = useTranslations('common');
@@ -28,20 +31,41 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
     ? (actionErrorKey[state.error] ? tErrors(actionErrorKey[state.error] as 'unauthorized') : state.error)
     : null;
 
+  const fetchBilling = useCallback(() => {
+    return fetch('/api/billing', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => {
+        setFetched(true);
+        if (data.provider) setProvider(data.provider);
+        if (data.sellerName != null) setSellerName(data.sellerName ?? '');
+        setHasCredentials(!!data.hasCredentials);
+      })
+      .catch(() => setFetched(true));
+  }, []);
+
+  useEffect(() => {
+    fetchBilling();
+  }, [fetchBilling]);
+
+  useEffect(() => {
+    if (state?.success) fetchBilling();
+  }, [state?.success, fetchBilling]);
+
   const inputClass =
     'w-full rounded-lg border border-border-medium bg-background-card px-3 py-2.5 text-base min-h-[44px] text-text-primary placeholder:text-text-disabled focus-visible:outline-none focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-primary/10 ' +
     (disabled ? disabledInputClass : '');
   const labelClass = 'block text-sm font-medium text-text-label mb-1';
 
-  useEffect(() => {
-    fetch('/api/billing')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.provider) setProvider(data.provider);
-        if (data.sellerName) setSellerName(data.sellerName);
-      })
-      .catch(() => {});
-  }, []);
+  const statusBadge = hasCredentials ? (
+    <Badge variant="green">{t('statusLive')}</Badge>
+  ) : (
+    <Badge variant="gray">{t('statusNotConfigured')}</Badge>
+  );
+
+  if (!fetched)
+    return (
+      <p className="text-text-secondary">{tCommon('loading')}</p>
+    );
 
   return (
     <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>
@@ -50,6 +74,9 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
           {tSub('guardTitle')}
         </p>
       )}
+      <div className="flex items-center gap-2 mb-4">
+        {statusBadge}
+      </div>
       <form action={formAction} className="space-y-4 max-w-lg">
         <div>
           <label htmlFor="billing-provider" className={labelClass}>

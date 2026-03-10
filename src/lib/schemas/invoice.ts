@@ -31,6 +31,8 @@ export const normalizedInvoiceRequestSchema = z.object({
 
 export const createInvoiceBodySchema = z.object({
   request: normalizedInvoiceRequestSchema,
+  /** Locale for validation error messages (e.g. 'hu', 'en'). */
+  locale: z.enum(['hu', 'en']).optional(),
 });
 
 export type CreateInvoiceBody = z.infer<typeof createInvoiceBodySchema>;

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 
@@ -26,6 +26,7 @@ function newItem(): InvoiceItem {
 
 export function CreateInvoiceForm() {
   const router = useRouter();
+  const locale = useLocale() as 'hu' | 'en';
   const t = useTranslations('invoicesNew');
   const tCommon = useTranslations('common');
   const tErrors = useTranslations('errors');
@@ -85,6 +86,7 @@ export function CreateInvoiceForm() {
             currency,
             fulfillmentDate,
           },
+          locale: locale === 'en' ? 'en' : 'hu',
         }),
       });
       const data = await res.json();

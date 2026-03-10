@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -37,19 +37,42 @@ function SubmitButton() {
   );
 }
 
+function parseMagicLinkErrorFromHash(): boolean {
+  if (typeof window === 'undefined' || !window.location.hash) return false;
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const error = params.get('error');
+  const errorCode = params.get('error_code');
+  if (error === 'access_denied' || errorCode === 'otp_expired') return true;
+  if (error && (errorCode || params.get('error_description'))) return true;
+  return false;
+}
+
 export default function LoginPage() {
   const [state, formAction] = useActionState<AuthState | null, FormData>(
     loginAction,
     null
   );
+  const [hashError, setHashError] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const errorAuth = searchParams.get('error') === 'auth';
   const t = useTranslations('auth');
   const tNav = useTranslations('nav');
 
+  useEffect(() => {
+    if (parseMagicLinkErrorFromHash()) {
+      setHashError(true);
+      window.history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search
+      );
+    }
+  }, []);
+
   const showSuccess = state?.success === true;
   const showForm = !showSuccess;
-  const errorMessage = state?.error || (errorAuth ? t('linkExpired') : null);
+  const errorMessage =
+    state?.error || (hashError || errorAuth ? t('linkExpired') : null);
 
   const features = [t('feature1'), t('feature2'), t('feature3')];
 
