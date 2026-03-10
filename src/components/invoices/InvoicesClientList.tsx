@@ -88,7 +88,10 @@ export function InvoicesClientList({ invoices, locale }: Props) {
 
   function getBillingAppUrl(inv: Invoice): string | null {
     if (!inv.external_id) return null;
-    if (inv.provider === 'billingo') return `https://app.billingo.hu/documents/${inv.external_id}`;
+    if (inv.provider === 'billingo') {
+      // Billingo app: direct link to document in dashboard. Hash route is common in SPAs.
+      return `https://app.billingo.hu/#/documents/${inv.external_id}`;
+    }
     if (inv.provider === 'szamlazz') return 'https://online.szamlazz.hu/szamla/';
     return null;
   }
@@ -159,7 +162,7 @@ export function InvoicesClientList({ invoices, locale }: Props) {
             >
               <div className="flex justify-between items-start gap-2 mb-1.5">
                 <p className="font-tabular-nums font-semibold text-sm text-text-primary">
-                  {inv.external_id ?? inv.moxie_invoice_id ?? '—'}
+                  {inv.external_id ?? '—'}
                 </p>
                 <StatusCell status={inv.status} label={statusLabel(inv.status)} />
               </div>
@@ -187,12 +190,12 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                   {formatDate(inv.created_at)}
                 </span>
                 <span className="flex items-center gap-2">
-                  {getBillingAppUrl(inv) && (
+                  {getBillingAppUrl(inv) ? (
                     <a
                       href={getBillingAppUrl(inv)!}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[32px]"
+                      className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-primary hover:bg-primary/10 rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                       aria-label={openInBillingAppLabel(inv)}
                       title={openInBillingAppLabel(inv)}
                     >
@@ -200,22 +203,39 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
                     </a>
+                  ) : (
+                    <span
+                      className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-text-tertiary cursor-not-allowed"
+                      aria-hidden
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </span>
                   )}
-                  {inv.pdf_url && (
+                  {inv.pdf_url ? (
                     <Link
                       href={inv.pdf_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[32px]"
+                      className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-primary hover:bg-primary/10 rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      aria-label={t('pdf')}
+                      title={t('pdf')}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                           d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      {t('pdf')}
                     </Link>
+                  ) : (
+                    <span className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-text-tertiary" aria-hidden>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </span>
                   )}
-                  <DeleteInvoiceButton invoiceId={inv.id} status={inv.status} />
+                  <DeleteInvoiceButton invoiceId={inv.id} status={inv.status} iconOnly />
                 </span>
               </div>
               {inv.error_message && (
@@ -266,7 +286,7 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                 <TableHead>{t('paymentStatus')}</TableHead>
                 <TableHead>{t('buyerName')}</TableHead>
                 <TableHead>{t('invoiceValue')}</TableHead>
-                <TableHead>{t('moxieInvoiceNumber')}</TableHead>
+                <TableHead>{t('invoiceNumber')}</TableHead>
                 <TableHead>{t('action')}</TableHead>
               </TableRow>
             </TableHeader>
@@ -336,19 +356,19 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                     <TableCell className="font-tabular-nums text-text-secondary">
                       {formatAmount(inv.total_amount ?? null, (inv.payload_snapshot as { currency?: string } | null)?.currency)}
                     </TableCell>
-                    <TableCell className="font-tabular-nums font-medium" title={inv.external_id ?? inv.moxie_invoice_id ?? undefined}>
+                    <TableCell className="font-tabular-nums font-medium" title={inv.external_id ?? undefined}>
                       <span className="block max-w-[180px] truncate">
-                        {inv.external_id ?? inv.moxie_invoice_id ?? '—'}
+                        {inv.external_id ?? '—'}
                       </span>
                     </TableCell>
                     <TableCell>
                       <span className="flex items-center gap-2">
-                        {getBillingAppUrl(inv) && (
+                        {getBillingAppUrl(inv) ? (
                           <a
                             href={getBillingAppUrl(inv)!}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[36px]"
+                            className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] text-primary hover:bg-primary/10 rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                             aria-label={openInBillingAppLabel(inv)}
                             title={openInBillingAppLabel(inv)}
                           >
@@ -356,24 +376,40 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                             </svg>
                           </a>
+                        ) : (
+                          <span
+                            className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] text-text-tertiary cursor-not-allowed"
+                            aria-hidden
+                            title={t('statusCreated')}
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </span>
                         )}
                         {inv.pdf_url ? (
                           <Link
                             href={inv.pdf_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[36px]"
+                            className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] text-primary hover:bg-primary/10 rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                            aria-label={t('pdf')}
+                            title={t('pdf')}
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            {t('pdf')}
                           </Link>
                         ) : (
-                          <span className="text-text-tertiary">—</span>
+                          <span className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] text-text-tertiary" aria-hidden>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </span>
                         )}
-                        <DeleteInvoiceButton invoiceId={inv.id} status={inv.status} />
+                        <DeleteInvoiceButton invoiceId={inv.id} status={inv.status} iconOnly />
                       </span>
                     </TableCell>
                   </TableRow>

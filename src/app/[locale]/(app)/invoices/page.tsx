@@ -8,6 +8,9 @@ import { Card } from '@/components/ui/Card';
 import { RefreshInvoicesButton } from '@/components/invoices/RefreshInvoicesButton';
 import { InvoicesClientList } from '@/components/invoices/InvoicesClientList';
 
+/** Always fetch fresh invoice list so refresh button shows updated payment status from Billingo. */
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('invoices');
   return { title: `${t('title')} – MoxieInvoice` };

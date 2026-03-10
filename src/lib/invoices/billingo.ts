@@ -79,6 +79,8 @@ export async function listBillingoBlocks(
 export interface BillingoDocumentPaymentInfo {
   total: number;
   total_paid: number;
+  /** True when Billingo response had status === 'paid' (used when total_paid not present). */
+  _paid?: boolean;
 }
 
 /**
@@ -107,16 +109,26 @@ export async function getBillingoDocument(
   const doc = (await res.json()) as {
     total?: number;
     total_paid?: number;
+    totalPaid?: number; // Billingo API may return camelCase
+    status?: string; // e.g. 'paid' – some Billingo responses use this
   };
   const total = Number(doc?.total) || 0;
-  const totalPaid = Number(doc?.total_paid) ?? 0;
-  return { total, total_paid: totalPaid };
+  const totalPaid =
+    Number(doc?.total_paid ?? doc?.totalPaid) ?? 0;
+  const statusPaid =
+    typeof doc?.status === 'string' && doc.status.toLowerCase() === 'paid';
+  // Consider paid if total_paid >= total (with total > 0) OR explicit status === 'paid'
+  const paid =
+    statusPaid || (total > 0 && totalPaid >= total);
+  return { total, total_paid: totalPaid, _paid: paid };
 }
 
 /**
- * Returns true if the document is considered paid (total_paid >= total and total > 0).
+ * Returns true if the document is considered paid (total_paid >= total and total > 0,
+ * or Billingo response had status === 'paid').
  */
 export function isBillingoDocumentPaid(info: BillingoDocumentPaymentInfo): boolean {
+  if (info._paid === true) return true;
   return info.total > 0 && info.total_paid >= info.total;
 }
 

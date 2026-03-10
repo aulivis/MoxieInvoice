@@ -77,6 +77,7 @@
     "buyerName": "Buyer",
     "invoiceValue": "Invoice value",
     "moxieInvoiceNumber": "Moxie invoice number",
+    "invoiceNumber": "Invoice number",
     "openInBillingo": "Open in Billingo",
     "openInSzamlazz": "Open in Számlázz.hu",
     "openInBillingApp": "Open in billing app",
