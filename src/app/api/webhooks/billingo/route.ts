@@ -2,9 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
-import { createMoxieClient } from '@/lib/moxie/client';
-import { decrypt } from '@/lib/crypto';
-import { logError } from '@/lib/logger';
+import { markInvoicePaidAndNotifyMoxie } from '@/lib/invoices/sync-billingo-payments';
 
 const supabaseAdmin = () =>
   createClient(
@@ -79,50 +77,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { error: updateErr } = await supabase
-    .from('invoices')
-    .update({ payment_status: paymentStatus })
-    .eq('id', invoice.id);
-
-  if (updateErr) {
+  let moxieNotified = false;
+  try {
+    const result = await markInvoicePaidAndNotifyMoxie(supabase, invoice);
+    moxieNotified = result.moxieNotified;
+  } catch (err) {
     return NextResponse.json(
-      { error: 'Update failed', details: updateErr.message },
+      { error: 'Update failed', details: err instanceof Error ? err.message : String(err) },
       { status: 500 }
     );
-  }
-
-  let moxieNotified = false;
-  const amount = Number(invoice.total_amount) || 0;
-  if (invoice.moxie_invoice_id && invoice.org_id && amount > 0) {
-    try {
-      const { data: moxie } = await supabase
-        .from('moxie_connections')
-        .select('base_url, api_key_encrypted')
-        .eq('org_id', invoice.org_id)
-        .maybeSingle();
-
-      if (moxie?.base_url && moxie?.api_key_encrypted) {
-        const apiKey = await decrypt(moxie.api_key_encrypted);
-        const client = createMoxieClient(moxie.base_url, apiKey);
-        const date = new Date().toISOString().slice(0, 10);
-        const snapshot = invoice.payload_snapshot as { buyer?: { name?: string } } | null;
-        const clientName = snapshot?.buyer?.name?.trim();
-        await client.applyPayment({
-          date,
-          amount,
-          invoiceNumber: invoice.moxie_invoice_id,
-          paymentType: 'BANK_TRANSFER',
-          ...(clientName ? { clientName } : {}),
-        });
-        moxieNotified = true;
-      }
-    } catch (err) {
-      logError(err instanceof Error ? err : new Error(String(err)), {
-        step: 'billingo_webhook_moxie_payment',
-        invoiceId: invoice.id,
-        moxieInvoiceId: invoice.moxie_invoice_id,
-      });
-    }
   }
 
   return NextResponse.json({

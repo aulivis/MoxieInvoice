@@ -5,7 +5,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { NormalizedInvoiceRequest, InvoiceResult } from './types';
 import { computeTotalAmount } from './total-amount';
-import { createBillingoInvoice } from './billingo';
+import { createBillingoInvoice, sendBillingoDocumentByEmail } from './billingo';
 import { createSzamlazzInvoice } from './szamlazz';
 import {
   validateBillingoRequest,
@@ -16,6 +16,7 @@ import {
   buildSzamlazzValidationMessage,
 } from './szamlazz-validate';
 import { mergeInvoiceRequestWithDefaults } from './merge-defaults';
+import { logError } from '@/lib/logger';
 import type { BillingProviderType } from '@/types/database';
 
 export interface CreateInvoiceInput {
@@ -46,18 +47,22 @@ function needsBillingoDefaults(request: NormalizedInvoiceRequest): boolean {
 export async function createInvoice(input: CreateInvoiceInput): Promise<CreateInvoiceOutput> {
   const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieBaseUrl, moxieApiKey, locale = 'hu' } = input;
   let request = rawRequest;
+  let billingoOrgSettings: { billingo_send_invoice_by_email?: boolean } | null = null;
 
-  if (provider === 'billingo' && needsBillingoDefaults(request)) {
+  if (provider === 'billingo') {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const secret = process.env.SUPABASE_SECRET_KEY;
     if (url && secret) {
       const admin = createClient(url, secret);
       const { data: orgSettings } = await admin
         .from('org_settings')
-        .select('default_invoice_block_id, default_invoice_language, default_payment_method')
+        .select('default_invoice_block_id, default_invoice_language, default_payment_method, billingo_send_invoice_by_email')
         .eq('org_id', orgId)
         .maybeSingle();
-      request = mergeInvoiceRequestWithDefaults(request, orgSettings ?? null);
+      billingoOrgSettings = orgSettings ?? null;
+      if (needsBillingoDefaults(request)) {
+        request = mergeInvoiceRequestWithDefaults(request, orgSettings ?? null);
+      }
     }
   }
 
@@ -131,6 +136,22 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
       success: false,
       errorMessage: insertErr?.message || 'Failed to save invoice record',
     };
+  }
+
+  if (provider === 'billingo' && billingoOrgSettings?.billingo_send_invoice_by_email && request.buyer?.email?.trim()) {
+    try {
+      await sendBillingoDocumentByEmail(
+        { apiKey: String(credentials.apiKey || credentials.api_key || '') },
+        result.externalId,
+        [request.buyer.email.trim()]
+      );
+    } catch (err) {
+      logError(err instanceof Error ? err : new Error(String(err)), {
+        step: 'billingo_send_document',
+        orgId,
+        documentId: result.externalId,
+      });
+    }
   }
 
   if (moxieBaseUrl && moxieApiKey && result.pdfUrl) {

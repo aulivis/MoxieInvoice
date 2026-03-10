@@ -25,6 +25,7 @@ export const invoiceDefaultsSchema = z.object({
   default_invoice_block_id: z.coerce.number().int().positive().optional().nullable(),
   default_invoice_language: z.string().optional().nullable(),
   default_payment_method: z.string().optional().nullable(),
+  billingo_send_invoice_by_email: z.boolean().optional(),
 });
 
 // Merged schema (used by the legacy saveOrgSettingsAction and API POST)

@@ -29,6 +29,7 @@ interface Invoice {
   pdf_url: string | null;
   total_amount: number | null;
   payload_snapshot: unknown;
+  provider: 'billingo' | 'szamlazz';
 }
 
 interface Props {
@@ -77,6 +78,25 @@ export function InvoicesClientList({ invoices, locale }: Props) {
     if (amount == null) return '—';
     const formatted = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
     return currency ? `${formatted} ${currency}` : formatted;
+  }
+
+  function getBuyerName(inv: Invoice): string | null {
+    const snap = inv.payload_snapshot as { buyer?: { name?: string } } | null;
+    const name = snap?.buyer?.name?.trim();
+    return name || null;
+  }
+
+  function getBillingAppUrl(inv: Invoice): string | null {
+    if (!inv.external_id) return null;
+    if (inv.provider === 'billingo') return `https://app.billingo.hu/documents/${inv.external_id}`;
+    if (inv.provider === 'szamlazz') return 'https://online.szamlazz.hu/szamla/';
+    return null;
+  }
+
+  function openInBillingAppLabel(inv: Invoice): string {
+    if (inv.provider === 'billingo') return t('openInBillingo');
+    if (inv.provider === 'szamlazz') return t('openInSzamlazz');
+    return t('openInBillingApp');
   }
 
   const statusCounts: Record<FilterValue, number> = {
@@ -143,6 +163,11 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                 </p>
                 <StatusCell status={inv.status} label={statusLabel(inv.status)} />
               </div>
+              {getBuyerName(inv) && (
+                <p className="text-sm text-text-secondary mb-1 truncate" title={getBuyerName(inv) ?? undefined}>
+                  {getBuyerName(inv)}
+                </p>
+              )}
               <p className="flex items-center gap-1.5 text-xs text-text-secondary mb-1">
                 <span
                   className={[
@@ -162,6 +187,20 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                   {formatDate(inv.created_at)}
                 </span>
                 <span className="flex items-center gap-2">
+                  {getBillingAppUrl(inv) && (
+                    <a
+                      href={getBillingAppUrl(inv)!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[32px]"
+                      aria-label={openInBillingAppLabel(inv)}
+                      title={openInBillingAppLabel(inv)}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
                   {inv.pdf_url && (
                     <Link
                       href={inv.pdf_url}
@@ -225,9 +264,9 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                 <TableHead>{t('date')}</TableHead>
                 <TableHead>{t('status')}</TableHead>
                 <TableHead>{t('paymentStatus')}</TableHead>
+                <TableHead>{t('buyerName')}</TableHead>
                 <TableHead>{t('invoiceValue')}</TableHead>
                 <TableHead>{t('moxieInvoiceNumber')}</TableHead>
-                <TableHead>{t('errorColumn')}</TableHead>
                 <TableHead>{t('action')}</TableHead>
               </TableRow>
             </TableHeader>
@@ -246,8 +285,32 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                     <TableCell className="font-tabular-nums text-text-secondary">
                       {formatDate(inv.created_at)}
                     </TableCell>
-                    <TableCell>
-                      <StatusCell status={inv.status} label={statusLabel(inv.status)} />
+                    <TableCell className="min-w-0 max-w-[200px]">
+                      <div className="flex flex-col gap-1">
+                        <StatusCell status={inv.status} label={statusLabel(inv.status)} />
+                        {inv.status === 'failed' && inv.error_message && (
+                          <div className="mt-0.5">
+                            <button
+                              type="button"
+                              onClick={() => toggleError(inv.id)}
+                              className="inline-flex items-center gap-1 text-status-error hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded text-xs"
+                            >
+                              {t('errorSummary')}
+                              <svg
+                                className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                            {isExpanded && (
+                              <p className="mt-1 break-words text-xs bg-error-muted/20 rounded p-2 text-status-error">
+                                {inv.error_message}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <span
@@ -265,6 +328,11 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                         {paymentStatusLabel(inv.payment_status)}
                       </span>
                     </TableCell>
+                    <TableCell className="text-text-secondary max-w-[160px]">
+                      <span className="block truncate" title={getBuyerName(inv) ?? undefined}>
+                        {getBuyerName(inv) ?? '—'}
+                      </span>
+                    </TableCell>
                     <TableCell className="font-tabular-nums text-text-secondary">
                       {formatAmount(inv.total_amount ?? null, (inv.payload_snapshot as { currency?: string } | null)?.currency)}
                     </TableCell>
@@ -273,34 +341,22 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                         {inv.external_id ?? inv.moxie_invoice_id ?? '—'}
                       </span>
                     </TableCell>
-                    <TableCell className="text-sm text-status-error min-w-0 max-w-md">
-                      {inv.error_message ? (
-                        <div>
-                          <button
-                            type="button"
-                            onClick={() => toggleError(inv.id)}
-                            className="inline-flex items-center gap-1 hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded text-sm"
-                          >
-                            {t('errorSummary')}
-                            <svg
-                              className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                              fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </button>
-                          {isExpanded && (
-                            <p className="mt-1 break-words text-xs bg-error-muted/20 rounded p-2">
-                              {inv.error_message}
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-text-tertiary">—</span>
-                      )}
-                    </TableCell>
                     <TableCell>
                       <span className="flex items-center gap-2">
+                        {getBillingAppUrl(inv) && (
+                          <a
+                            href={getBillingAppUrl(inv)!}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[36px]"
+                            aria-label={openInBillingAppLabel(inv)}
+                            title={openInBillingAppLabel(inv)}
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        )}
                         {inv.pdf_url ? (
                           <Link
                             href={inv.pdf_url}

@@ -75,6 +75,81 @@ export async function listBillingoBlocks(
   return { blocks, defaultBlockId };
 }
 
+/** Billingo v3 document (GET /documents/{id}) – total and total_paid for payment status. */
+export interface BillingoDocumentPaymentInfo {
+  total: number;
+  total_paid: number;
+}
+
+/**
+ * Get a single document from Billingo by id. Used to check payment status (total_paid vs total).
+ * Returns null on 404 or when the document is not found.
+ */
+export async function getBillingoDocument(
+  credentials: BillingoCredentials,
+  documentId: string
+): Promise<BillingoDocumentPaymentInfo | null> {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'X-API-KEY': credentials.apiKey,
+  };
+
+  const res = await fetch(`${BILLINGO_API_BASE}/documents/${encodeURIComponent(documentId)}`, {
+    headers,
+  });
+
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Billingo document: ${res.status} ${errText}`);
+  }
+
+  const doc = (await res.json()) as {
+    total?: number;
+    total_paid?: number;
+  };
+  const total = Number(doc?.total) || 0;
+  const totalPaid = Number(doc?.total_paid) ?? 0;
+  return { total, total_paid: totalPaid };
+}
+
+/**
+ * Returns true if the document is considered paid (total_paid >= total and total > 0).
+ */
+export function isBillingoDocumentPaid(info: BillingoDocumentPaymentInfo): boolean {
+  return info.total > 0 && info.total_paid >= info.total;
+}
+
+/**
+ * Send document by email via Billingo API (POST /documents/{id}/send).
+ * @see https://app.swaggerhub.com/apis/Billingo/Billingo/3.0.13#/Document/SendDocument
+ * Only call when emails array is non-empty.
+ */
+export async function sendBillingoDocumentByEmail(
+  credentials: BillingoCredentials,
+  documentId: string,
+  emails: string[]
+): Promise<void> {
+  const validEmails = emails.filter((e) => typeof e === 'string' && e.trim().length > 0);
+  if (validEmails.length === 0) return;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'X-API-KEY': credentials.apiKey,
+  };
+
+  const res = await fetch(`${BILLINGO_API_BASE}/documents/${encodeURIComponent(documentId)}/send`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ emails: validEmails }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Billingo send document: ${res.status} ${errText}`);
+  }
+}
+
 /** Billingo v3 payment_method enum values (from API spec). User selects from these. */
 export const BILLINGO_PAYMENT_METHODS = [
   'aruhitel',

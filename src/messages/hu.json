@@ -74,8 +74,12 @@
     "newInvoice": "Új számla",
     "date": "Dátum",
     "status": "Státusz",
+    "buyerName": "Vevő",
     "invoiceValue": "Számla értéke",
     "moxieInvoiceNumber": "Moxie számla száma",
+    "openInBillingo": "Megnyitás a Billingo-ban",
+    "openInSzamlazz": "Megnyitás a Számlázz.hu-n",
+    "openInBillingApp": "Megnyitás a számlázóban",
     "numberOrId": "Szám / Külső ID",
     "errorColumn": "Hiba",
     "errorSummary": "Hibás adatok",
@@ -255,7 +259,10 @@
     "blocksLoadError": "Nem sikerült betölteni a számlatömböket. Ellenőrizd az API kulcsot.",
     "optionsLoading": "Opciók betöltése…",
     "defaultLanguage": "Nyelv",
-    "defaultPaymentMethod": "Fizetési mód"
+    "defaultPaymentMethod": "Fizetési mód",
+    "billingoSendByEmailTitle": "E-mail küldés",
+    "billingoSendByEmailLabel": "Számla automatikus kiküldése e-mailben (Billingo)",
+    "billingoSendByEmailHint": "Ez csak akkor működik, ha a vevőhöz meg van adva e-mail cím (pl. a Moxie ügyféladatokban)."
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF konverzió",

@@ -31,6 +31,7 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
   const [billingoPaymentMethods, setBillingoPaymentMethods] = useState<Array<{ value: string; label: string }>>([]);
   const [billingoLanguages, setBillingoLanguages] = useState<Array<{ value: string; label: string }>>([]);
   const [billingoOptionsLoading, setBillingoOptionsLoading] = useState(false);
+  const [billingoSendByEmail, setBillingoSendByEmail] = useState(false);
   const t = useTranslations('billing');
   const tCommon = useTranslations('common');
   const tSub = useTranslations('subscription');
@@ -81,6 +82,7 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
         if (savedBlockId) setDefaultBlockId(savedBlockId);
         if (d.default_invoice_language) setDefaultLanguage(d.default_invoice_language);
         if (d.default_payment_method) setDefaultPaymentMethod(d.default_payment_method);
+        setBillingoSendByEmail(d.billingo_send_invoice_by_email === true);
         setDefaultsFetched(true);
 
         setBillingoBlocksLoading(true);
@@ -226,6 +228,7 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
                     default_invoice_block_id: defaultBlockId ? Number(defaultBlockId) : null,
                     default_invoice_language: defaultLanguage,
                     default_payment_method: defaultPaymentMethod || null,
+                    billingo_send_invoice_by_email: billingoSendByEmail,
                   }),
                 });
                 if (res.ok) {
@@ -350,6 +353,23 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
                   className="mt-1"
                 />
               )}
+            </div>
+            <div className="pt-4 mt-4 border-t border-border-light">
+              <h4 className="text-sm font-semibold text-text-primary mb-2">{t('billingoSendByEmailTitle')}</h4>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={billingoSendByEmail}
+                  onChange={(e) => setBillingoSendByEmail(e.target.checked)}
+                  disabled={disabled}
+                  className="mt-1 rounded border-border-medium text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  aria-describedby="billingo-send-email-hint"
+                />
+                <span className="text-sm text-text-primary">{t('billingoSendByEmailLabel')}</span>
+              </label>
+              <p id="billingo-send-email-hint" className="text-xs text-text-secondary mt-1.5 ml-6">
+                {t('billingoSendByEmailHint')}
+              </p>
             </div>
             <Button type="submit" variant="primary" disabled={disabled || defaultsSaving}>
               {defaultsSaving ? tCommon('loading') : tCommon('save')}

@@ -74,8 +74,12 @@
     "newInvoice": "New invoice",
     "date": "Date",
     "status": "Status",
+    "buyerName": "Buyer",
     "invoiceValue": "Invoice value",
     "moxieInvoiceNumber": "Moxie invoice number",
+    "openInBillingo": "Open in Billingo",
+    "openInSzamlazz": "Open in Számlázz.hu",
+    "openInBillingApp": "Open in billing app",
     "numberOrId": "Number / External ID",
     "errorColumn": "Error",
     "errorSummary": "Incorrect data",
@@ -255,7 +259,10 @@
     "blocksLoadError": "Could not load invoice blocks. Check your API key.",
     "optionsLoading": "Loading options…",
     "defaultLanguage": "Language",
-    "defaultPaymentMethod": "Payment method"
+    "defaultPaymentMethod": "Payment method",
+    "billingoSendByEmailTitle": "Email sending",
+    "billingoSendByEmailLabel": "Automatically send invoice by email (Billingo)",
+    "billingoSendByEmailHint": "This only works when the customer has an email address set (e.g. in Moxie client details)."
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF conversion",

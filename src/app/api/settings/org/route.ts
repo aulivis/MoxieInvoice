@@ -73,6 +73,7 @@ export async function POST(request: Request) {
   if (body.default_invoice_block_id !== undefined) payload.default_invoice_block_id = body.default_invoice_block_id;
   if (body.default_invoice_language !== undefined) payload.default_invoice_language = body.default_invoice_language;
   if (body.default_payment_method !== undefined) payload.default_payment_method = body.default_payment_method;
+  if (body.billingo_send_invoice_by_email !== undefined) payload.billingo_send_invoice_by_email = body.billingo_send_invoice_by_email;
 
   await supabase.from('org_settings').upsert(payload as Record<string, never>, { onConflict: 'org_id' });
   return NextResponse.json({ ok: true });

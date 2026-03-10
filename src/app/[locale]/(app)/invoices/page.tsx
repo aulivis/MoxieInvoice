@@ -26,7 +26,7 @@ export default async function InvoicesListPage() {
   const supabase = await createClient();
   const { data: invoices } = await supabase
     .from('invoices')
-    .select('id, external_id, moxie_invoice_id, status, payment_status, error_message, created_at, pdf_url, total_amount, payload_snapshot')
+    .select('id, external_id, moxie_invoice_id, status, payment_status, error_message, created_at, pdf_url, total_amount, payload_snapshot, provider')
     .eq('org_id', orgId)
     .order('created_at', { ascending: false })
     .limit(50);
