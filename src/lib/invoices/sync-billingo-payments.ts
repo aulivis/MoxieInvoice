@@ -1,6 +1,6 @@
 /**
- * Pull-based sync: fetch payment status from Billingo (GET document) and update
- * invoices.payment_status + optionally notify Moxie.
+ * Pull-based sync: fetch payment status from the billing provider (Billingo or Számlázz.hu)
+ * and update invoices.payment_status + optionally notify Moxie.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -14,6 +14,11 @@ import {
   isBillingoDocumentPaid,
   type BillingoCredentials,
 } from './billingo';
+import {
+  getSzamlazzDocument,
+  isSzamlazzDocumentPaid,
+  type SzamlazzCredentials,
+} from './szamlazz';
 
 const SYNC_INVOICES_LIMIT = 100;
 
@@ -24,6 +29,7 @@ export interface InvoiceForPaymentSync {
   moxie_invoice_id: string | null;
   total_amount: number | null;
   payload_snapshot: { buyer?: { name?: string }; items?: unknown[] } | null;
+  pdf_url: string | null;
 }
 
 /**
@@ -114,8 +120,9 @@ export async function markInvoicePaidAndNotifyMoxie(
 }
 
 /**
- * For one org: fetch open invoices with external_id, GET each document from Billingo,
- * and if paid, update payment_status and notify Moxie.
+ * For one org: fetch open invoices with external_id, query each document from the
+ * configured billing provider (Billingo or Számlázz.hu), and if paid update
+ * payment_status + notify Moxie.
  */
 export async function syncBillingoPaymentsForOrg(
   orgId: string,
@@ -127,24 +134,35 @@ export async function syncBillingoPaymentsForOrg(
     .eq('org_id', orgId)
     .maybeSingle();
 
-  if (!billing || billing.provider !== 'billingo' || !billing.credentials_encrypted) {
+  const provider = billing?.provider;
+  if (!billing || (provider !== 'billingo' && provider !== 'szamlazz') || !billing.credentials_encrypted) {
     return { updated: 0, moxieNotified: 0, moxieErrors: [] };
   }
 
-  let credentials: BillingoCredentials;
+  // Decrypt and parse credentials per provider
+  let billingoCredentials: BillingoCredentials | null = null;
+  let szamlazzCredentials: SzamlazzCredentials | null = null;
   try {
     const rawCreds = billing.credentials_encrypted;
     const decrypted =
       typeof rawCreds === 'string' ? await decrypt(rawCreds) : JSON.stringify(rawCreds);
-    const parsed = JSON.parse(decrypted) as { apiKey?: string; api_key?: string };
-    credentials = { apiKey: parsed.apiKey ?? parsed.api_key ?? '' };
+    const parsed = JSON.parse(decrypted) as Record<string, string>;
+    if (provider === 'billingo') {
+      billingoCredentials = { apiKey: parsed.apiKey ?? parsed.api_key ?? '' };
+    } else {
+      szamlazzCredentials = {
+        agentKey: parsed.agentKey ?? parsed.agent_key,
+        username: parsed.username,
+        password: parsed.password,
+      };
+    }
   } catch {
     return { updated: 0, moxieNotified: 0, moxieErrors: [] };
   }
 
   const { data: invoices } = await supabase
     .from('invoices')
-    .select('id, org_id, external_id, moxie_invoice_id, total_amount, payload_snapshot')
+    .select('id, org_id, external_id, moxie_invoice_id, total_amount, payload_snapshot, pdf_url')
     .eq('org_id', orgId)
     .not('external_id', 'is', null)
     .eq('payment_status', 'open')
@@ -160,20 +178,52 @@ export async function syncBillingoPaymentsForOrg(
     const externalId = inv.external_id;
     if (!externalId) continue;
 
-    let docInfo;
-    try {
-      docInfo = await getBillingoDocument(credentials, externalId);
-    } catch (err) {
-      logError(err instanceof Error ? err : new Error(String(err)), {
-        step: 'sync_billingo_get_document',
-        orgId,
-        externalId,
-        invoiceId: inv.id,
-      });
-      continue;
+    // --- Fetch document info from the billing provider ---
+    let isPaid = false;
+    let fetchedPublicUrl: string | undefined;
+
+    if (provider === 'billingo' && billingoCredentials) {
+      let docInfo;
+      try {
+        docInfo = await getBillingoDocument(billingoCredentials, externalId);
+      } catch (err) {
+        logError(err instanceof Error ? err : new Error(String(err)), {
+          step: 'sync_billingo_get_document',
+          orgId,
+          externalId,
+          invoiceId: inv.id,
+        });
+        continue;
+      }
+      if (!docInfo) continue;
+      isPaid = isBillingoDocumentPaid(docInfo);
+      fetchedPublicUrl = docInfo.public_url;
+    } else if (provider === 'szamlazz' && szamlazzCredentials) {
+      let docInfo;
+      try {
+        docInfo = await getSzamlazzDocument(szamlazzCredentials, externalId);
+      } catch (err) {
+        logError(err instanceof Error ? err : new Error(String(err)), {
+          step: 'sync_szamlazz_get_document',
+          orgId,
+          externalId,
+          invoiceId: inv.id,
+        });
+        continue;
+      }
+      if (!docInfo) continue;
+      isPaid = isSzamlazzDocumentPaid(docInfo);
     }
 
-    if (!docInfo || !isBillingoDocumentPaid(docInfo)) continue;
+    // Opportunistically save pdf_url if the provider returned one and it's missing in the DB.
+    if (fetchedPublicUrl && !inv.pdf_url) {
+      await supabase
+        .from('invoices')
+        .update({ pdf_url: fetchedPublicUrl })
+        .eq('id', inv.id);
+    }
+
+    if (!isPaid) continue;
 
     try {
       const { moxieNotified: notified, moxieError } = await markInvoicePaidAndNotifyMoxie(supabase, inv);
@@ -186,7 +236,7 @@ export async function syncBillingoPaymentsForOrg(
       }
     } catch (err) {
       logError(err instanceof Error ? err : new Error(String(err)), {
-        step: 'sync_billingo_mark_paid',
+        step: 'sync_provider_mark_paid',
         orgId,
         invoiceId: inv.id,
       });

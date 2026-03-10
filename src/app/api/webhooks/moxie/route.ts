@@ -179,7 +179,7 @@ function normalizeMoxiePayload(
           quantity: qty,
           unit: 'db',
           netUnitPrice: rate,
-          vatPercent: Number(item.vat ?? 27),
+          vatPercent: Number(item.vat ?? 0),
         };
       });
     } else {
@@ -188,7 +188,7 @@ function normalizeMoxiePayload(
       const subTotal = Number(body.subTotal ?? total - tax);
       if (subTotal <= 0 && total <= 0) return null;
       const netTotal = total > 0 && tax >= 0 ? total - tax : subTotal;
-      const vatPct = netTotal > 0 && tax > 0 ? Math.round((tax / netTotal) * 100) : 27;
+      const vatPct = netTotal > 0 && tax > 0 ? Math.round((tax / netTotal) * 100) : 0;
       items = [
         {
           name: 'Invoice',
@@ -244,7 +244,7 @@ function normalizeMoxiePayload(
       quantity: Number(item.quantity ?? 1),
       unit: 'db',
       netUnitPrice: Number(item.rate ?? item.unit_price ?? 0),
-      vatPercent: Number(item.vat ?? 27),
+      vatPercent: Number(item.vat ?? 0),
     })),
     currency: (body.currency as string) || 'HUF',
     fulfillmentDate: (body.fulfillment_date as string) || new Date().toISOString().slice(0, 10),

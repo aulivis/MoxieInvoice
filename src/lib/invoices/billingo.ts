@@ -81,6 +81,8 @@ export interface BillingoDocumentPaymentInfo {
   total_paid: number;
   /** True when Billingo response had status === 'paid' (used when total_paid not present). */
   _paid?: boolean;
+  /** Public URL of the invoice viewer (public_url from Billingo). */
+  public_url?: string;
 }
 
 /**
@@ -118,6 +120,8 @@ export async function getBillingoDocument(
     payment_status?: string;
     // Fallback status field
     status?: string;
+    // Public URL of the invoice viewer
+    public_url?: string;
   };
   const total = Number(doc?.gross_total ?? doc?.total) || 0;
   const totalPaid = Number(doc?.paid_amount ?? doc?.total_paid ?? doc?.totalPaid) || 0;
@@ -126,7 +130,7 @@ export async function getBillingoDocument(
     (typeof doc?.status === 'string' && doc.status.toLowerCase() === 'paid');
   // Consider paid if explicit payment_status/status === 'paid' OR total_paid >= total
   const paid = statusPaid || (total > 0 && totalPaid >= total);
-  return { total, total_paid: totalPaid, _paid: paid };
+  return { total, total_paid: totalPaid, _paid: paid, public_url: doc.public_url ?? undefined };
 }
 
 /**
@@ -339,9 +343,24 @@ export async function createBillingoInvoice(
     public_url?: string;
   };
 
+  // Billingo does not always return public_url in the POST response.
+  // Fall back to GET /documents/{id} to retrieve it.
+  let publicUrl: string | undefined = doc.public_url;
+  if (!publicUrl) {
+    try {
+      const getRes = await fetch(`${BILLINGO_API_BASE}/documents/${doc.id}`, { headers });
+      if (getRes.ok) {
+        const getDoc = (await getRes.json()) as { public_url?: string };
+        publicUrl = getDoc.public_url ?? undefined;
+      }
+    } catch {
+      // Non-fatal — invoice was created, just the URL is missing
+    }
+  }
+
   return {
     externalId: String(doc.id),
     invoiceNumber: doc.invoice_number || String(doc.id),
-    pdfUrl: doc.public_url,
+    pdfUrl: publicUrl,
   };
 }

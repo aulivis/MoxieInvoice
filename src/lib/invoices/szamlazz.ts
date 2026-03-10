@@ -90,11 +90,86 @@ function parseResponseXml(xml: string): { invoiceNumber?: string; pdfUrl?: strin
   const errorMatch = xml.match(/<hiba(?:kód)?>([^<]*)<\/hiba(?:kód)?>/i) ?? xml.match(/<hiba>([^<]*)<\/hiba>/i);
   if (errorMatch) return { error: errorMatch[1].trim() };
   const numMatch = xml.match(/<szamlaszam>([^<]*)<\/szamlaszam>/i);
-  const pdfMatch = xml.match(/<pdf>([^<]*)<\/pdf>/i);
+  // szamlakulcsar is an access key that allows viewing the invoice publicly.
+  // We build a viewer URL from it instead of storing the base64 <pdf> content.
+  const kulcsarMatch = xml.match(/<szamlakulcsar>([^<]*)<\/szamlakulcsar>/i);
+  let pdfUrl: string | undefined;
+  if (numMatch && kulcsarMatch) {
+    const szamlaszam = numMatch[1].trim();
+    const kulcsar = kulcsarMatch[1].trim();
+    if (szamlaszam && kulcsar) {
+      pdfUrl = `https://www.szamlazz.hu/szamla/printpreview?szamlaszam=${encodeURIComponent(szamlaszam)}&keyman=${encodeURIComponent(kulcsar)}`;
+    }
+  }
   return {
     invoiceNumber: numMatch ? numMatch[1].trim() : undefined,
-    pdfUrl: pdfMatch ? pdfMatch[1].trim() : undefined,
+    pdfUrl,
   };
+}
+
+/** Számlázz.hu payment status info returned by getSzamlazzDocument. */
+export interface SzamlazzDocumentPaymentInfo {
+  total: number;
+  total_paid: number;
+  _paid: boolean;
+}
+
+/**
+ * Query payment status for an existing invoice via action-xmlszamlainformacio.
+ * The invoice number is used as the identifier (external_id == invoice_number for Számlázz.hu).
+ * Returns null on 404, auth error, or unexpected response.
+ */
+export async function getSzamlazzDocument(
+  credentials: SzamlazzCredentials,
+  invoiceNumber: string
+): Promise<SzamlazzDocumentPaymentInfo | null> {
+  const authXml = credentials.agentKey
+    ? `<szamlaagentkulcs>${escapeXml(credentials.agentKey)}</szamlaagentkulcs>`
+    : `<felhasznalo>${escapeXml(credentials.username || '')}</felhasznalo><jelszo>${escapeXml(credentials.password || '')}</jelszo>`;
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<xmlszamlainformacio xmlns="http://www.szamlazz.hu/xmlszamlainformacio" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.szamlazz.hu/xmlszamlainformacio https://www.szamlazz.hu/docs/xsd/agent/xmlszamlainformacio.xsd">
+  <beallitasok>
+    ${authXml}
+    <szamlaszam>${escapeXml(invoiceNumber)}</szamlaszam>
+  </beallitasok>
+</xmlszamlainformacio>`;
+
+  let text: string;
+  try {
+    const form = new FormData();
+    form.append('action-xmlszamlainformacio', new Blob([xml], { type: 'application/xml' }));
+    const res = await fetch(SZAMLAZZ_ENDPOINT, { method: 'POST', body: form });
+    if (!res.ok) return null;
+    text = await res.text();
+  } catch {
+    return null;
+  }
+
+  // Non-zero hibakod means an error (0 = success)
+  const errorCodeMatch = text.match(/<hibakod>\s*([^<]*)\s*<\/hibakod>/i);
+  if (errorCodeMatch && errorCodeMatch[1].trim() !== '0') return null;
+
+  // Total amount: <brutto> can appear at top level or inside <alap>
+  const bruttoMatch = text.match(/<brutto>\s*([^<]*)\s*<\/brutto>/i);
+  const total = bruttoMatch ? Math.abs(Number(bruttoMatch[1].trim().replace(',', '.'))) : 0;
+
+  // Sum all <osszeg> values inside <kifizetesek> payment records
+  const paymentMatches = [...text.matchAll(/<osszeg>\s*([^<]*)\s*<\/osszeg>/gi)];
+  const totalPaid = paymentMatches.reduce(
+    (sum, m) => sum + Math.abs(Number(m[1].trim().replace(',', '.'))),
+    0
+  );
+
+  const paid = total > 0 && totalPaid >= total;
+  return { total, total_paid: totalPaid, _paid: paid };
+}
+
+/**
+ * Returns true if the Számlázz.hu document is considered fully paid.
+ */
+export function isSzamlazzDocumentPaid(info: SzamlazzDocumentPaymentInfo): boolean {
+  return info._paid || (info.total > 0 && info.total_paid >= info.total);
 }
 
 export async function createSzamlazzInvoice(
