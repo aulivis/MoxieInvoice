@@ -65,6 +65,7 @@ export interface Invoice {
   provider: BillingProviderType;
   status: InvoiceStatus;
   pdf_url: string | null;
+  total_amount: number | null;
   payload_snapshot: Record<string, unknown> | null;
   error_message: string | null;
   created_at: string;

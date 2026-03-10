@@ -16,6 +16,7 @@ const invoiceItemSchema = z.object({
   unit: z.string().min(1),
   netUnitPrice: z.coerce.number().min(0),
   vatPercent: z.coerce.number().min(0).max(100),
+  unitPriceType: z.enum(['net', 'gross']).optional(),
 });
 
 export const normalizedInvoiceRequestSchema = z.object({
@@ -27,6 +28,8 @@ export const normalizedInvoiceRequestSchema = z.object({
   paymentMethod: z.string().optional(),
   comment: z.string().optional(),
   invoiceType: z.string().optional(),
+  blockId: z.coerce.number().int().positive().optional(),
+  language: z.string().optional(),
 });
 
 export const createInvoiceBodySchema = z.object({

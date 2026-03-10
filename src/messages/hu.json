@@ -70,8 +70,11 @@
     "newInvoice": "Új számla",
     "date": "Dátum",
     "status": "Státusz",
+    "invoiceValue": "Számla értéke",
+    "moxieInvoiceNumber": "Moxie számla száma",
     "numberOrId": "Szám / Külső ID",
     "errorColumn": "Hiba",
+    "errorSummary": "Hibás adatok",
     "action": "Művelet",
     "empty": "Még nincs számla.",
     "count": "{count, plural, =0 {Nincs számla} other {# számla}}",
@@ -79,7 +82,11 @@
     "statusCreated": "Létrehozva",
     "statusSynced": "Moxie-nak elküldve",
     "pdf": "PDF",
-    "details": "Részletek"
+    "details": "Részletek",
+    "refresh": "Frissítés",
+    "delete": "Törlés",
+    "deleteFailed": "Hibás sor törlése",
+    "deleting": "Törlés..."
   },
   "invoicesNew": {
     "title": "Új számla",
@@ -165,6 +172,7 @@
   "billingoValidation": {
     "blocked": "A számla generálását a Billingo követelményei miatt blokkoltuk, mert egy vagy több adat hiányzik vagy érvénytelen.",
     "missingField": "A következő kötelező mező hiányzik: {field}.",
+    "missingFields": "A következő kötelező mező hiányzik: {fields}.",
     "invalidValue": "A(z) „{field}” mező értéke nem megfelelő.",
     "invalidValueWithDetail": "A(z) „{field}” mező értéke nem megfelelő (tétel {value}).",
     "fixAndRetry": "Ha kijavítod az adatokat, a számla újra beküldhető (pl. a Moxie-ban a számlát Sent-re állítva, vagy az Új számla űrlapról).",
@@ -178,16 +186,20 @@
       "dueDate": "fizetési határidő",
       "currency": "pénznem",
       "paymentMethod": "fizetési mód",
+      "blockId": "számlatömb",
+      "language": "nyelv",
       "items": "tételek",
       "itemName": "tétel megnevezése",
       "quantity": "mennyiség",
       "netUnitPrice": "nettó egységár",
+      "unitPriceType": "egységár típusa",
       "vatPercent": "ÁFA százalék"
     }
   },
   "szamlazzValidation": {
     "blocked": "A számla generálását a Számlázz.hu követelményei miatt blokkoltuk, mert egy vagy több adat hiányzik vagy érvénytelen.",
     "missingField": "A következő kötelező mező hiányzik: {field}.",
+    "missingFields": "A következő kötelező mező hiányzik: {fields}.",
     "invalidValue": "A(z) „{field}” mező értéke nem megfelelő.",
     "invalidValueWithDetail": "A(z) „{field}” mező értéke nem megfelelő (tétel {value}).",
     "fixAndRetry": "Ha kijavítod az adatokat, a számla újra beküldhető (pl. a Moxie-ban a számlát Sent-re állítva, vagy az Új számla űrlapról).",
@@ -218,7 +230,12 @@
     "sellerName": "Eladó neve (opcionális)",
     "saved": "Mentve.",
     "statusNotConfigured": "Nincs beállítva",
-    "statusLive": "Él"
+    "statusLive": "Él",
+    "invoiceDefaultsTitle": "Alapértelmezett számla mezők (Billingo)",
+    "invoiceDefaultsHint": "Ha a Moxie számla nem ad meg értéket, ezek kerülnek használatra.",
+    "defaultBlockId": "Számlatömb (block id)",
+    "defaultLanguage": "Nyelv",
+    "defaultPaymentMethod": "Fizetési mód"
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF konverzió",

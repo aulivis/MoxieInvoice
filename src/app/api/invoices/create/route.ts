@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { hasActiveSubscription } from '@/lib/subscription';
 import { createInvoice } from '@/lib/invoices/orchestrator';
+import { mergeInvoiceRequestWithDefaults } from '@/lib/invoices/merge-defaults';
+import { computeTotalAmount } from '@/lib/invoices/total-amount';
 import { createInvoiceBodySchema, validate, validationErrorResponse } from '@/lib/schemas';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { decrypt } from '@/lib/crypto';
@@ -72,24 +74,34 @@ export async function POST(request: Request) {
     .eq('org_id', profile.organization_id)
     .maybeSingle();
 
+  const { data: orgSettings } = await supabase
+    .from('org_settings')
+    .select('default_invoice_block_id, default_invoice_language, default_payment_method')
+    .eq('org_id', profile.organization_id)
+    .maybeSingle();
+
+  const mergedRequest = mergeInvoiceRequestWithDefaults(body.request, orgSettings ?? null);
+
   const locale = body.locale === 'en' ? 'en' : 'hu';
   const result = await createInvoice({
     orgId: profile.organization_id,
     provider: billing.provider,
     credentials: await decryptCredentials(billing.credentials_encrypted),
-    request: body.request,
+    request: mergedRequest,
     moxieBaseUrl: moxie?.base_url ?? undefined,
     moxieApiKey: moxie?.api_key_encrypted ? await decrypt(moxie.api_key_encrypted) : undefined,
     locale,
   });
 
   if (!result.success) {
+    const totalAmount = computeTotalAmount(mergedRequest);
     await supabase.from('invoices').insert({
       org_id: profile.organization_id,
       provider: billing.provider,
       status: 'failed',
       error_message: result.errorMessage,
-      payload_snapshot: body.request as unknown as Record<string, unknown>,
+      total_amount: totalAmount,
+      payload_snapshot: mergedRequest as unknown as Record<string, unknown>,
     });
     return NextResponse.json(
       { error: result.errorMessage, success: false },

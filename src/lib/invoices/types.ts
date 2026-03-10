@@ -1,5 +1,12 @@
+/** Billingo accepts these unit_price_type values. */
+export type UnitPriceType = 'net' | 'gross';
+
+/** Billingo accepts these VAT percentages (item.vat). */
+export const BILLINGO_ALLOWED_VAT_PERCENTS = [0, 5, 18, 27] as const;
+
 /**
  * Normalized invoice request used by both Billingo and Számlázz.hu adapters.
+ * blockId, language, paymentMethod are required for Billingo (or use org defaults).
  */
 export interface NormalizedInvoiceRequest {
   buyer: {
@@ -17,6 +24,8 @@ export interface NormalizedInvoiceRequest {
     unit: string;
     netUnitPrice: number;
     vatPercent: number;
+    /** Billingo: required when product_id is not present. Default 'net'. */
+    unitPriceType?: UnitPriceType;
   }>;
   currency: string;
   fulfillmentDate: string; // YYYY-MM-DD
@@ -24,6 +33,10 @@ export interface NormalizedInvoiceRequest {
   paymentMethod?: string;
   comment?: string;
   invoiceType?: string; // e.g. 'invoice', 'proforma', 'advance'
+  /** Billingo: invoice block id (required). */
+  blockId?: number;
+  /** Billingo: document language e.g. 'hu', 'en' (required). */
+  language?: string;
 }
 
 export interface InvoiceResult {

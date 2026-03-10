@@ -6,9 +6,23 @@ import { saveBillingAction, type SettingsState } from '@/app/actions/settings';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
+import { Select } from '@/components/ui/Select';
 
 const disabledInputClass =
   'disabled:opacity-60 disabled:cursor-not-allowed';
+
+const BILLINGO_PAYMENT_METHODS = [
+  'bank_transfer',
+  'cash',
+  'bankcard',
+  'elore_utalas',
+  'levonas',
+  'postautalvany',
+  'postai_csekk',
+  'coupon',
+  'skrill',
+  'barion',
+] as const;
 
 export function BillingProviderForm({ hasSubscription = true }: { hasSubscription?: boolean }) {
   const [provider, setProvider] = useState<'billingo' | 'szamlazz'>('billingo');
@@ -16,6 +30,12 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
   const [hasCredentials, setHasCredentials] = useState(false);
   const [fetched, setFetched] = useState(false);
   const [state, formAction] = useActionState<SettingsState | null, FormData>(saveBillingAction, null);
+  const [defaultBlockId, setDefaultBlockId] = useState('');
+  const [defaultLanguage, setDefaultLanguage] = useState<'hu' | 'en'>('hu');
+  const [defaultPaymentMethod, setDefaultPaymentMethod] = useState('bank_transfer');
+  const [defaultsFetched, setDefaultsFetched] = useState(false);
+  const [defaultsSaving, setDefaultsSaving] = useState(false);
+  const [defaultsSaved, setDefaultsSaved] = useState(false);
   const t = useTranslations('billing');
   const tCommon = useTranslations('common');
   const tSub = useTranslations('subscription');
@@ -51,6 +71,22 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
     if (state?.success) fetchBilling();
   }, [state?.success, fetchBilling]);
 
+  useEffect(() => {
+    if (provider !== 'billingo') {
+      setDefaultsFetched(true);
+      return;
+    }
+    fetch('/api/settings/org')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.default_invoice_block_id != null) setDefaultBlockId(String(d.default_invoice_block_id));
+        if (d.default_invoice_language === 'hu' || d.default_invoice_language === 'en') setDefaultLanguage(d.default_invoice_language);
+        if (d.default_payment_method) setDefaultPaymentMethod(d.default_payment_method);
+        setDefaultsFetched(true);
+      })
+      .catch(() => setDefaultsFetched(true));
+  }, [provider]);
+
   const inputClass =
     'w-full rounded-lg border border-border-medium bg-background-card px-3 py-2.5 text-base min-h-[44px] text-text-primary placeholder:text-text-disabled focus-visible:outline-none focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-primary/10 ' +
     (disabled ? disabledInputClass : '');
@@ -82,17 +118,19 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
           <label htmlFor="billing-provider" className={labelClass}>
             {t('provider')}
           </label>
-          <select
+          <Select
             id="billing-provider"
             name="provider"
             value={provider}
-            onChange={(e) => setProvider(e.target.value as 'billingo' | 'szamlazz')}
-            className={inputClass}
+            options={[
+              { value: 'billingo', label: 'Billingo' },
+              { value: 'szamlazz', label: 'Számlázz.hu' },
+            ]}
+            onChange={(v) => setProvider(v as 'billingo' | 'szamlazz')}
             disabled={disabled}
-          >
-            <option value="billingo">Billingo</option>
-            <option value="szamlazz">Számlázz.hu</option>
-          </select>
+            aria-label={t('provider')}
+            className="mt-1"
+          />
         </div>
         {provider === 'billingo' && (
           <div>
@@ -144,6 +182,94 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
         {displayActionError && <Alert variant="error">{displayActionError}</Alert>}
         {state?.success && <Alert variant="success">{t('saved')}</Alert>}
       </form>
+
+      {provider === 'billingo' && (
+        <div className="mt-8 pt-6 border-t border-border-light">
+          <h3 className="text-sm font-semibold text-text-primary mb-1">{t('invoiceDefaultsTitle')}</h3>
+          <p className="text-xs text-text-secondary mb-4">{t('invoiceDefaultsHint')}</p>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setDefaultsSaving(true);
+              setDefaultsSaved(false);
+              try {
+                const current = await fetch('/api/settings/org').then((r) => r.json());
+                const res = await fetch('/api/settings/org', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    ...current,
+                    default_invoice_block_id: defaultBlockId ? Number(defaultBlockId) : null,
+                    default_invoice_language: defaultLanguage,
+                    default_payment_method: defaultPaymentMethod || null,
+                  }),
+                });
+                if (res.ok) {
+                  setDefaultsSaved(true);
+                  setTimeout(() => setDefaultsSaved(false), 3000);
+                }
+              } finally {
+                setDefaultsSaving(false);
+              }
+            }}
+            className="space-y-4 max-w-lg"
+          >
+            <div>
+              <label htmlFor="default-block-id" className={labelClass}>
+                {t('defaultBlockId')}
+              </label>
+              <input
+                id="default-block-id"
+                type="number"
+                min={1}
+                value={defaultBlockId}
+                onChange={(e) => setDefaultBlockId(e.target.value)}
+                placeholder="1"
+                className={inputClass}
+                disabled={disabled}
+              />
+            </div>
+            <div>
+              <label htmlFor="default-language" className={labelClass}>
+                {t('defaultLanguage')}
+              </label>
+              <Select<'hu' | 'en'>
+                id="default-language"
+                value={defaultLanguage}
+                options={[
+                  { value: 'hu', label: 'Magyar', leading: '🇭🇺' },
+                  { value: 'en', label: 'English', leading: '🇬🇧' },
+                ]}
+                onChange={(v) => setDefaultLanguage(v)}
+                disabled={disabled}
+                aria-label={t('defaultLanguage')}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label htmlFor="default-payment-method" className={labelClass}>
+                {t('defaultPaymentMethod')}
+              </label>
+              <Select
+                id="default-payment-method"
+                value={defaultPaymentMethod}
+                options={BILLINGO_PAYMENT_METHODS.map((value) => ({
+                  value,
+                  label: value.replace(/_/g, ' '),
+                }))}
+                onChange={setDefaultPaymentMethod}
+                disabled={disabled}
+                aria-label={t('defaultPaymentMethod')}
+                className="mt-1"
+              />
+            </div>
+            <Button type="submit" variant="primary" disabled={disabled || defaultsSaving}>
+              {defaultsSaving ? tCommon('loading') : tCommon('save')}
+            </Button>
+            {defaultsSaved && <Alert variant="success">{t('saved')}</Alert>}
+          </form>
+        </div>
+      )}
     </div>
   );
 }

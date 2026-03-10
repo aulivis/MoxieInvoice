@@ -20,5 +20,7 @@ export {
 } from './Table';
 export type { TableProps } from './Table';
 export { Spinner } from './Spinner';
+export { Select } from './Select';
+export type { SelectOption, SelectProps } from './Select';
 export { EmptyState } from './EmptyState';
 export { StatCard } from './StatCard';

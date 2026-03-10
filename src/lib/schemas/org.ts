@@ -20,8 +20,17 @@ export const scheduleSettingsSchema = z.object({
   end_time: z.string().optional(),
 });
 
-// Merged schema (used by the legacy saveOrgSettingsAction)
-export const orgSettingsBodySchema = currencySettingsSchema.merge(scheduleSettingsSchema);
+/** Billingo default fields: applied when request does not override (block, language, payment_method). */
+export const invoiceDefaultsSchema = z.object({
+  default_invoice_block_id: z.coerce.number().int().positive().optional().nullable(),
+  default_invoice_language: z.enum(['hu', 'en']).optional().nullable(),
+  default_payment_method: z.string().optional().nullable(),
+});
+
+// Merged schema (used by the legacy saveOrgSettingsAction and API POST)
+export const orgSettingsBodySchema = currencySettingsSchema
+  .merge(scheduleSettingsSchema)
+  .merge(invoiceDefaultsSchema);
 
 export type OrgSettingsBody = z.infer<typeof orgSettingsBodySchema>;
 export type CurrencySettings = z.infer<typeof currencySettingsSchema>;

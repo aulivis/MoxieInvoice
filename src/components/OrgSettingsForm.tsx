@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { saveOrgSettingsAction, type SettingsState } from '@/app/actions/settings';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
+import { Select } from '@/components/ui/Select';
 
 const disabledInputClass =
   'disabled:opacity-60 disabled:cursor-not-allowed';
@@ -93,11 +94,19 @@ export function OrgSettingsForm({ hasSubscription = true }: { hasSubscription?: 
         </div>
         <div>
           <h3 className="text-section-title mb-2">{t('scheduleTitle')}</h3>
-          <select name="schedule_type" value={scheduleType} onChange={(e) => setScheduleType(e.target.value as typeof scheduleType)} className={inputClass} disabled={disabled}>
-            <option value="always">{t('scheduleAlways')}</option>
-            <option value="weekdays_only">{t('scheduleWeekdays')}</option>
-            <option value="business_hours_only">{t('scheduleBusiness')}</option>
-          </select>
+          <Select
+            name="schedule_type"
+            value={scheduleType}
+            options={[
+              { value: 'always', label: t('scheduleAlways') },
+              { value: 'weekdays_only', label: t('scheduleWeekdays') },
+              { value: 'business_hours_only', label: t('scheduleBusiness') },
+            ]}
+            onChange={(v) => setScheduleType(v as typeof scheduleType)}
+            disabled={disabled}
+            aria-label={t('scheduleTitle')}
+            className="mt-1"
+          />
           {scheduleType === 'business_hours_only' && (
             <div className="mt-2 flex gap-2 items-center">
               <input type="time" name="start_time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className={inputClass} disabled={disabled} />

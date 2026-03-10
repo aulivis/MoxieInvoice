@@ -4,6 +4,7 @@
  */
 
 import type { NormalizedInvoiceRequest } from './types';
+import { BILLINGO_ALLOWED_VAT_PERCENTS } from './types';
 
 // Lazy-load messages to avoid pulling all locales into server bundle when only one is used
 const getMessages = (locale: 'hu' | 'en') => {
@@ -16,6 +17,7 @@ const getMessages = (locale: 'hu' | 'en') => {
 interface BillingoValidationMessages {
   blocked: string;
   missingField: string;
+  missingFields: string;
   invalidValue: string;
   invalidValueWithDetail: string;
   fixAndRetry: string;
@@ -104,16 +106,26 @@ export function validateBillingoRequest(
     errors.push({ code: 'MISSING_FIELD', field: 'currency' });
   }
 
-  // --- Payment method (optional but if present must be allowed) ---
-  if (
-    request.paymentMethod !== undefined &&
-    request.paymentMethod !== '' &&
-    !ALLOWED_PAYMENT_METHODS.has(request.paymentMethod.trim().toLowerCase())
-  ) {
+  // --- Billingo-specific: block_id, language, payment_method (required) ---
+  if (request.blockId === undefined || request.blockId === null || Number.isNaN(Number(request.blockId))) {
+    errors.push({ code: 'MISSING_FIELD', field: 'blockId' });
+  } else if (typeof request.blockId === 'number' && request.blockId < 1) {
+    errors.push({ code: 'INVALID_VALUE', field: 'blockId', value: String(request.blockId) });
+  }
+  if (empty(request.language)) {
+    errors.push({ code: 'MISSING_FIELD', field: 'language' });
+  } else {
+    const lang = request.language!.trim().toLowerCase();
+    if (lang !== 'hu' && lang !== 'en') {
+      errors.push({ code: 'INVALID_VALUE', field: 'language', value: request.language! });
+    }
+  }
+  const paymentMethodNorm = request.paymentMethod?.trim().toLowerCase() ?? '';
+  if (empty(request.paymentMethod) || !ALLOWED_PAYMENT_METHODS.has(paymentMethodNorm)) {
     errors.push({
-      code: 'INVALID_VALUE',
+      code: request.paymentMethod ? 'INVALID_VALUE' : 'MISSING_FIELD',
       field: 'paymentMethod',
-      value: request.paymentMethod,
+      value: request.paymentMethod || '',
     });
   }
 
@@ -158,6 +170,20 @@ export function validateBillingoRequest(
           field: 'vatPercent',
           value: String(index + 1),
         });
+      } else if (!BILLINGO_ALLOWED_VAT_PERCENTS.includes(item.vatPercent as (typeof BILLINGO_ALLOWED_VAT_PERCENTS)[number])) {
+        errors.push({
+          code: 'INVALID_VALUE',
+          field: 'vatPercent',
+          value: String(index + 1),
+        });
+      }
+      const unitPriceType = item.unitPriceType ?? 'net';
+      if (unitPriceType !== 'net' && unitPriceType !== 'gross') {
+        errors.push({
+          code: 'INVALID_VALUE',
+          field: 'unitPriceType',
+          value: String(index + 1),
+        });
       }
     });
   }
@@ -170,6 +196,7 @@ export function validateBillingoRequest(
 
 /**
  * Build a single, detailed user-facing message for Billingo validation errors in the given locale.
+ * "A következő kötelező mező hiányzik:" appears once, followed by comma-separated field names.
  * Used for error_message in DB and for API/UI responses.
  */
 export function buildBillingoValidationMessage(
@@ -177,23 +204,18 @@ export function buildBillingoValidationMessage(
   locale: 'hu' | 'en'
 ): string {
   const m = getMessages(locale);
-  const lines: string[] = [m.blocked];
+  const fieldLabels = new Set<string>();
   for (const e of errors) {
-    const fieldLabel = e.field ? (m.fields[e.field] ?? e.field) : '';
-    if (e.code === 'MISSING_FIELD') {
-      lines.push(m.missingField.replace('{field}', fieldLabel));
-    } else if (e.code === 'INVALID_VALUE') {
-      if (e.value !== undefined && e.value !== '') {
-        lines.push(
-          m.invalidValueWithDetail
-            .replace('{field}', fieldLabel)
-            .replace('{value}', e.value)
-        );
-      } else {
-        lines.push(m.invalidValue.replace('{field}', fieldLabel));
-      }
+    if (e.field) {
+      fieldLabels.add(m.fields[e.field] ?? e.field);
     }
   }
-  lines.push(m.fixAndRetry);
-  return lines.join(' ');
+  const fieldsLine =
+    fieldLabels.size > 0
+      ? m.missingFields.replace('{fields}', [...fieldLabels].join(', '))
+      : '';
+  const parts = [m.blocked];
+  if (fieldsLine) parts.push(fieldsLine);
+  parts.push(m.fixAndRetry);
+  return parts.join(' ');
 }

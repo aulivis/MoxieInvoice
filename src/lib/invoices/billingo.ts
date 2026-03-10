@@ -52,17 +52,20 @@ export async function createBillingoInvoice(
     name: item.name,
     quantity: item.quantity,
     unit: item.unit,
+    unit_price: item.netUnitPrice,
     net_unit_price: item.netUnitPrice,
+    unit_price_type: item.unitPriceType ?? 'net',
     vat: item.vatPercent,
   }));
 
   const invoicePayload = {
     partner_id: partnerId,
-    block_uid: undefined as string | undefined,
+    block_id: request.blockId,
     type: request.invoiceType === 'proforma' ? 'proforma' : request.invoiceType === 'advance' ? 'advance' : 'invoice',
     fulfillment_date: request.fulfillmentDate,
     due_date: dueDate,
-    payment_method: request.paymentMethod || 'bank_transfer',
+    payment_method: request.paymentMethod ?? 'bank_transfer',
+    language: request.language ?? 'hu',
     currency: request.currency,
     comment: request.comment || '',
     items: invoiceItems,

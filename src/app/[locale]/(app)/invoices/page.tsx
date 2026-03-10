@@ -15,6 +15,8 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/Table';
+import { RefreshInvoicesButton } from '@/components/invoices/RefreshInvoicesButton';
+import { DeleteInvoiceButton } from '@/components/invoices/DeleteInvoiceButton';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('invoices');
@@ -34,7 +36,7 @@ export default async function InvoicesListPage() {
   const supabase = await createClient();
   const { data: invoices } = await supabase
     .from('invoices')
-    .select('id, external_id, status, error_message, created_at, pdf_url')
+    .select('id, external_id, moxie_invoice_id, status, error_message, created_at, pdf_url, total_amount, payload_snapshot')
     .eq('org_id', orgId)
     .order('created_at', { ascending: false })
     .limit(50);
@@ -52,6 +54,12 @@ export default async function InvoicesListPage() {
     return status;
   }
 
+  function formatAmount(amount: number | null | undefined, currency?: string) {
+    if (amount == null) return '—';
+    const formatted = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+    return currency ? `${formatted} ${currency}` : formatted;
+  }
+
   const count = invoices?.length ?? 0;
 
   return (
@@ -64,15 +72,18 @@ export default async function InvoicesListPage() {
             {t('count', { count })}
           </p>
         </div>
-        <Link
-          href="/invoices/new"
-          className="hidden sm:inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-[#E91E63] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none shadow-sm shrink-0"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-          </svg>
-          {t('newInvoice')}
-        </Link>
+        <div className="flex items-center gap-2">
+          <RefreshInvoicesButton />
+          <Link
+            href="/invoices/new"
+            className="hidden sm:inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-[#E91E63] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none shadow-sm shrink-0"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('newInvoice')}
+          </Link>
+        </div>
       </div>
 
       {/* Invoices list */}
@@ -96,28 +107,36 @@ export default async function InvoicesListPage() {
               >
                 <div className="flex justify-between items-start gap-2 mb-1.5">
                   <p className="font-tabular-nums font-semibold text-sm text-text-primary">
-                    {inv.external_id || inv.id}
+                    {inv.external_id ?? inv.moxie_invoice_id ?? '—'}
                   </p>
                   <StatusCell status={inv.status} label={statusLabel(inv.status)} />
                 </div>
-                <div className="flex items-center justify-between gap-2">
+                {(inv.total_amount != null || inv.payload_snapshot) && (
+                  <p className="font-tabular-nums text-xs text-text-secondary mb-1">
+                    {formatAmount(inv.total_amount ?? null, (inv.payload_snapshot as { currency?: string } | null)?.currency)}
+                  </p>
+                )}
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <span className="font-tabular-nums text-xs text-text-tertiary">
                     {formatDate(inv.created_at)}
                   </span>
-                  {inv.pdf_url && (
-                    <Link
-                      href={inv.pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[32px]"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      {t('pdf')}
-                    </Link>
-                  )}
+                  <span className="flex items-center gap-2">
+                    {inv.pdf_url && (
+                      <Link
+                        href={inv.pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[32px]"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        {t('pdf')}
+                      </Link>
+                    )}
+                    <DeleteInvoiceButton invoiceId={inv.id} status={inv.status} />
+                  </span>
                 </div>
                 {inv.error_message && (
                   <details className="mt-2">
@@ -126,7 +145,7 @@ export default async function InvoicesListPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
-                      {t('details')}
+                      {t('errorSummary')}
                     </summary>
                     <p className="mt-1.5 text-xs text-status-error break-words bg-error-muted/30 rounded p-2">
                       {inv.error_message}
@@ -152,7 +171,8 @@ export default async function InvoicesListPage() {
                 <TableRow className="border-0 bg-surface-50 hover:bg-surface-50">
                   <TableHead>{t('date')}</TableHead>
                   <TableHead>{t('status')}</TableHead>
-                  <TableHead>{t('numberOrId')}</TableHead>
+                  <TableHead>{t('invoiceValue')}</TableHead>
+                  <TableHead>{t('moxieInvoiceNumber')}</TableHead>
                   <TableHead>{t('errorColumn')}</TableHead>
                   <TableHead>{t('action')}</TableHead>
                 </TableRow>
@@ -173,16 +193,17 @@ export default async function InvoicesListPage() {
                     <TableCell>
                       <StatusCell status={inv.status} label={statusLabel(inv.status)} />
                     </TableCell>
+                    <TableCell className="font-tabular-nums text-text-secondary">
+                      {formatAmount(inv.total_amount ?? null, (inv.payload_snapshot as { currency?: string } | null)?.currency)}
+                    </TableCell>
                     <TableCell className="font-tabular-nums font-medium">
-                      {inv.external_id || inv.id}
+                      {inv.external_id ?? inv.moxie_invoice_id ?? '—'}
                     </TableCell>
                     <TableCell className="text-sm text-status-error max-w-xs">
                       {inv.error_message ? (
                         <details>
                           <summary className="cursor-pointer hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded list-none">
-                            {inv.error_message.length > 50
-                              ? `${inv.error_message.slice(0, 50)}…`
-                              : inv.error_message}
+                            {t('errorSummary')}
                           </summary>
                           <p className="mt-1 break-words text-xs">
                             {inv.error_message}
@@ -193,22 +214,25 @@ export default async function InvoicesListPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {inv.pdf_url ? (
-                        <Link
-                          href={inv.pdf_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[36px]"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          {t('pdf')}
-                        </Link>
-                      ) : (
-                        <span className="text-text-tertiary">—</span>
-                      )}
+                      <span className="flex items-center gap-2">
+                        {inv.pdf_url ? (
+                          <Link
+                            href={inv.pdf_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded min-h-[36px]"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {t('pdf')}
+                          </Link>
+                        ) : (
+                          <span className="text-text-tertiary">—</span>
+                        )}
+                        <DeleteInvoiceButton invoiceId={inv.id} status={inv.status} />
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}

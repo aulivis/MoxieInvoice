@@ -70,8 +70,11 @@
     "newInvoice": "New invoice",
     "date": "Date",
     "status": "Status",
+    "invoiceValue": "Invoice value",
+    "moxieInvoiceNumber": "Moxie invoice number",
     "numberOrId": "Number / External ID",
     "errorColumn": "Error",
+    "errorSummary": "Incorrect data",
     "action": "Action",
     "empty": "No invoices yet.",
     "count": "{count, plural, =0 {No invoices} one {# invoice} other {# invoices}}",
@@ -79,7 +82,11 @@
     "statusCreated": "Created",
     "statusSynced": "Synced to Moxie",
     "pdf": "PDF",
-    "details": "Details"
+    "details": "Details",
+    "refresh": "Refresh",
+    "delete": "Delete",
+    "deleteFailed": "Delete failed row",
+    "deleting": "Deleting..."
   },
   "invoicesNew": {
     "title": "New invoice",
@@ -165,6 +172,7 @@
   "billingoValidation": {
     "blocked": "Invoice generation was blocked because of Billingo requirements: one or more fields are missing or invalid.",
     "missingField": "The following required field is missing: {field}.",
+    "missingFields": "The following required fields are missing: {fields}.",
     "invalidValue": "The \"{field}\" field has an invalid value.",
     "invalidValueWithDetail": "The \"{field}\" field has an invalid value (item {value}).",
     "fixAndRetry": "If you fix the data, you can try again (e.g. set the invoice to Sent in Moxie, or use the New invoice form).",
@@ -178,16 +186,20 @@
       "dueDate": "due date",
       "currency": "currency",
       "paymentMethod": "payment method",
+      "blockId": "invoice block",
+      "language": "language",
       "items": "items",
       "itemName": "item description",
       "quantity": "quantity",
       "netUnitPrice": "net unit price",
+      "unitPriceType": "unit price type",
       "vatPercent": "VAT percent"
     }
   },
   "szamlazzValidation": {
     "blocked": "Invoice generation was blocked because of Számlázz.hu requirements: one or more fields are missing or invalid.",
     "missingField": "The following required field is missing: {field}.",
+    "missingFields": "The following required fields are missing: {fields}.",
     "invalidValue": "The \"{field}\" field has an invalid value.",
     "invalidValueWithDetail": "The \"{field}\" field has an invalid value (item {value}).",
     "fixAndRetry": "If you fix the data, you can try again (e.g. set the invoice to Sent in Moxie, or use the New invoice form).",
@@ -218,7 +230,12 @@
     "sellerName": "Seller name (optional)",
     "saved": "Saved.",
     "statusNotConfigured": "Not configured",
-    "statusLive": "Live"
+    "statusLive": "Live",
+    "invoiceDefaultsTitle": "Default invoice fields (Billingo)",
+    "invoiceDefaultsHint": "Used when the Moxie invoice does not provide these values.",
+    "defaultBlockId": "Invoice block (block id)",
+    "defaultLanguage": "Language",
+    "defaultPaymentMethod": "Payment method"
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF conversion",

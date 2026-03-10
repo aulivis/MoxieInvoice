@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createInvoice } from '@/lib/invoices/orchestrator';
+import { mergeInvoiceRequestWithDefaults } from '@/lib/invoices/merge-defaults';
+import { computeTotalAmount } from '@/lib/invoices/total-amount';
 import type { NormalizedInvoiceRequest } from '@/lib/invoices/types';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { decrypt } from '@/lib/crypto';
@@ -102,12 +104,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, skipped: 'No invoice data' });
   }
 
+  const { data: orgSettings } = await supabase
+    .from('org_settings')
+    .select('default_invoice_block_id, default_invoice_language, default_payment_method')
+    .eq('org_id', orgId)
+    .maybeSingle();
+
+  const mergedRequest = mergeInvoiceRequestWithDefaults(normalized.request, orgSettings ?? null);
+
   const locale = (request.headers.get('Accept-Language')?.toLowerCase().startsWith('en') ? 'en' : 'hu') as 'hu' | 'en';
   const result = await createInvoice({
     orgId,
     provider: billing.provider,
     credentials,
-    request: normalized.request,
+    request: mergedRequest,
     moxieInvoiceId: normalized.moxieInvoiceId,
     moxieBaseUrl: moxie.base_url,
     moxieApiKey,
@@ -116,13 +126,15 @@ export async function POST(request: NextRequest) {
 
   if (!result.success) {
     logError(new Error(result.errorMessage ?? 'Invoice creation failed'), { orgId, step: 'webhook_create_invoice' });
+    const totalAmount = computeTotalAmount(mergedRequest);
     await supabase.from('invoices').insert({
       org_id: orgId,
       provider: billing.provider,
       status: 'failed',
       error_message: result.errorMessage,
       moxie_invoice_id: normalized.moxieInvoiceId || null,
-      payload_snapshot: normalized.request as unknown as Record<string, unknown>,
+      total_amount: totalAmount,
+      payload_snapshot: mergedRequest as unknown as Record<string, unknown>,
     });
   }
 

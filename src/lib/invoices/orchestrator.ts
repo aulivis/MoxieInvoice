@@ -3,6 +3,7 @@
  */
 
 import type { NormalizedInvoiceRequest, InvoiceResult } from './types';
+import { computeTotalAmount } from './total-amount';
 import { createBillingoInvoice } from './billingo';
 import { createSzamlazzInvoice } from './szamlazz';
 import {
@@ -79,6 +80,7 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
   }
 
   const supabase = await import('@/lib/supabase/server').then((m) => m.createClient());
+  const totalAmount = computeTotalAmount(request);
   const { data: row, error: insertErr } = await supabase
     .from('invoices')
     .insert({
@@ -88,6 +90,7 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
       provider,
       status: 'created',
       pdf_url: result.pdfUrl || null,
+      total_amount: totalAmount,
       payload_snapshot: request as unknown as Record<string, unknown>,
     })
     .select('id')

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
+import { Select } from '@/components/ui/Select';
 
 const inputClass =
   'rounded-lg border border-border-medium bg-background-card px-3 py-2.5 text-base min-h-[44px] text-text-primary placeholder:text-text-disabled focus-visible:outline-none focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-primary/10 w-full';
@@ -82,6 +83,7 @@ export function CreateInvoiceForm() {
               unit: 'db',
               netUnitPrice: item.netUnitPrice,
               vatPercent: item.vatPercent,
+              unitPriceType: 'net' as const,
             })),
             currency,
             fulfillmentDate,
@@ -203,10 +205,17 @@ export function CreateInvoiceForm() {
       <section className="flex flex-wrap gap-4 items-center">
         <div>
           <label htmlFor="invoice-currency" className={labelClass}>{t('currency')}</label>
-          <select id="invoice-currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className={inputClass}>
-            <option value="HUF">HUF</option>
-            <option value="EUR">EUR</option>
-          </select>
+          <Select
+            id="invoice-currency"
+            value={currency}
+            options={[
+              { value: 'HUF', label: 'HUF' },
+              { value: 'EUR', label: 'EUR' },
+            ]}
+            onChange={setCurrency}
+            aria-label={t('currency')}
+            className="mt-1"
+          />
         </div>
         <div>
           <label htmlFor="invoice-fulfillmentDate" className={labelClass}>{t('fulfillmentDate')}</label>

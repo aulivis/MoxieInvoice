@@ -16,6 +16,7 @@ const getMessages = (locale: 'hu' | 'en') => {
 interface SzamlazzValidationMessages {
   blocked: string;
   missingField: string;
+  missingFields: string;
   invalidValue: string;
   invalidValueWithDetail: string;
   fixAndRetry: string;
@@ -143,6 +144,7 @@ export function validateSzamlazzRequest(
 
 /**
  * Build a single, detailed user-facing message for Számlázz.hu validation errors in the given locale.
+ * "A következő kötelező mező hiányzik:" appears once, followed by comma-separated field names.
  * Used for error_message in DB and for API/UI responses.
  */
 export function buildSzamlazzValidationMessage(
@@ -150,23 +152,18 @@ export function buildSzamlazzValidationMessage(
   locale: 'hu' | 'en'
 ): string {
   const m = getMessages(locale);
-  const lines: string[] = [m.blocked];
+  const fieldLabels = new Set<string>();
   for (const e of errors) {
-    const fieldLabel = e.field ? (m.fields[e.field] ?? e.field) : '';
-    if (e.code === 'MISSING_FIELD') {
-      lines.push(m.missingField.replace('{field}', fieldLabel));
-    } else if (e.code === 'INVALID_VALUE') {
-      if (e.value !== undefined && e.value !== '') {
-        lines.push(
-          m.invalidValueWithDetail
-            .replace('{field}', fieldLabel)
-            .replace('{value}', e.value)
-        );
-      } else {
-        lines.push(m.invalidValue.replace('{field}', fieldLabel));
-      }
+    if (e.field) {
+      fieldLabels.add(m.fields[e.field] ?? e.field);
     }
   }
-  lines.push(m.fixAndRetry);
-  return lines.join(' ');
+  const fieldsLine =
+    fieldLabels.size > 0
+      ? m.missingFields.replace('{fields}', [...fieldLabels].join(', '))
+      : '';
+  const parts = [m.blocked];
+  if (fieldsLine) parts.push(fieldsLine);
+  parts.push(m.fixAndRetry);
+  return parts.join(' ');
 }

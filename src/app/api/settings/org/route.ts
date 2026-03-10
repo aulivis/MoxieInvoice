@@ -44,19 +44,28 @@ export async function POST(request: Request) {
   if (!parsed.success) return validationErrorResponse(parsed);
   const body = parsed.data;
 
-  await supabase.from('org_settings').upsert(
-    {
-      org_id: profile.organization_id,
-      currency_convert_to_huf: body.currency_convert_to_huf,
-      conversion_source: body.conversion_source,
-      fixed_eur_huf_rate: body.fixed_eur_huf_rate ?? undefined,
-      schedule_type: body.schedule_type,
-      timezone: body.timezone,
-      start_time: body.start_time,
-      end_time: body.end_time,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'org_id' }
-  );
+  const { data: current } = await supabase
+    .from('org_settings')
+    .select('*')
+    .eq('org_id', profile.organization_id)
+    .maybeSingle();
+
+  const payload: Record<string, unknown> = {
+    org_id: profile.organization_id,
+    ...(current ?? {}),
+    updated_at: new Date().toISOString(),
+  };
+  if (body.currency_convert_to_huf !== undefined) payload.currency_convert_to_huf = body.currency_convert_to_huf;
+  if (body.conversion_source !== undefined) payload.conversion_source = body.conversion_source;
+  if (body.fixed_eur_huf_rate !== undefined) payload.fixed_eur_huf_rate = body.fixed_eur_huf_rate;
+  if (body.schedule_type !== undefined) payload.schedule_type = body.schedule_type;
+  if (body.timezone !== undefined) payload.timezone = body.timezone;
+  if (body.start_time !== undefined) payload.start_time = body.start_time;
+  if (body.end_time !== undefined) payload.end_time = body.end_time;
+  if (body.default_invoice_block_id !== undefined) payload.default_invoice_block_id = body.default_invoice_block_id;
+  if (body.default_invoice_language !== undefined) payload.default_invoice_language = body.default_invoice_language;
+  if (body.default_payment_method !== undefined) payload.default_payment_method = body.default_payment_method;
+
+  await supabase.from('org_settings').upsert(payload as Record<string, never>, { onConflict: 'org_id' });
   return NextResponse.json({ ok: true });
 }
