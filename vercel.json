@@ -1,0 +1,9 @@
+{
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/process-invoice-queue",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

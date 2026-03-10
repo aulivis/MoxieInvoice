@@ -1,0 +1,108 @@
+/**
+ * Invoice orchestrator: normalized request → Billingo or Számlázz.hu → save → Moxie callback.
+ */
+
+import type { NormalizedInvoiceRequest, InvoiceResult } from './types';
+import { createBillingoInvoice } from './billingo';
+import { createSzamlazzInvoice } from './szamlazz';
+import type { BillingProviderType } from '@/types/database';
+
+export interface CreateInvoiceInput {
+  orgId: string;
+  provider: BillingProviderType;
+  credentials: Record<string, unknown>;
+  request: NormalizedInvoiceRequest;
+  moxieInvoiceId?: string;
+  moxieBaseUrl?: string;
+  moxieApiKey?: string;
+}
+
+export type CreateInvoiceOutput =
+  | { success: true; invoiceId: string; externalId: string; invoiceNumber: string; pdfUrl?: string }
+  | { success: false; errorMessage: string };
+
+export async function createInvoice(input: CreateInvoiceInput): Promise<CreateInvoiceOutput> {
+  const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieBaseUrl, moxieApiKey } = input;
+  const request = rawRequest;
+
+  let result: InvoiceResult;
+  try {
+    if (provider === 'billingo') {
+      result = await createBillingoInvoice(
+        { apiKey: String(credentials.apiKey || credentials.api_key || '') },
+        request
+      );
+    } else if (provider === 'szamlazz') {
+      result = await createSzamlazzInvoice(
+        {
+          agentKey: credentials.agentKey as string | undefined,
+          username: credentials.username as string | undefined,
+          password: credentials.password as string | undefined,
+        },
+        request
+      );
+    } else {
+      return { success: false, errorMessage: `Unknown provider: ${provider}` };
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, errorMessage: message };
+  }
+
+  const supabase = await import('@/lib/supabase/server').then((m) => m.createClient());
+  const { data: row, error: insertErr } = await supabase
+    .from('invoices')
+    .insert({
+      org_id: orgId,
+      moxie_invoice_id: moxieInvoiceId || null,
+      external_id: result.externalId,
+      provider,
+      status: 'created',
+      pdf_url: result.pdfUrl || null,
+      payload_snapshot: request as unknown as Record<string, unknown>,
+    })
+    .select('id')
+    .single();
+
+  if (insertErr || !row) {
+    return {
+      success: false,
+      errorMessage: insertErr?.message || 'Failed to save invoice record',
+    };
+  }
+
+  if (moxieBaseUrl && moxieApiKey && result.pdfUrl) {
+    try {
+      const base = moxieBaseUrl.replace(/\/$/, '').replace(/\/api\/public\/?$/i, '');
+      const form = new FormData();
+      form.set('type', 'DELIVERABLE');
+      form.set('id', moxieInvoiceId || row.id);
+      form.set('fileUrl', result.pdfUrl);
+      form.set('fileName', `invoice-${result.invoiceNumber}.pdf`);
+      const moxieRes = await fetch(
+        `${base}/api/public/action/attachments/createFromUrl`,
+        {
+          method: 'POST',
+          headers: { 'X-API-KEY': moxieApiKey },
+          body: form,
+        }
+      );
+      if (moxieRes.ok) {
+        await supabase
+          .from('invoices')
+          .update({ status: 'synced_to_moxie' })
+          .eq('id', row.id);
+      }
+    } catch {
+      // Non-fatal: invoice was created, only Moxie sync failed
+    }
+  }
+
+  return {
+    success: true,
+    invoiceId: row.id,
+    externalId: result.externalId,
+    invoiceNumber: result.invoiceNumber,
+    pdfUrl: result.pdfUrl,
+  };
+}

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /d/Apps/MoxieInvoice/src/messages/*.json)",
+      "Bash(wc -l src/lib/**/*.ts src/components/*.tsx src/app/api/**/*.ts)",
+      "Bash(npm install:*)",
+      "Bash(npx vitest:*)",
+      "Bash(node -e \"console.log\\(require\\(''crypto''\\).randomBytes\\(32\\).toString\\(''hex''\\)\\)\")",
+      "Bash(wc -l /d/Apps/MoxieInvoice/src/components/*.tsx)",
+      "Bash(ls -la \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(app\\)\")",
+      "Bash(ls -la \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(auth\\)\")",
+      "Bash(ls -la \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(auth\\)/login\")",
+      "Bash(cat \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(auth\\)/login/page.tsx\")",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run build)",
+      "Bash(npx next build)",
+      "Bash(node --version)",
+      "Bash(node -e \":*)"
+    ]
+  }
+}
