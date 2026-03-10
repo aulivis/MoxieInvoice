@@ -229,6 +229,7 @@
     "passwordPlaceholder": "Password (if no Agent key)",
     "sellerName": "Seller name (optional)",
     "saved": "Saved.",
+    "saveFailed": "Save failed. Please try again.",
     "statusNotConfigured": "Not configured",
     "statusLive": "Live",
     "invoiceDefaultsTitle": "Default invoice fields (Billingo)",

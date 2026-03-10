@@ -115,7 +115,7 @@ export function MoxieConnectionForm({ hasSubscription = true }: { hasSubscriptio
     !connected ? (
       <Badge variant="gray">{t('statusNotConfigured')}</Badge>
     ) : isLive ? (
-      <Badge variant="green">{t('statusLive')}</Badge>
+      <Badge variant="green">{t('statusConnected')}</Badge>
     ) : (
       <Badge variant="gray">{t('statusNotTested')}</Badge>
     );

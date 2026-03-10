@@ -168,7 +168,10 @@ export function Sidebar() {
                   {Icon && <Icon active={isActive} />}
                   <span>{t(key)}</span>
                   {showMoxieLive && (
-                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" aria-label={tMoxie('statusConnected')} />
+                    <span className="ml-auto flex items-center gap-1 text-xs font-semibold text-emerald-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" aria-hidden />
+                      {tMoxie('statusConnected')}
+                    </span>
                   )}
                 </Link>
               </li>

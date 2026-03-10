@@ -36,6 +36,7 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
   const [defaultsFetched, setDefaultsFetched] = useState(false);
   const [defaultsSaving, setDefaultsSaving] = useState(false);
   const [defaultsSaved, setDefaultsSaved] = useState(false);
+  const [defaultsError, setDefaultsError] = useState<string | null>(null);
   const t = useTranslations('billing');
   const tCommon = useTranslations('common');
   const tSub = useTranslations('subscription');
@@ -193,12 +194,11 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
               setDefaultsSaving(true);
               setDefaultsSaved(false);
               try {
-                const current = await fetch('/api/settings/org').then((r) => r.json());
+                setDefaultsError(null);
                 const res = await fetch('/api/settings/org', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                    ...current,
                     default_invoice_block_id: defaultBlockId ? Number(defaultBlockId) : null,
                     default_invoice_language: defaultLanguage,
                     default_payment_method: defaultPaymentMethod || null,
@@ -207,6 +207,10 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
                 if (res.ok) {
                   setDefaultsSaved(true);
                   setTimeout(() => setDefaultsSaved(false), 3000);
+                } else {
+                  const err = await res.json().catch(() => ({}));
+                  const msg = typeof err?.error === 'string' ? err.error : t('saveFailed');
+                  setDefaultsError(msg);
                 }
               } finally {
                 setDefaultsSaving(false);
@@ -267,6 +271,7 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
               {defaultsSaving ? tCommon('loading') : tCommon('save')}
             </Button>
             {defaultsSaved && <Alert variant="success">{t('saved')}</Alert>}
+            {defaultsError && <Alert variant="error">{defaultsError}</Alert>}
           </form>
         </div>
       )}

@@ -229,6 +229,7 @@
     "passwordPlaceholder": "Jelszó (ha nincs Agent kulcs)",
     "sellerName": "Eladó neve (opcionális)",
     "saved": "Mentve.",
+    "saveFailed": "A mentés sikertelen. Próbáld újra.",
     "statusNotConfigured": "Nincs beállítva",
     "statusLive": "Él",
     "invoiceDefaultsTitle": "Alapértelmezett számla mezők (Billingo)",

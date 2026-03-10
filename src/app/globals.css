@@ -56,78 +56,87 @@
 body {
   color: var(--ds-text-primary);
   background: var(--ds-bg-main);
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: 1rem;        /* 16px — matches the new base scale */
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Typography utilities from design system */
 @layer utilities {
+  /* ─── Typography scale — 2026 standard ─────────────────────────────────────
+   *   xs   10 → 12px  |  sm   12 → 14px  |  base  14 → 16px  |  md  16 → 17px
+   * ──────────────────────────────────────────────────────────────────────── */
+
   .text-page-title {
-    font-size: 1.75rem;
+    font-size: 1.875rem;       /* 30px — was 28px, feels more commanding */
     font-weight: 700;
     line-height: 1.2;
     color: var(--ds-text-primary);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 
   .text-section-title {
-    font-size: 0.875rem;
+    font-size: 1rem;           /* 16px — was 14px, now proper section heading */
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.35;
     color: var(--ds-text-primary);
   }
 
   .text-metric-value {
-    font-size: 2.25rem;
+    font-size: 2.25rem;        /* 36px — unchanged, bento card numbers */
     font-weight: 700;
     line-height: 1;
     color: var(--ds-text-primary);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
   }
 
   .text-metric-label {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;      /* 13px — was 12px, label below metric */
     font-weight: 500;
     line-height: 1.4;
     color: var(--ds-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
 
   .text-sidebar-item {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;      /* 15px — was 14px, nav items */
     font-weight: 500;
-    line-height: 1.5;
+    line-height: 1.4;
     color: var(--sidebar-text);
   }
 
   .text-sidebar-section {
-    font-size: 0.625rem;
+    font-size: 0.6875rem;      /* 11px — was 10px, "MENU" label */
     font-weight: 700;
     line-height: 1.4;
     color: var(--sidebar-muted);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
   }
 
   .text-table-header {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;      /* 13px — was 12px, column headers */
     font-weight: 600;
     line-height: 1.4;
     color: var(--ds-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
   .text-table-cell {
-    font-size: 0.875rem;
+    font-size: 1rem;           /* 16px — was 14px, table body rows */
     font-weight: 400;
     line-height: 1.5;
     color: var(--ds-text-primary);
   }
 
   .text-caption {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;      /* 13px — was 12px, captions & hints */
     font-weight: 400;
-    line-height: 1.4;
+    line-height: 1.45;
     color: var(--ds-text-tertiary);
   }
 

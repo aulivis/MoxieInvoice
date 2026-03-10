@@ -124,17 +124,18 @@ const config: Config = {
         mono: ['var(--font-jetbrains-mono)', 'JetBrains Mono', 'Courier New', 'monospace'],
       },
       fontSize: {
-        xs: ['0.625rem', { lineHeight: '1.25' }],
-        sm: ['0.75rem', { lineHeight: '1.4' }],
-        base: ['0.875rem', { lineHeight: '1.5' }],
-        md: ['1rem', { lineHeight: '1.5' }],
-        lg: ['1.125rem', { lineHeight: '1.5' }],
-        xl: ['1.25rem', { lineHeight: '1.5' }],
-        '2xl': ['1.5rem', { lineHeight: '1.5' }],
-        '3xl': ['2rem', { lineHeight: '1.2' }],
-        '4xl': ['2.5rem', { lineHeight: '1.2' }],
-        '5xl': ['3rem', { lineHeight: '1.2' }],
-        display: ['2.25rem', { lineHeight: '1.2' }],
+        // 2026 standard scale — aligned with Tailwind defaults for readability
+        xs:      ['0.75rem',   { lineHeight: '1.3'  }], // 12px  (was 10px)
+        sm:      ['0.875rem',  { lineHeight: '1.45' }], // 14px  (was 12px)
+        base:    ['1rem',      { lineHeight: '1.55' }], // 16px  (was 14px)
+        md:      ['1.0625rem', { lineHeight: '1.5'  }], // 17px  (was 16px)
+        lg:      ['1.125rem',  { lineHeight: '1.45' }], // 18px
+        xl:      ['1.25rem',   { lineHeight: '1.4'  }], // 20px
+        '2xl':   ['1.5rem',    { lineHeight: '1.35' }], // 24px
+        '3xl':   ['2rem',      { lineHeight: '1.2'  }], // 32px
+        '4xl':   ['2.5rem',    { lineHeight: '1.15' }], // 40px
+        '5xl':   ['3rem',      { lineHeight: '1.1'  }], // 48px
+        display: ['2.25rem',   { lineHeight: '1.2'  }], // 36px
       },
       fontWeight: {
         light: '300',
