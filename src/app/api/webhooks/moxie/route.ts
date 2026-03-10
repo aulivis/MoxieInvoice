@@ -218,7 +218,7 @@ function normalizeMoxiePayload(
     };
     return {
       request,
-      moxieInvoiceId: (body.invoiceNumberFormatted ?? String(body.invoiceNumber ?? body.id ?? body.invoice_id ?? '')).trim() || undefined,
+      moxieInvoiceId: (String(body.invoiceNumberFormatted ?? body.invoiceNumber ?? body.id ?? body.invoice_id ?? '').trim()) || undefined,
     };
   }
 
