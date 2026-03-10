@@ -60,6 +60,7 @@ export function DeleteInvoiceButton({ invoiceId, status, iconOnly = false }: Del
   }
 
   if (!canDelete) return null;
+  return (
     <button
       type="button"
       onClick={handleDelete}
