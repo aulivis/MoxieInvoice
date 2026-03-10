@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { StatusCell } from '@/components/ui/StatusCell';
+import { PaymentStatusCell } from '@/components/ui/PaymentStatusCell';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { DeleteInvoiceButton } from '@/components/invoices/DeleteInvoiceButton';
 import {
@@ -177,14 +178,11 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                     {getBuyerName(inv)}
                   </p>
                 )}
-                <p className="flex items-center gap-1.5 text-xs text-text-secondary mb-1">
-                  <span
-                    className={[
-                      'shrink-0 w-1.5 h-1.5 rounded-full',
-                      inv.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-amber-500',
-                    ].join(' ')}
+                <p className="flex items-center gap-1.5 mb-1">
+                  <PaymentStatusCell
+                    paymentStatus={inv.payment_status}
+                    label={paymentStatusLabel(inv.payment_status)}
                   />
-                  {paymentStatusLabel(inv.payment_status)}
                 </p>
                 {(inv.total_amount != null || !!inv.payload_snapshot) && (
                   <p className="font-tabular-nums text-xs text-text-secondary mb-1">
@@ -319,20 +317,10 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span
-                        className={[
-                          'inline-flex items-center gap-1.5 text-sm',
-                          inv.payment_status === 'paid' ? 'text-emerald-600' : 'text-amber-600',
-                        ].join(' ')}
-                      >
-                        <span
-                          className={[
-                            'shrink-0 w-1.5 h-1.5 rounded-full',
-                            inv.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-amber-500',
-                          ].join(' ')}
-                        />
-                        {paymentStatusLabel(inv.payment_status)}
-                      </span>
+                      <PaymentStatusCell
+                        paymentStatus={inv.payment_status}
+                        label={paymentStatusLabel(inv.payment_status)}
+                      />
                     </TableCell>
                     <TableCell className="text-text-secondary max-w-[160px]">
                       <span className="block truncate" title={getBuyerName(inv) ?? undefined}>
