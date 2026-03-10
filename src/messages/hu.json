@@ -95,7 +95,10 @@
     "filterCreated": "Létrehozva",
     "filterSynced": "Szinkronizált",
     "filterFailed": "Sikertelen",
-    "emptyFiltered": "Nincs ilyen számla."
+    "emptyFiltered": "Nincs ilyen számla.",
+    "paymentStatus": "Fizetés",
+    "paymentOpen": "Nyitott",
+    "paymentPaid": "Fizetve"
   },
   "invoicesNew": {
     "title": "Új számla",

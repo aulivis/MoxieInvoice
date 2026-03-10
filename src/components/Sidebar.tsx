@@ -175,6 +175,7 @@ export function Sidebar() {
                         connected={moxieLive}
                         connectedLabel={tMoxie('statusConnected')}
                         disconnectedLabel={tMoxie('statusDisconnected')}
+                        dotOnly
                       />
                     </span>
                   )}

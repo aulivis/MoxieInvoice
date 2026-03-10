@@ -23,6 +23,7 @@ interface Invoice {
   external_id: string | null;
   moxie_invoice_id: string | null;
   status: string;
+  payment_status: 'open' | 'paid';
   error_message: string | null;
   created_at: string;
   pdf_url: string | null;
@@ -66,6 +67,10 @@ export function InvoicesClientList({ invoices, locale }: Props) {
     if (status === 'created') return t('statusCreated');
     if (status === 'synced_to_moxie') return t('statusSynced');
     return status;
+  }
+
+  function paymentStatusLabel(paymentStatus: 'open' | 'paid') {
+    return paymentStatus === 'paid' ? t('paymentPaid') : t('paymentOpen');
   }
 
   function formatAmount(amount: number | null | undefined, currency?: string) {
@@ -138,6 +143,15 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                 </p>
                 <StatusCell status={inv.status} label={statusLabel(inv.status)} />
               </div>
+              <p className="flex items-center gap-1.5 text-xs text-text-secondary mb-1">
+                <span
+                  className={[
+                    'shrink-0 w-1.5 h-1.5 rounded-full',
+                    inv.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-amber-500',
+                  ].join(' ')}
+                />
+                {paymentStatusLabel(inv.payment_status)}
+              </p>
               {(inv.total_amount != null || !!inv.payload_snapshot) && (
                 <p className="font-tabular-nums text-xs text-text-secondary mb-1">
                   {formatAmount(inv.total_amount ?? null, (inv.payload_snapshot as { currency?: string } | null)?.currency)}
@@ -210,6 +224,7 @@ export function InvoicesClientList({ invoices, locale }: Props) {
               <TableRow className="border-0 bg-surface-50 hover:bg-surface-50">
                 <TableHead>{t('date')}</TableHead>
                 <TableHead>{t('status')}</TableHead>
+                <TableHead>{t('paymentStatus')}</TableHead>
                 <TableHead>{t('invoiceValue')}</TableHead>
                 <TableHead>{t('moxieInvoiceNumber')}</TableHead>
                 <TableHead>{t('errorColumn')}</TableHead>
@@ -233,6 +248,22 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                     </TableCell>
                     <TableCell>
                       <StatusCell status={inv.status} label={statusLabel(inv.status)} />
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={[
+                          'inline-flex items-center gap-1.5 text-sm',
+                          inv.payment_status === 'paid' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
+                        ].join(' ')}
+                      >
+                        <span
+                          className={[
+                            'shrink-0 w-1.5 h-1.5 rounded-full',
+                            inv.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-amber-500',
+                          ].join(' ')}
+                        />
+                        {paymentStatusLabel(inv.payment_status)}
+                      </span>
                     </TableCell>
                     <TableCell className="font-tabular-nums text-text-secondary">
                       {formatAmount(inv.total_amount ?? null, (inv.payload_snapshot as { currency?: string } | null)?.currency)}

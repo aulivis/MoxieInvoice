@@ -2,7 +2,7 @@
  * Invoice orchestrator: normalized request → Billingo or Számlázz.hu → save → Moxie callback.
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { NormalizedInvoiceRequest, InvoiceResult } from './types';
 import { computeTotalAmount } from './total-amount';
 import { createBillingoInvoice } from './billingo';
@@ -28,6 +28,8 @@ export interface CreateInvoiceInput {
   moxieApiKey?: string;
   /** Locale for validation error messages (Billingo / Számlázz.hu) (default 'hu'). */
   locale?: 'hu' | 'en';
+  /** Supabase client to use for DB insert/update. Use authenticated client (RLS) or service role (bypass RLS). */
+  supabase?: SupabaseClient;
 }
 
 export type CreateInvoiceOutput =
@@ -102,7 +104,9 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
     return { success: false, errorMessage: message };
   }
 
-  const supabase = await import('@/lib/supabase/server').then((m) => m.createClient());
+  const supabase =
+    input.supabase ??
+    (await import('@/lib/supabase/server').then((m) => m.createClient()));
   const totalAmount = computeTotalAmount(request);
   const { data: row, error: insertErr } = await supabase
     .from('invoices')

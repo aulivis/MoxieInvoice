@@ -57,6 +57,8 @@ export interface BillingProvider {
   updated_at: string;
 }
 
+export type PaymentStatus = 'open' | 'paid';
+
 export interface Invoice {
   id: string;
   org_id: string;
@@ -64,6 +66,7 @@ export interface Invoice {
   external_id: string | null;
   provider: BillingProviderType;
   status: InvoiceStatus;
+  payment_status: PaymentStatus;
   pdf_url: string | null;
   total_amount: number | null;
   payload_snapshot: Record<string, unknown> | null;

@@ -136,30 +136,30 @@ export function SettingsTabs({ hasSubscription }: SettingsTabsProps) {
         </div>
       </div>
 
-      {/* Tab panels — Card title removed to avoid duplication with tab label */}
+      {/* Tab panels — Card title removed to avoid duplication with tab label; same width as app pages (max-w-7xl) */}
       <div role="tabpanel" className="animate-fade-in">
         {activeTab === 'subscription' && (
-          <Card className="max-w-2xl">
+          <Card>
             <SubscriptionSection />
           </Card>
         )}
         {activeTab === 'moxie' && (
-          <Card className="max-w-2xl">
+          <Card>
             <MoxieConnectionForm hasSubscription={hasSubscription} />
           </Card>
         )}
         {activeTab === 'billing' && (
-          <Card className="max-w-2xl">
+          <Card>
             <BillingProviderForm hasSubscription={hasSubscription} />
           </Card>
         )}
         {activeTab === 'currency' && (
-          <Card className="max-w-2xl">
+          <Card>
             <CurrencyForm hasSubscription={hasSubscription} />
           </Card>
         )}
         {activeTab === 'schedule' && (
-          <Card className="max-w-2xl">
+          <Card>
             <ScheduleForm hasSubscription={hasSubscription} />
           </Card>
         )}

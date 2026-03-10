@@ -122,6 +122,7 @@ export async function POST(request: NextRequest) {
     moxieBaseUrl: moxie.base_url,
     moxieApiKey,
     locale,
+    supabase,
   });
 
   if (!result.success) {
@@ -217,7 +218,7 @@ function normalizeMoxiePayload(
     };
     return {
       request,
-      moxieInvoiceId: (body.id ?? body.invoice_id) as string | undefined,
+      moxieInvoiceId: (body.invoiceNumberFormatted ?? String(body.invoiceNumber ?? body.id ?? body.invoice_id ?? '')).trim() || undefined,
     };
   }
 
@@ -253,6 +254,6 @@ function normalizeMoxiePayload(
 
   return {
     request,
-    moxieInvoiceId: body.invoice_id as string | undefined,
+    moxieInvoiceId: (body.invoiceNumberFormatted ?? (body.invoiceNumber != null ? String(body.invoiceNumber) : undefined) ?? body.invoice_id) as string | undefined,
   };
 }

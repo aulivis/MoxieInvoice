@@ -6,6 +6,8 @@ export interface ConnectionStatusBadgeProps {
   disconnectedLabel: string;
   /** Compact: dot + text inline (e.g. in sidebar). Default true. */
   compact?: boolean;
+  /** When true, only the dot is shown (no label). Used in sidebar for "Csatlakoztatva". Default false. */
+  dotOnly?: boolean;
   className?: string;
 }
 
@@ -14,6 +16,7 @@ export function ConnectionStatusBadge({
   connectedLabel,
   disconnectedLabel,
   compact = true,
+  dotOnly = false,
   className = '',
 }: ConnectionStatusBadgeProps) {
   const label = connected ? connectedLabel : disconnectedLabel;
@@ -34,7 +37,7 @@ export function ConnectionStatusBadge({
           ${connected ? 'bg-emerald-400 animate-pulse-dot' : 'bg-text-disabled'}
         `}
       />
-      {compact ? <span>{label}</span> : null}
+      {!dotOnly && compact ? <span>{label}</span> : null}
     </span>
   );
 }

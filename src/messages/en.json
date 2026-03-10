@@ -95,7 +95,10 @@
     "filterCreated": "Created",
     "filterSynced": "Synced",
     "filterFailed": "Failed",
-    "emptyFiltered": "No invoices match this filter."
+    "emptyFiltered": "No invoices match this filter.",
+    "paymentStatus": "Payment",
+    "paymentOpen": "Open",
+    "paymentPaid": "Paid"
   },
   "invoicesNew": {
     "title": "New invoice",

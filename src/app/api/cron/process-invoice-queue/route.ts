@@ -95,6 +95,7 @@ export async function GET(request: Request) {
       moxieBaseUrl: moxie?.base_url,
       moxieApiKey,
       locale: 'hu',
+      supabase,
     });
 
     if (result.success) {
