@@ -107,6 +107,9 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
   const supabase =
     input.supabase ??
     (await import('@/lib/supabase/server').then((m) => m.createClient()));
+  if (!supabase) {
+    return { success: false, errorMessage: 'Database client not available' };
+  }
   const totalAmount = computeTotalAmount(request);
   const { data: row, error: insertErr } = await supabase
     .from('invoices')
