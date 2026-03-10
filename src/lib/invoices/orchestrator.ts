@@ -2,6 +2,7 @@
  * Invoice orchestrator: normalized request → Billingo or Számlázz.hu → save → Moxie callback.
  */
 
+import { createClient } from '@supabase/supabase-js';
 import type { NormalizedInvoiceRequest, InvoiceResult } from './types';
 import { computeTotalAmount } from './total-amount';
 import { createBillingoInvoice } from './billingo';
@@ -14,6 +15,7 @@ import {
   validateSzamlazzRequest,
   buildSzamlazzValidationMessage,
 } from './szamlazz-validate';
+import { mergeInvoiceRequestWithDefaults } from './merge-defaults';
 import type { BillingProviderType } from '@/types/database';
 
 export interface CreateInvoiceInput {
@@ -32,9 +34,30 @@ export type CreateInvoiceOutput =
   | { success: true; invoiceId: string; externalId: string; invoiceNumber: string; pdfUrl?: string }
   | { success: false; errorMessage: string };
 
+function needsBillingoDefaults(request: NormalizedInvoiceRequest): boolean {
+  const hasBlockId = request.blockId != null && request.blockId !== '' && Number(request.blockId) >= 1;
+  const hasLanguage = (request.language?.trim() ?? '').length > 0;
+  const hasPaymentMethod = (request.paymentMethod?.trim() ?? '').length > 0;
+  return !hasBlockId || !hasLanguage || !hasPaymentMethod;
+}
+
 export async function createInvoice(input: CreateInvoiceInput): Promise<CreateInvoiceOutput> {
   const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieBaseUrl, moxieApiKey, locale = 'hu' } = input;
-  const request = rawRequest;
+  let request = rawRequest;
+
+  if (provider === 'billingo' && needsBillingoDefaults(request)) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const secret = process.env.SUPABASE_SECRET_KEY;
+    if (url && secret) {
+      const admin = createClient(url, secret);
+      const { data: orgSettings } = await admin
+        .from('org_settings')
+        .select('default_invoice_block_id, default_invoice_language, default_payment_method')
+        .eq('org_id', orgId)
+        .maybeSingle();
+      request = mergeInvoiceRequestWithDefaults(request, orgSettings ?? null);
+    }
+  }
 
   if (provider === 'billingo') {
     const validation = validateBillingoRequest(request);

@@ -14,7 +14,7 @@ export default async function SettingsPage() {
   const hasSubscription = ctx?.hasSubscription ?? false;
 
   return (
-    <div className="space-y-6 max-w-3xl animate-fade-in">
+    <div className="space-y-6 max-w-5xl animate-fade-in">
       <header>
         <h1 className="text-page-title">{t('title')}</h1>
         <p className="mt-1 text-sm text-text-secondary">

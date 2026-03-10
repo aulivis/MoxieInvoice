@@ -63,7 +63,7 @@ export default async function InvoicesListPage() {
   const count = invoices?.length ?? 0;
 
   return (
-    <div className="space-y-5 max-w-5xl animate-fade-in">
+    <div className="space-y-5 max-w-7xl animate-fade-in">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -199,7 +199,7 @@ export default async function InvoicesListPage() {
                     <TableCell className="font-tabular-nums font-medium">
                       {inv.external_id ?? inv.moxie_invoice_id ?? '—'}
                     </TableCell>
-                    <TableCell className="text-sm text-status-error max-w-xs">
+                    <TableCell className="text-sm text-status-error min-w-0 max-w-md">
                       {inv.error_message ? (
                         <details>
                           <summary className="cursor-pointer hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded list-none">
