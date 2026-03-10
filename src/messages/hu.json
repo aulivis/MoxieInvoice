@@ -63,7 +63,11 @@
     "statSuccessRate": "Sikeresség",
     "statFailed": "Hibás számlák",
     "quickActionsTitle": "Gyors műveletek",
-    "quickActionsDesc": "Hozz létre új számlát vagy ellenőrizd a beállításokat."
+    "quickActionsDesc": "Hozz létre új számlát vagy ellenőrizd a beállításokat.",
+    "setupGuideTitle": "Kezdeti beállítás",
+    "setupStep1": "Előfizetés aktiválása",
+    "setupStep2": "Moxie kapcsolat beállítása",
+    "setupStep3": "Számlázó beállítása"
   },
   "invoices": {
     "title": "Számlák",
@@ -86,7 +90,12 @@
     "refresh": "Frissítés",
     "delete": "Törlés",
     "deleteFailed": "Hibás sor törlése",
-    "deleting": "Törlés..."
+    "deleting": "Törlés...",
+    "filterAll": "Összes",
+    "filterCreated": "Létrehozva",
+    "filterSynced": "Szinkronizált",
+    "filterFailed": "Sikertelen",
+    "emptyFiltered": "Nincs ilyen számla."
   },
   "invoicesNew": {
     "title": "Új számla",
@@ -143,7 +152,8 @@
     "connectionSuccess": "Kapcsolat sikeres.",
     "apiKeyAlreadySaved": "Az API kulcs már el van mentve. Csak új kulcs megadásakor kell felülírni.",
     "statusLive": "Él",
-    "statusConnected": "Összekapcsolva",
+    "statusConnected": "Csatlakoztatva",
+    "statusDisconnected": "Nincs kapcsolat",
     "statusNotTested": "Nem tesztelt",
     "statusNotConfigured": "Nincs beállítva",
     "webhookUrl": "A webhook URL a Moxie-ban:",
@@ -231,6 +241,8 @@
     "saved": "Mentve.",
     "saveFailed": "A mentés sikertelen. Próbáld újra.",
     "statusNotConfigured": "Nincs beállítva",
+    "statusConnected": "Csatlakoztatva",
+    "statusDisconnected": "Nincs kapcsolat",
     "statusLive": "Él",
     "invoiceDefaultsTitle": "Alapértelmezett számla mezők (Billingo)",
     "invoiceDefaultsHint": "Ha a Moxie számla nem ad meg értéket, ezek kerülnek használatra.",
@@ -238,6 +250,7 @@
     "defaultBlockIdHint": "A Billingo számlatömbök közül választhatsz; az első a Billingo alapértelmezettje.",
     "blocksLoading": "Számlatömbök betöltése…",
     "blocksLoadError": "Nem sikerült betölteni a számlatömböket. Ellenőrizd az API kulcsot.",
+    "optionsLoading": "Opciók betöltése…",
     "defaultLanguage": "Nyelv",
     "defaultPaymentMethod": "Fizetési mód"
   },

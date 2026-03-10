@@ -75,6 +75,87 @@ export async function listBillingoBlocks(
   return { blocks, defaultBlockId };
 }
 
+/** Billingo v3 payment_method enum values (from API spec). User selects from these. */
+export const BILLINGO_PAYMENT_METHODS = [
+  'aruhitel',
+  'bankcard',
+  'barion',
+  'barter',
+  'cash',
+  'cash_on_delivery',
+  'coupon',
+  'elore_utalas',
+  'ep_kartya',
+  'kompenzacio',
+  'levonas',
+  'online_bankcard',
+  'other',
+  'paylike',
+  'payoneer',
+  'paypal',
+  'paypal_utolag',
+  'payu',
+  'pick_pack_pont',
+  'postai_csekk',
+  'postautalvany',
+  'skrill',
+  'szep_card',
+  'transferwise',
+  'upwork',
+  'utalvany',
+  'valto',
+  'wire_transfer',
+] as const;
+
+/** Billingo v3 document language enum. */
+export const BILLINGO_LANGUAGES = ['hu', 'en', 'de', 'fr', 'hr', 'it', 'ro', 'sk', 'us'] as const;
+
+/** Billingo v3 item.vat enum (string). Common percent values + special codes. */
+export const BILLINGO_VAT_OPTIONS = [
+  '0%',
+  '1%',
+  '2%',
+  '3%',
+  '4%',
+  '5%',
+  '5,5%',
+  '6%',
+  '7%',
+  '7,7%',
+  '8%',
+  '9%',
+  '9,5%',
+  '10%',
+  '11%',
+  '12%',
+  '13%',
+  '14%',
+  '15%',
+  '16%',
+  '17%',
+  '18%',
+  '19%',
+  '20%',
+  '21%',
+  '22%',
+  '23%',
+  '24%',
+  '25%',
+  '26%',
+  '27%',
+  'AAM',
+  'AM',
+  'EU',
+  'EUK',
+  'F.AFA',
+  'FAD',
+  'K.AFA',
+  'MAA',
+  'TAM',
+  'ÁKK',
+  'ÁTHK',
+] as const;
+
 export async function createBillingoInvoice(
   credentials: BillingoCredentials,
   request: NormalizedInvoiceRequest
@@ -118,6 +199,12 @@ export async function createBillingoInvoice(
   }
 
   const dueDate = request.dueDate || request.fulfillmentDate;
+  // Billingo v3 expects item.vat as string enum e.g. '27%', '18%', '5%', '0%'
+  const vatToString = (percent: number): string => {
+    if (Number.isInteger(percent)) return `${percent}%`;
+    const s = percent.toFixed(1).replace('.', ',');
+    return `${s}%`;
+  };
   const invoiceItems = request.items.map((item) => ({
     name: item.name,
     quantity: item.quantity,
@@ -125,7 +212,7 @@ export async function createBillingoInvoice(
     unit_price: item.netUnitPrice,
     net_unit_price: item.netUnitPrice,
     unit_price_type: item.unitPriceType ?? 'net',
-    vat: item.vatPercent,
+    vat: vatToString(item.vatPercent),
   }));
 
   const invoicePayload = {
@@ -134,7 +221,7 @@ export async function createBillingoInvoice(
     type: request.invoiceType === 'proforma' ? 'proforma' : request.invoiceType === 'advance' ? 'advance' : 'invoice',
     fulfillment_date: request.fulfillmentDate,
     due_date: dueDate,
-    payment_method: request.paymentMethod ?? 'bank_transfer',
+    payment_method: request.paymentMethod ?? 'wire_transfer',
     language: request.language ?? 'hu',
     currency: request.currency,
     comment: request.comment || '',

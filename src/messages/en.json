@@ -63,7 +63,11 @@
     "statSuccessRate": "Success rate",
     "statFailed": "Failed invoices",
     "quickActionsTitle": "Quick actions",
-    "quickActionsDesc": "Create a new invoice or check your settings."
+    "quickActionsDesc": "Create a new invoice or check your settings.",
+    "setupGuideTitle": "Getting started",
+    "setupStep1": "Activate subscription",
+    "setupStep2": "Set up Moxie connection",
+    "setupStep3": "Configure billing provider"
   },
   "invoices": {
     "title": "Invoices",
@@ -86,7 +90,12 @@
     "refresh": "Refresh",
     "delete": "Delete",
     "deleteFailed": "Delete failed row",
-    "deleting": "Deleting..."
+    "deleting": "Deleting...",
+    "filterAll": "All",
+    "filterCreated": "Created",
+    "filterSynced": "Synced",
+    "filterFailed": "Failed",
+    "emptyFiltered": "No invoices match this filter."
   },
   "invoicesNew": {
     "title": "New invoice",
@@ -144,6 +153,7 @@
     "apiKeyAlreadySaved": "API key is already saved. Only enter a value to replace it.",
     "statusLive": "Live",
     "statusConnected": "Connected",
+    "statusDisconnected": "Not connected",
     "statusNotTested": "Not tested",
     "statusNotConfigured": "Not configured",
     "webhookUrl": "Webhook URL in Moxie:",
@@ -231,6 +241,8 @@
     "saved": "Saved.",
     "saveFailed": "Save failed. Please try again.",
     "statusNotConfigured": "Not configured",
+    "statusConnected": "Connected",
+    "statusDisconnected": "Not connected",
     "statusLive": "Live",
     "invoiceDefaultsTitle": "Default invoice fields (Billingo)",
     "invoiceDefaultsHint": "Used when the Moxie invoice does not provide these values.",
@@ -238,6 +250,7 @@
     "defaultBlockIdHint": "Choose from your Billingo document blocks; the first is usually Billingo's default.",
     "blocksLoading": "Loading invoice blocks…",
     "blocksLoadError": "Could not load invoice blocks. Check your API key.",
+    "optionsLoading": "Loading options…",
     "defaultLanguage": "Language",
     "defaultPaymentMethod": "Payment method"
   },

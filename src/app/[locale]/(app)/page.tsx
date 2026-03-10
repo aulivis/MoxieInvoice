@@ -8,6 +8,59 @@ import { Card } from '@/components/ui/Card';
 import { StatusCell } from '@/components/ui/StatusCell';
 import { EmptyState } from '@/components/ui/EmptyState';
 
+// ── Icons for stat cards ────────────────────────────────────────────────────
+
+function DocumentIcon() {
+  return (
+    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+// ── Setup step indicator ────────────────────────────────────────────────────
+
+function SetupStep({ done, label, href }: { done: boolean; label: string; href: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-2 group outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
+    >
+      {done ? (
+        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-status-success shrink-0" aria-label="Kész">
+          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </span>
+      ) : (
+        <span className="flex items-center justify-center w-5 h-5 rounded-full border-2 border-border-medium shrink-0" aria-label="Hiányzik" />
+      )}
+      <span className={`text-sm ${done ? 'text-text-tertiary line-through' : 'text-text-primary group-hover:text-primary transition-colors'}`}>
+        {label}
+      </span>
+    </Link>
+  );
+}
+
 export default async function HomePage() {
   const t = await getTranslations('dashboard');
   const tInvoices = await getTranslations('invoices');
@@ -20,28 +73,32 @@ export default async function HomePage() {
 
   const locale = await getLocale();
   const supabase = await createClient();
+  const hasSubscription = ctx?.hasSubscription ?? false;
 
-  // Fetch stats and recent invoices in parallel
-  const [allResult, recentResult] = await Promise.all([
-    supabase
-      .from('invoices')
-      .select('id, status')
-      .eq('org_id', orgId),
+  // Fetch stats, recent invoices, and setup status in parallel
+  const [allResult, recentResult, moxieResult, billingResult] = await Promise.all([
+    supabase.from('invoices').select('id, status').eq('org_id', orgId),
     supabase
       .from('invoices')
       .select('id, external_id, status, error_message, created_at')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
       .limit(6),
+    supabase.from('moxie_connections').select('base_url').eq('org_id', orgId).maybeSingle(),
+    supabase.from('billing_providers').select('provider').eq('org_id', orgId).maybeSingle(),
   ]);
 
   const all = allResult.data ?? [];
   const recent = recentResult.data ?? [];
+  const moxieConnected = !!moxieResult.data?.base_url;
+  const billingConfigured = !!billingResult.data?.provider;
 
   const total = all.length;
   const failed = all.filter((i) => i.status === 'failed').length;
   const success = total - failed;
   const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
+
+  const allSetupDone = hasSubscription && moxieConnected && billingConfigured;
 
   function formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleDateString(locale, {
@@ -73,25 +130,51 @@ export default async function HomePage() {
         </Link>
       </div>
 
+      {/* Setup guide strip — hidden once all steps are done */}
+      {!allSetupDone && (
+        <div className="opacity-0 animate-fade-up bg-background-card border border-border-light rounded-xl px-5 py-4 shadow-subtle">
+          <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{t('setupGuideTitle')}</p>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+            <SetupStep done={hasSubscription} label={t('setupStep1')} href="/settings" />
+            <span className="hidden sm:block text-border-medium">→</span>
+            <SetupStep done={moxieConnected} label={t('setupStep2')} href="/settings" />
+            <span className="hidden sm:block text-border-medium">→</span>
+            <SetupStep done={billingConfigured} label={t('setupStep3')} href="/settings" />
+          </div>
+        </div>
+      )}
+
       {/* Bento: Stats row */}
-      <div className="grid grid-cols-3 gap-4 opacity-0 animate-fade-up">
-        <StatCard
-          label={t('statTotal')}
-          value={total}
-          accent="primary"
-        />
-        <StatCard
-          label={t('statSuccessRate')}
-          value={`${successRate}%`}
-          trend={successRate >= 90 ? 'up' : successRate >= 70 ? 'neutral' : 'down'}
-          accent="success"
-        />
-        <StatCard
-          label={t('statFailed')}
-          value={failed}
-          trend={failed === 0 ? 'neutral' : 'down'}
-          accent={failed > 0 ? 'error' : 'default'}
-        />
+      <div className="grid grid-cols-3 gap-4">
+        <div className="opacity-0 animate-fade-up">
+          <StatCard
+            label={t('statTotal')}
+            value={total}
+            accent="primary"
+            icon={<DocumentIcon />}
+            iconBg="bg-blue-50"
+          />
+        </div>
+        <div className="opacity-0 animate-fade-up delay-60">
+          <StatCard
+            label={t('statSuccessRate')}
+            value={`${successRate}%`}
+            trend={successRate >= 90 ? 'up' : successRate >= 70 ? 'neutral' : 'down'}
+            accent="success"
+            icon={<CheckIcon />}
+            iconBg="bg-emerald-50"
+          />
+        </div>
+        <div className="opacity-0 animate-fade-up delay-120">
+          <StatCard
+            label={t('statFailed')}
+            value={failed}
+            trend={failed === 0 ? 'neutral' : 'down'}
+            accent={failed > 0 ? 'error' : 'default'}
+            icon={<XIcon />}
+            iconBg="bg-red-50"
+          />
+        </div>
       </div>
 
       {/* Recent invoices */}
@@ -120,7 +203,7 @@ export default async function HomePage() {
               {recent.map((inv, i) => (
                 <li
                   key={inv.id}
-                  className={`flex items-center gap-3 px-5 py-3.5 hover:bg-surface-50 transition-colors opacity-0 animate-fade-up`}
+                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-surface-50 transition-colors opacity-0 animate-fade-up"
                   style={{ animationDelay: `${(i + 2) * 50}ms` }}
                 >
                   <div className="flex-1 min-w-0">
@@ -146,35 +229,6 @@ export default async function HomePage() {
               ))}
             </ul>
           )}
-        </Card>
-      </div>
-
-      {/* Bottom row: Quick actions */}
-      <div className="opacity-0 animate-fade-up-2">
-        <Card variant="gradient" contentClassName="p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="font-semibold text-white text-base mb-1">{t('quickActionsTitle')}</p>
-              <p className="text-sm text-white/70">{t('quickActionsDesc')}</p>
-            </div>
-            <div className="flex gap-3 shrink-0">
-              <Link
-                href="/invoices/new"
-                className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-white/90 transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary outline-none"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                </svg>
-                {t('newInvoice')}
-              </Link>
-              <Link
-                href="/settings"
-                className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 outline-none"
-              >
-                {t('settings')}
-              </Link>
-            </div>
-          </div>
         </Card>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
-import { Badge } from '@/components/ui/Badge';
+import { ConnectionStatusBadge } from '@/components/ui/ConnectionStatusBadge';
 
 const disabledInputClass =
   'disabled:opacity-60 disabled:cursor-not-allowed';
@@ -111,14 +111,13 @@ export function MoxieConnectionForm({ hasSubscription = true }: { hasSubscriptio
 
   const connected = !!baseUrl;
   const isLive = connected && lastTestedAt && (Date.now() - new Date(lastTestedAt).getTime() < LIVE_THRESHOLD_MS);
-  const statusBadge =
-    !connected ? (
-      <Badge variant="gray">{t('statusNotConfigured')}</Badge>
-    ) : isLive ? (
-      <Badge variant="green">{t('statusConnected')}</Badge>
-    ) : (
-      <Badge variant="gray">{t('statusNotTested')}</Badge>
-    );
+  const statusBadge = (
+    <ConnectionStatusBadge
+      connected={!!isLive}
+      connectedLabel={t('statusConnected')}
+      disconnectedLabel={connected ? t('statusNotTested') : t('statusDisconnected')}
+    />
+  );
 
   // Build the full webhook URL including the secret for Moxie configuration
   const webhookUrl = typeof window !== 'undefined' && organizationId && webhookSecret

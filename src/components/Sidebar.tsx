@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { HeaderAuth } from '@/components/HeaderAuth';
+import { ConnectionStatusBadge } from '@/components/ui/ConnectionStatusBadge';
 
 const navLinks = [
   { href: '/', key: 'dashboard' as const },
@@ -83,20 +84,21 @@ export function Sidebar() {
   const pathname = usePathname();
   const t = useTranslations('nav');
   const tMoxie = useTranslations('moxie');
-  const moxieLiveRef = useRef(false);
+  const [moxieLive, setMoxieLive] = useState(false);
 
   useEffect(() => {
     fetch('/api/moxie/connection')
       .then((r) => r.json())
       .then((data) => {
         const at = data?.lastTestedAt;
-        moxieLiveRef.current =
+        setMoxieLive(
           !!data?.connected &&
-          !!data?.hasApiKey &&
-          !!at &&
-          Date.now() - new Date(at).getTime() < MOXIE_LIVE_THRESHOLD_MS;
+            !!data?.hasApiKey &&
+            !!at &&
+            Date.now() - new Date(at).getTime() < MOXIE_LIVE_THRESHOLD_MS
+        );
       })
-      .catch(() => {});
+      .catch(() => setMoxieLive(false));
   }, []);
 
   return (
@@ -137,7 +139,7 @@ export function Sidebar() {
           {navLinks.map(({ href, key }) => {
             const isActive =
               pathname === href || (href !== '/' && pathname.startsWith(href));
-            const showMoxieLive = href === '/settings' && moxieLiveRef.current;
+            const showConnectionBadge = href === '/settings';
             const Icon = navIcons[key];
 
             return (
@@ -167,12 +169,14 @@ export function Sidebar() {
                 >
                   {Icon && <Icon active={isActive} />}
                   <span>{t(key)}</span>
-                  {showMoxieLive && (
-                    <span
-                      className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot shrink-0"
-                      title={tMoxie('statusConnected')}
-                      aria-label={tMoxie('statusConnected')}
-                    />
+                  {showConnectionBadge && (
+                    <span className="ml-auto shrink-0">
+                      <ConnectionStatusBadge
+                        connected={moxieLive}
+                        connectedLabel={tMoxie('statusConnected')}
+                        disconnectedLabel={tMoxie('statusDisconnected')}
+                      />
+                    </span>
                   )}
                 </Link>
               </li>

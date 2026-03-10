@@ -5,6 +5,7 @@
 
 import type { NormalizedInvoiceRequest } from './types';
 import { BILLINGO_ALLOWED_VAT_PERCENTS } from './types';
+import { BILLINGO_LANGUAGES } from './billingo';
 
 // Lazy-load messages to avoid pulling all locales into server bundle when only one is used
 const getMessages = (locale: 'hu' | 'en') => {
@@ -26,18 +27,36 @@ interface BillingoValidationMessages {
 
 const DATE_YYYY_MM_DD = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Billingo accepts these payment_method values (whitelist). */
+/** Billingo v3 payment_method enum (from API spec). */
 const ALLOWED_PAYMENT_METHODS = new Set([
-  'bank_transfer',
-  'cash',
+  'aruhitel',
   'bankcard',
+  'barion',
+  'barter',
+  'cash',
+  'cash_on_delivery',
   'coupon',
   'elore_utalas',
+  'ep_kartya',
+  'kompenzacio',
   'levonas',
-  'postautalvany',
+  'online_bankcard',
+  'other',
+  'paylike',
+  'payoneer',
+  'paypal',
+  'paypal_utolag',
+  'payu',
+  'pick_pack_pont',
   'postai_csekk',
+  'postautalvany',
   'skrill',
-  'barion',
+  'szep_card',
+  'transferwise',
+  'upwork',
+  'utalvany',
+  'valto',
+  'wire_transfer',
 ]);
 
 export interface BillingoValidationError {
@@ -116,7 +135,7 @@ export function validateBillingoRequest(
     errors.push({ code: 'MISSING_FIELD', field: 'language' });
   } else {
     const lang = request.language!.trim().toLowerCase();
-    if (lang !== 'hu' && lang !== 'en') {
+    if (!(BILLINGO_LANGUAGES as readonly string[]).includes(lang)) {
       errors.push({ code: 'INVALID_VALUE', field: 'language', value: request.language! });
     }
   }

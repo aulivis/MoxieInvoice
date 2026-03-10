@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 interface StatCardProps {
   label: string;
   value: string | number;
@@ -5,6 +7,8 @@ interface StatCardProps {
   trendLabel?: string;
   accent?: 'default' | 'success' | 'error' | 'primary';
   className?: string;
+  icon?: ReactNode;
+  iconBg?: string;
 }
 
 const accentClasses = {
@@ -42,19 +46,28 @@ function TrendIcon({ trend }: { trend: 'up' | 'down' | 'neutral' }) {
   );
 }
 
-export function StatCard({ label, value, trend, trendLabel, accent = 'default', className = '' }: StatCardProps) {
+export function StatCard({ label, value, trend, trendLabel, accent = 'default', className = '', icon, iconBg }: StatCardProps) {
   return (
     <div
       className={`bg-background-card rounded-xl p-5 shadow-stat border ${accentClasses[accent]} ${className}`}
     >
-      <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{label}</p>
-      <p className="text-metric-value font-tabular-nums mb-2">{value}</p>
-      {trend && trendLabel && (
-        <div className={`flex items-center gap-1 text-xs font-medium ${trendColors[trend]}`}>
-          <TrendIcon trend={trend} />
-          <span>{trendLabel}</span>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{label}</p>
+          <p className="text-metric-value font-tabular-nums mb-2">{value}</p>
+          {trend && trendLabel && (
+            <div className={`flex items-center gap-1 text-xs font-medium ${trendColors[trend]}`}>
+              <TrendIcon trend={trend} />
+              <span>{trendLabel}</span>
+            </div>
+          )}
         </div>
-      )}
+        {icon && (
+          <div className={`flex items-center justify-center w-10 h-10 rounded-xl shrink-0 ${iconBg ?? 'bg-surface-100'}`}>
+            {icon}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

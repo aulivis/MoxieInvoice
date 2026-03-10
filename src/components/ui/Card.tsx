@@ -15,6 +15,7 @@ const variants = {
     'rounded-xl border border-white/20 bg-white/80 backdrop-blur-md shadow-elevated',
 };
 
+
 export interface CardProps {
   children: ReactNode;
   className?: string;
@@ -39,7 +40,7 @@ export function Card({
   return (
     <div className={`${variants[variant]} ${className}`}>
       {title && (
-        <div className="border-b border-border-light px-5 py-3.5 rounded-t-xl flex items-center justify-between gap-3">
+        <div className="bg-surface-50 px-5 py-3.5 rounded-t-xl flex items-center justify-between gap-3">
           <h2 className="text-section-title">{title}</h2>
           {titleAction && <div className="shrink-0">{titleAction}</div>}
         </div>
