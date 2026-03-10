@@ -234,7 +234,10 @@
     "statusLive": "Live",
     "invoiceDefaultsTitle": "Default invoice fields (Billingo)",
     "invoiceDefaultsHint": "Used when the Moxie invoice does not provide these values.",
-    "defaultBlockId": "Invoice block (block id)",
+    "defaultBlockId": "Default invoice block",
+    "defaultBlockIdHint": "Choose from your Billingo document blocks; the first is usually Billingo's default.",
+    "blocksLoading": "Loading invoice blocks…",
+    "blocksLoadError": "Could not load invoice blocks. Check your API key.",
     "defaultLanguage": "Language",
     "defaultPaymentMethod": "Payment method"
   },

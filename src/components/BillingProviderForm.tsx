@@ -37,6 +37,10 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
   const [defaultsSaving, setDefaultsSaving] = useState(false);
   const [defaultsSaved, setDefaultsSaved] = useState(false);
   const [defaultsError, setDefaultsError] = useState<string | null>(null);
+  const [billingoBlocks, setBillingoBlocks] = useState<Array<{ id: number; name: string; prefix: string }>>([]);
+  const [billingoBlocksLoading, setBillingoBlocksLoading] = useState(false);
+  const [billingoBlocksError, setBillingoBlocksError] = useState<string | null>(null);
+  const [billingoDefaultBlockId, setBillingoDefaultBlockId] = useState<number | null>(null);
   const t = useTranslations('billing');
   const tCommon = useTranslations('common');
   const tSub = useTranslations('subscription');
@@ -75,18 +79,39 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
   useEffect(() => {
     if (provider !== 'billingo') {
       setDefaultsFetched(true);
+      setBillingoBlocks([]);
+      setBillingoBlocksError(null);
       return;
     }
+    setBillingoBlocksError(null);
     fetch('/api/settings/org')
       .then((r) => r.json())
       .then((d) => {
-        if (d.default_invoice_block_id != null) setDefaultBlockId(String(d.default_invoice_block_id));
+        const savedBlockId = d.default_invoice_block_id != null ? String(d.default_invoice_block_id) : '';
+        if (savedBlockId) setDefaultBlockId(savedBlockId);
         if (d.default_invoice_language === 'hu' || d.default_invoice_language === 'en') setDefaultLanguage(d.default_invoice_language);
         if (d.default_payment_method) setDefaultPaymentMethod(d.default_payment_method);
         setDefaultsFetched(true);
+
+        setBillingoBlocksLoading(true);
+        fetch('/api/billing/billingo-blocks', { cache: 'no-store' })
+          .then((res) => res.json())
+          .then((data) => {
+            setBillingoBlocksLoading(false);
+            if (data.blocks?.length) {
+              setBillingoBlocks(data.blocks);
+              if (data.defaultBlockId != null) setBillingoDefaultBlockId(data.defaultBlockId);
+              if (!savedBlockId && data.defaultBlockId != null) setDefaultBlockId(String(data.defaultBlockId));
+            }
+            if (data.error) setBillingoBlocksError(data.error);
+          })
+          .catch(() => {
+            setBillingoBlocksLoading(false);
+            setBillingoBlocksError(t('blocksLoadError'));
+          });
       })
       .catch(() => setDefaultsFetched(true));
-  }, [provider]);
+  }, [provider, t]);
 
   const inputClass =
     'w-full rounded-lg border border-border-medium bg-background-card px-3 py-2.5 text-base min-h-[44px] text-text-primary placeholder:text-text-disabled focus-visible:outline-none focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-primary/10 ' +
@@ -222,16 +247,47 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
               <label htmlFor="default-block-id" className={labelClass}>
                 {t('defaultBlockId')}
               </label>
-              <input
-                id="default-block-id"
-                type="number"
-                min={1}
-                value={defaultBlockId}
-                onChange={(e) => setDefaultBlockId(e.target.value)}
-                placeholder="1"
-                className={inputClass}
-                disabled={disabled}
-              />
+              <p className="text-xs text-text-secondary mb-1.5">{t('defaultBlockIdHint')}</p>
+              {billingoBlocksLoading && (
+                <p className="text-sm text-text-secondary py-2">{t('blocksLoading')}</p>
+              )}
+              {billingoBlocksError && (
+                <Alert variant="error" className="mb-2">{billingoBlocksError}</Alert>
+              )}
+              {billingoBlocks.length > 0 ? (
+                <Select
+                  id="default-block-id"
+                  value={defaultBlockId}
+                  options={(() => {
+                    const opts = billingoBlocks.map((b) => ({
+                      value: String(b.id),
+                      label: [b.name, b.prefix].filter(Boolean).join(' — ') || `#${b.id}`,
+                      ...(billingoDefaultBlockId === b.id ? { leading: '★' as const } : {}),
+                    }));
+                    if (defaultBlockId && !opts.some((o) => o.value === defaultBlockId)) {
+                      opts.unshift({ value: defaultBlockId, label: `ID: ${defaultBlockId}` });
+                    }
+                    return opts;
+                  })()}
+                  onChange={(v) => setDefaultBlockId(v)}
+                  disabled={disabled || billingoBlocksLoading}
+                  aria-label={t('defaultBlockId')}
+                  className="mt-1"
+                />
+              ) : (
+                !billingoBlocksLoading && (
+                  <input
+                    id="default-block-id"
+                    type="number"
+                    min={1}
+                    value={defaultBlockId}
+                    onChange={(e) => setDefaultBlockId(e.target.value)}
+                    placeholder="1"
+                    className={inputClass}
+                    disabled={disabled}
+                  />
+                )
+              )}
             </div>
             <div>
               <label htmlFor="default-language" className={labelClass}>

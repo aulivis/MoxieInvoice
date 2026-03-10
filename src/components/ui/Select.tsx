@@ -30,6 +30,8 @@ export interface SelectProps<T extends string = string> {
   variant?: 'default' | 'compact';
   /** For dark sidebar context – uses CSS variables */
   dark?: boolean;
+  /** Dropdown placement: 'bottom' (default) or 'top' (e.g. when near bottom of viewport) */
+  placement?: 'bottom' | 'top';
   /** Optional label – not rendered inside Select, use with external label for form layout */
   'aria-label': string;
   className?: string;
@@ -44,7 +46,7 @@ const triggerDefault =
 const triggerCompact = 'min-h-[36px] px-3 py-2 text-sm font-medium';
 
 const listBase =
-  'absolute z-50 min-w-[var(--select-trigger-width)] max-h-[280px] overflow-auto rounded-lg shadow-dropdown border border-border-light bg-background-card py-1 animate-fade-up origin-top';
+  'absolute z-50 left-0 min-w-[var(--select-trigger-width)] max-h-[280px] overflow-auto rounded-lg shadow-dropdown border border-border-light bg-background-card py-1 animate-fade-up';
 
 const optionBase =
   'flex items-center gap-2 w-full px-3 py-2.5 text-left text-base cursor-pointer transition-colors outline-none';
@@ -60,6 +62,7 @@ export function Select<T extends string = string>({
   placeholder,
   variant = 'default',
   dark = false,
+  placement = 'bottom',
   'aria-label': ariaLabel,
   className = '',
 }: SelectProps<T>) {
@@ -185,7 +188,7 @@ export function Select<T extends string = string>({
       >
         <span className="flex items-center gap-2 min-w-0 truncate">
           {selectedOption?.leading != null && (
-            <span className="shrink-0 flex items-center justify-center text-lg leading-none">
+            <span className="shrink-0 flex items-center justify-center w-6 text-lg leading-none" role="img" aria-hidden>
               {selectedOption.leading}
             </span>
           )}
@@ -204,10 +207,11 @@ export function Select<T extends string = string>({
           role="listbox"
           aria-activedescendant={options[highlightedIndex] ? `option-${options[highlightedIndex].value}` : undefined}
           className={listBase}
-          style={{
-            top: 'calc(100% + 4px)',
-            left: 0,
-          }}
+          style={
+            placement === 'top'
+              ? { bottom: '100%', marginBottom: '4px' }
+              : { top: 'calc(100% + 4px)' }
+          }
         >
           {options.map((opt, i) => {
             const isSelected = opt.value === value;
@@ -233,7 +237,7 @@ export function Select<T extends string = string>({
                 }}
               >
                 {opt.leading != null && (
-                  <span className="shrink-0 flex items-center justify-center text-lg leading-none">
+                  <span className="shrink-0 flex items-center justify-center w-6 text-lg leading-none" role="img" aria-hidden>
                     {opt.leading}
                   </span>
                 )}

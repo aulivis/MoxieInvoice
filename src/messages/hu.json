@@ -234,7 +234,10 @@
     "statusLive": "Él",
     "invoiceDefaultsTitle": "Alapértelmezett számla mezők (Billingo)",
     "invoiceDefaultsHint": "Ha a Moxie számla nem ad meg értéket, ezek kerülnek használatra.",
-    "defaultBlockId": "Számlatömb (block id)",
+    "defaultBlockId": "Alapértelmezett számlatömb",
+    "defaultBlockIdHint": "A Billingo számlatömbök közül választhatsz; az első a Billingo alapértelmezettje.",
+    "blocksLoading": "Számlatömbök betöltése…",
+    "blocksLoadError": "Nem sikerült betölteni a számlatömböket. Ellenőrizd az API kulcsot.",
     "defaultLanguage": "Nyelv",
     "defaultPaymentMethod": "Fizetési mód"
   },

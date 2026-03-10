@@ -28,6 +28,7 @@ export function LanguageSwitcher({ dark = false }: LanguageSwitcherProps) {
       onChange={(newLocale) => router.replace(pathname, { locale: newLocale })}
       variant={dark ? 'compact' : 'default'}
       dark={dark}
+      placement={dark ? 'top' : 'bottom'}
       aria-label="Select language"
     />
   );

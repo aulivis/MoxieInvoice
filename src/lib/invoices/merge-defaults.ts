@@ -26,8 +26,9 @@ export function mergeInvoiceRequestWithDefaults(
   if (!defaults) {
     return base;
   }
+  const defaultBlock = defaults.default_invoice_block_id != null ? Number(defaults.default_invoice_block_id) : undefined;
   const blockId = isBlockIdMissing(request.blockId)
-    ? (defaults.default_invoice_block_id != null ? Number(defaults.default_invoice_block_id) : undefined)
+    ? (defaultBlock != null && !Number.isNaN(defaultBlock) && defaultBlock >= 1 ? defaultBlock : undefined)
     : Number(request.blockId);
   const language = request.language?.trim() || defaults.default_invoice_language?.trim() || undefined;
   const paymentMethod = request.paymentMethod?.trim() || defaults.default_payment_method?.trim() || undefined;
