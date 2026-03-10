@@ -54,6 +54,14 @@ export async function POST(request: Request) {
     org_id: profile.organization_id,
     ...(current ?? {}),
     updated_at: new Date().toISOString(),
+    // Ensure NOT NULL columns when creating a new row (no existing org_settings)
+    ...(current == null
+      ? {
+          currency_convert_to_huf: false,
+          schedule_type: 'always',
+          timezone: 'Europe/Budapest',
+        }
+      : {}),
   };
   if (body.currency_convert_to_huf !== undefined) payload.currency_convert_to_huf = body.currency_convert_to_huf;
   if (body.conversion_source !== undefined) payload.conversion_source = body.conversion_source;
