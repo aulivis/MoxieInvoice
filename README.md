@@ -87,6 +87,19 @@ A Moxie-ban regisztráld a webhook URL-t **org paraméterrel**:
 `GET /api/cron/process-invoice-queue` – 5 percenként (vercel.json).  
 Beállítsd a `CRON_SECRET` env-et és a Vercel Cron auth header-t.
 
+## GitHub (first-time push)
+
+If the repo is not yet on GitHub:
+
+1. On [GitHub](https://github.com/new) create a new repository named **MoxieInvoice** (no README, no .gitignore).
+2. In this folder run:
+   ```bash
+   git remote add origin https://github.com/YOUR_USERNAME/MoxieInvoice.git
+   git branch -M main
+   git push -u origin main
+   ```
+   Replace `YOUR_USERNAME` with your GitHub username or org.
+
 ## Deploy to Vercel
 
 1. Push this repo to GitHub and import the project in [Vercel](https://vercel.com).
