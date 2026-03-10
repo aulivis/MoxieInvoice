@@ -107,19 +107,25 @@ export async function getBillingoDocument(
   }
 
   const doc = (await res.json()) as {
+    // Billingo v3 uses gross_total for the invoice total; older/internal may use total
+    gross_total?: number;
     total?: number;
+    // Amount paid; Billingo v3 uses paid_amount on the document object
+    paid_amount?: number;
     total_paid?: number;
-    totalPaid?: number; // Billingo API may return camelCase
-    status?: string; // e.g. 'paid' – some Billingo responses use this
+    totalPaid?: number;
+    // Primary payment status field in Billingo v3: 'outstanding' | 'paid' | 'partial'
+    payment_status?: string;
+    // Fallback status field
+    status?: string;
   };
-  const total = Number(doc?.total) || 0;
-  const totalPaid =
-    Number(doc?.total_paid ?? doc?.totalPaid) ?? 0;
+  const total = Number(doc?.gross_total ?? doc?.total) || 0;
+  const totalPaid = Number(doc?.paid_amount ?? doc?.total_paid ?? doc?.totalPaid) || 0;
   const statusPaid =
-    typeof doc?.status === 'string' && doc.status.toLowerCase() === 'paid';
-  // Consider paid if total_paid >= total (with total > 0) OR explicit status === 'paid'
-  const paid =
-    statusPaid || (total > 0 && totalPaid >= total);
+    (typeof doc?.payment_status === 'string' && doc.payment_status.toLowerCase() === 'paid') ||
+    (typeof doc?.status === 'string' && doc.status.toLowerCase() === 'paid');
+  // Consider paid if explicit payment_status/status === 'paid' OR total_paid >= total
+  const paid = statusPaid || (total > 0 && totalPaid >= total);
   return { total, total_paid: totalPaid, _paid: paid };
 }
 

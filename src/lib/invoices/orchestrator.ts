@@ -122,6 +122,7 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
       org_id: orgId,
       moxie_invoice_id: moxieInvoiceId || null,
       external_id: result.externalId,
+      invoice_number: result.invoiceNumber || null,
       provider,
       status: 'created',
       pdf_url: result.pdfUrl || null,
