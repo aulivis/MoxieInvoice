@@ -143,6 +143,33 @@ export function isBillingoDocumentPaid(info: BillingoDocumentPaymentInfo): boole
 }
 
 /**
+ * Download the PDF binary of a Billingo document via GET /documents/{id}/download.
+ * Returns the PDF as a Response (stream) so the caller can forward it directly.
+ * Throws on non-2xx responses.
+ */
+export async function downloadBillingoPdf(
+  credentials: BillingoCredentials,
+  documentId: string
+): Promise<Response> {
+  const res = await fetch(
+    `${BILLINGO_API_BASE}/documents/${encodeURIComponent(documentId)}/download`,
+    {
+      headers: {
+        Accept: 'application/pdf',
+        'X-API-KEY': credentials.apiKey,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Billingo PDF download: ${res.status} ${errText}`);
+  }
+
+  return res;
+}
+
+/**
  * Send document by email via Billingo API (POST /documents/{id}/send).
  * @see https://app.swaggerhub.com/apis/Billingo/Billingo/3.0.13#/Document/SendDocument
  * Only call when emails array is non-empty.

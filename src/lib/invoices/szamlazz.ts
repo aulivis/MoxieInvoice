@@ -90,9 +90,11 @@ function parseResponseXml(xml: string): { invoiceNumber?: string; pdfUrl?: strin
   const errorMatch = xml.match(/<hiba(?:kód)?>([^<]*)<\/hiba(?:kód)?>/i) ?? xml.match(/<hiba>([^<]*)<\/hiba>/i);
   if (errorMatch) return { error: errorMatch[1].trim() };
   const numMatch = xml.match(/<szamlaszam>([^<]*)<\/szamlaszam>/i);
-  // szamlakulcsar is an access key that allows viewing the invoice publicly.
-  // We build a viewer URL from it instead of storing the base64 <pdf> content.
-  const kulcsarMatch = xml.match(/<szamlakulcsar>([^<]*)<\/szamlakulcsar>/i);
+  // szamlakulcsar (or szamlakulcs in some response versions) is a public access key
+  // for viewing the invoice online. We build a viewer URL from it.
+  const kulcsarMatch =
+    xml.match(/<szamlakulcsar>([^<]*)<\/szamlakulcsar>/i) ??
+    xml.match(/<szamlakulcs>([^<]*)<\/szamlakulcs>/i);
   let pdfUrl: string | undefined;
   if (numMatch && kulcsarMatch) {
     const szamlaszam = numMatch[1].trim();

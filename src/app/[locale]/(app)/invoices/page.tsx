@@ -27,12 +27,23 @@ export default async function InvoicesListPage() {
   const t = await getTranslations('invoices');
   const locale = await getLocale();
   const supabase = await createClient();
-  const { data: invoices } = await supabase
-    .from('invoices')
-    .select('id, external_id, invoice_number, moxie_invoice_id, status, payment_status, error_message, created_at, pdf_url, total_amount, payload_snapshot, provider')
-    .eq('org_id', orgId)
-    .order('created_at', { ascending: false })
-    .limit(50);
+  const [{ data: invoices }, { data: moxieConn }] = await Promise.all([
+    supabase
+      .from('invoices')
+      .select('id, external_id, invoice_number, moxie_invoice_id, moxie_invoice_uuid, status, payment_status, error_message, created_at, pdf_url, total_amount, payload_snapshot, provider')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false })
+      .limit(50),
+    supabase
+      .from('moxie_connections')
+      .select('base_url')
+      .eq('org_id', orgId)
+      .maybeSingle(),
+  ]);
+
+  const moxieWebBaseUrl = moxieConn?.base_url
+    ? moxieConn.base_url.replace(/\/$/, '').replace(/\/api\/public\/?$/i, '')
+    : undefined;
 
   const count = invoices?.length ?? 0;
 
@@ -62,7 +73,7 @@ export default async function InvoicesListPage() {
 
       {/* Invoices list */}
       <Card contentClassName="p-0">
-        <InvoicesClientList invoices={invoices ?? []} locale={locale} />
+        <InvoicesClientList invoices={invoices ?? []} locale={locale} moxieWebBaseUrl={moxieWebBaseUrl} />
       </Card>
 
       {/* Mobile FAB – above bottom nav */}

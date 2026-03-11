@@ -243,5 +243,34 @@ export async function syncBillingoPaymentsForOrg(
     }
   }
 
+  // Retroactively fetch pdf_url for Billingo invoices where it was never stored.
+  // This covers invoices created before the public_url was reliably captured, or where
+  // Billingo didn't return public_url during creation.
+  if (provider === 'billingo' && billingoCredentials) {
+    const { data: missingPdfInvoices } = await supabase
+      .from('invoices')
+      .select('id, external_id')
+      .eq('org_id', orgId)
+      .eq('provider', 'billingo')
+      .not('external_id', 'is', null)
+      .is('pdf_url', null)
+      .limit(20);
+
+    for (const inv of missingPdfInvoices ?? []) {
+      if (!inv.external_id) continue;
+      try {
+        const docInfo = await getBillingoDocument(billingoCredentials, inv.external_id);
+        if (docInfo?.public_url) {
+          await supabase
+            .from('invoices')
+            .update({ pdf_url: docInfo.public_url })
+            .eq('id', inv.id);
+        }
+      } catch {
+        // Non-fatal — pdf_url stays null for this invoice
+      }
+    }
+  }
+
   return { updated, moxieNotified, moxieErrors };
 }

@@ -119,6 +119,7 @@ export async function POST(request: NextRequest) {
     credentials,
     request: mergedRequest,
     moxieInvoiceId: normalized.moxieInvoiceId,
+    moxieInvoiceUuid: normalized.moxieInvoiceUuid,
     moxieBaseUrl: moxie.base_url,
     moxieApiKey,
     locale,
@@ -134,6 +135,7 @@ export async function POST(request: NextRequest) {
       status: 'failed',
       error_message: result.errorMessage,
       moxie_invoice_id: normalized.moxieInvoiceId || null,
+      moxie_invoice_uuid: normalized.moxieInvoiceUuid || null,
       total_amount: totalAmount,
       payload_snapshot: mergedRequest as unknown as Record<string, unknown>,
     });
@@ -156,7 +158,7 @@ type MoxieLineItem = {
 function normalizeMoxiePayload(
   body: Record<string, unknown>,
   _eventType: string
-): { request: NormalizedInvoiceRequest; moxieInvoiceId?: string } | null {
+): { request: NormalizedInvoiceRequest; moxieInvoiceId?: string; moxieInvoiceUuid?: string } | null {
   // 1) Moxie InvoiceSent: clientInfo + lineItems or items, or totals as fallback
   const clientInfo = body.clientInfo as Record<string, unknown> | undefined;
   if (clientInfo) {
@@ -219,6 +221,7 @@ function normalizeMoxiePayload(
     return {
       request,
       moxieInvoiceId: (String(body.invoiceNumberFormatted ?? body.invoiceNumber ?? body.id ?? body.invoice_id ?? '').trim()) || undefined,
+      moxieInvoiceUuid: (String(body.id ?? body.invoice_id ?? '').trim()) || undefined,
     };
   }
 
@@ -255,5 +258,6 @@ function normalizeMoxiePayload(
   return {
     request,
     moxieInvoiceId: (body.invoiceNumberFormatted ?? (body.invoiceNumber != null ? String(body.invoiceNumber) : undefined) ?? body.invoice_id) as string | undefined,
+    moxieInvoiceUuid: (String(body.id ?? body.invoice_id ?? '').trim()) || undefined,
   };
 }

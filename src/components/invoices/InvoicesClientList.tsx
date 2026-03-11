@@ -23,6 +23,7 @@ interface Invoice {
   external_id: string | null;
   invoice_number: string | null;
   moxie_invoice_id: string | null;
+  moxie_invoice_uuid: string | null;
   status: string;
   payment_status: 'open' | 'paid';
   error_message: string | null;
@@ -36,6 +37,7 @@ interface Invoice {
 interface Props {
   invoices: Invoice[];
   locale: string;
+  moxieWebBaseUrl?: string;
 }
 
 const FILTERS: { value: FilterValue; labelKey: string }[] = [
@@ -45,7 +47,7 @@ const FILTERS: { value: FilterValue; labelKey: string }[] = [
   { value: 'failed', labelKey: 'filterFailed' },
 ];
 
-export function InvoicesClientList({ invoices, locale }: Props) {
+export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props) {
   const t = useTranslations('invoices');
   const [filter, setFilter] = useState<FilterValue>('all');
   const [expandedErrors, setExpandedErrors] = useState<Set<string>>(new Set());
@@ -99,6 +101,11 @@ export function InvoicesClientList({ invoices, locale }: Props) {
    */
   function getPublicUrl(inv: Invoice): string | null {
     return inv.pdf_url ?? null;
+  }
+
+  function getMoxieUrl(inv: Invoice): string | null {
+    if (!inv.moxie_invoice_uuid || !moxieWebBaseUrl) return null;
+    return `${moxieWebBaseUrl}/accounting/invoices#${inv.moxie_invoice_uuid}`;
   }
 
   function openInvoiceLabel(inv: Invoice): string {
@@ -194,6 +201,20 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                     {formatDate(inv.created_at)}
                   </span>
                   <span className="flex items-center gap-1">
+                    {getMoxieUrl(inv) && (
+                      <a
+                        href={getMoxieUrl(inv)!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-[#7C3AED] hover:bg-[#7C3AED]/10 rounded focus-visible:ring-2 focus-visible:ring-[#7C3AED] focus-visible:ring-offset-2"
+                        aria-label={t('openInMoxie')}
+                        title={t('openInMoxie')}
+                      >
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2l2 3 2-3h2v8h-2v-5l-2 3-2-3v5z"/>
+                        </svg>
+                      </a>
+                    )}
                     {publicUrl ? (
                       <a
                         href={publicUrl}
@@ -337,6 +358,20 @@ export function InvoicesClientList({ invoices, locale }: Props) {
                     </TableCell>
                     <TableCell>
                       <span className="flex items-center gap-1">
+                        {getMoxieUrl(inv) && (
+                          <a
+                            href={getMoxieUrl(inv)!}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] text-[#7C3AED] hover:bg-[#7C3AED]/10 rounded focus-visible:ring-2 focus-visible:ring-[#7C3AED] focus-visible:ring-offset-2"
+                            aria-label={t('openInMoxie')}
+                            title={t('openInMoxie')}
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2l2 3 2-3h2v8h-2v-5l-2 3-2-3v5z"/>
+                            </svg>
+                          </a>
+                        )}
                         {publicUrl ? (
                           <a
                             href={publicUrl}

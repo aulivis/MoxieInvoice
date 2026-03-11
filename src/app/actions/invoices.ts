@@ -29,7 +29,6 @@ export async function deleteInvoiceAction(
     .maybeSingle();
 
   if (fetchErr || !row) return { error: 'Invoice not found' };
-  if (row.status !== 'failed') return { error: 'Only failed invoices can be deleted' };
 
   const { error: deleteErr } = await supabase.from('invoices').delete().eq('id', invoiceId);
 

@@ -15,7 +15,12 @@
       "Bash(npm run build)",
       "Bash(npx next build)",
       "Bash(node --version)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "WebFetch(domain:help.withmoxie.com)",
+      "WebFetch(domain:docs.szamlazz.hu)",
+      "WebFetch(domain:api.billingo.hu)",
+      "WebFetch(domain:app.swaggerhub.com)",
+      "Bash(ls -la \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\components\\\\ui\"\" | grep -i \"dialog|modal|confirm \")"
     ]
   }
 }

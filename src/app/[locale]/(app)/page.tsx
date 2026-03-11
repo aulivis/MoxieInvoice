@@ -5,25 +5,25 @@ import { createClient } from '@/lib/supabase/server';
 import { getAppLayoutContext } from '@/lib/auth';
 import { StatCard } from '@/components/ui/StatCard';
 import { Card } from '@/components/ui/Card';
-import { StatusCell } from '@/components/ui/StatusCell';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { PaymentStatusCell } from '@/components/ui/PaymentStatusCell';
 
 // ── Icons for stat cards ────────────────────────────────────────────────────
 
-function DocumentIcon() {
+function CashIcon() {
   return (
-    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+    <svg className="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   );
 }
 
-function CheckIcon() {
+function TrendUpIcon() {
   return (
     <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
     </svg>
   );
 }
@@ -61,6 +61,17 @@ function SetupStep({ done, label, href }: { done: boolean; label: string; href: 
   );
 }
 
+// ── Currency formatter ───────────────────────────────────────────────────────
+
+function formatCurrency(amount: number, locale: string): string {
+  const isHu = locale === 'hu';
+  return new Intl.NumberFormat(isHu ? 'hu-HU' : 'en-US', {
+    style: 'currency',
+    currency: isHu ? 'HUF' : 'EUR',
+    maximumFractionDigits: isHu ? 0 : 2,
+  }).format(amount);
+}
+
 export default async function HomePage() {
   const t = await getTranslations('dashboard');
   const tInvoices = await getTranslations('invoices');
@@ -77,13 +88,16 @@ export default async function HomePage() {
 
   // Fetch stats, recent invoices, and setup status in parallel
   const [allResult, recentResult, moxieResult, billingResult] = await Promise.all([
-    supabase.from('invoices').select('id, status').eq('org_id', orgId),
     supabase
       .from('invoices')
-      .select('id, external_id, status, error_message, created_at')
+      .select('id, status, total_amount, payment_status, created_at')
+      .eq('org_id', orgId),
+    supabase
+      .from('invoices')
+      .select('id, external_id, invoice_number, status, payment_status, error_message, created_at, total_amount, payload_snapshot')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-      .limit(6),
+      .limit(5),
     supabase.from('moxie_connections').select('base_url').eq('org_id', orgId).maybeSingle(),
     supabase.from('billing_providers').select('provider').eq('org_id', orgId).maybeSingle(),
   ]);
@@ -93,10 +107,16 @@ export default async function HomePage() {
   const moxieConnected = !!moxieResult.data?.base_url;
   const billingConfigured = !!billingResult.data?.provider;
 
-  const total = all.length;
   const failed = all.filter((i) => i.status === 'failed').length;
-  const success = total - failed;
-  const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
+
+  const outstandingAmount = all
+    .filter((i) => i.payment_status === 'open' && i.status !== 'failed')
+    .reduce((sum, i) => sum + (i.total_amount ?? 0), 0);
+
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const paidLast30Days = all
+    .filter((i) => i.payment_status === 'paid' && i.created_at >= thirtyDaysAgo)
+    .reduce((sum, i) => sum + (i.total_amount ?? 0), 0);
 
   const allSetupDone = hasSubscription && moxieConnected && billingConfigured;
 
@@ -105,13 +125,6 @@ export default async function HomePage() {
       month: 'short',
       day: 'numeric',
     });
-  }
-
-  function statusLabel(status: string) {
-    if (status === 'failed') return tInvoices('statusFailed');
-    if (status === 'created') return tInvoices('statusCreated');
-    if (status === 'synced_to_moxie') return tInvoices('statusSynced');
-    return status;
   }
 
   return (
@@ -148,20 +161,20 @@ export default async function HomePage() {
       <div className="grid grid-cols-3 gap-4">
         <div className="opacity-0 animate-fade-up">
           <StatCard
-            label={t('statTotal')}
-            value={total}
+            label={t('statOutstanding')}
+            value={formatCurrency(outstandingAmount, locale)}
             accent="primary"
-            icon={<DocumentIcon />}
-            iconBg="bg-blue-50"
+            icon={<CashIcon />}
+            iconBg="bg-amber-50"
           />
         </div>
         <div className="opacity-0 animate-fade-up delay-60">
           <StatCard
-            label={t('statSuccessRate')}
-            value={`${successRate}%`}
-            trend={successRate >= 90 ? 'up' : successRate >= 70 ? 'neutral' : 'down'}
+            label={t('statPaidMonth')}
+            value={formatCurrency(paidLast30Days, locale)}
+            trend="up"
             accent="success"
-            icon={<CheckIcon />}
+            icon={<TrendUpIcon />}
             iconBg="bg-emerald-50"
           />
         </div>
@@ -170,9 +183,9 @@ export default async function HomePage() {
             label={t('statFailed')}
             value={failed}
             trend={failed === 0 ? 'neutral' : 'down'}
-            accent={failed > 0 ? 'error' : 'default'}
+            accent={failed > 0 ? 'error' : 'success'}
             icon={<XIcon />}
-            iconBg="bg-red-50"
+            iconBg={failed > 0 ? 'bg-red-50' : 'bg-emerald-50'}
           />
         </div>
       </div>
@@ -200,33 +213,52 @@ export default async function HomePage() {
             />
           ) : (
             <ul className="divide-y divide-border-light">
-              {recent.map((inv, i) => (
-                <li
-                  key={inv.id}
-                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-surface-50 transition-colors opacity-0 animate-fade-up"
-                  style={{ animationDelay: `${(i + 2) * 50}ms` }}
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-tabular-nums text-sm font-medium text-text-primary truncate">
-                        {inv.external_id || inv.id.slice(0, 8) + '…'}
-                      </span>
-                      <StatusCell
-                        status={inv.status}
-                        label={statusLabel(inv.status)}
-                      />
-                    </div>
-                    {inv.error_message && (
-                      <p className="text-xs text-status-error mt-0.5 truncate max-w-sm" title={inv.error_message}>
-                        {inv.error_message}
+              {recent.map((inv, i) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const snapshot = inv.payload_snapshot as Record<string, any> | null;
+                const clientName =
+                  snapshot?.partner?.name ??
+                  snapshot?.client_name ??
+                  inv.external_id ??
+                  '–';
+                const invoiceRef = inv.invoice_number ?? inv.external_id ?? '–';
+                const paymentStatus = (inv.payment_status ?? 'open') as 'open' | 'paid';
+
+                return (
+                  <li
+                    key={inv.id}
+                    className="flex items-center gap-3 px-5 py-3.5 hover:bg-surface-50 transition-colors opacity-0 animate-fade-up"
+                    style={{ animationDelay: `${(i + 2) * 50}ms` }}
+                  >
+                    {/* Left: client + ref + date */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-text-primary truncate">{clientName}</p>
+                      <p className="text-xs text-text-tertiary font-tabular-nums mt-0.5">
+                        {invoiceRef !== '–' ? `${invoiceRef} · ` : ''}{formatDate(inv.created_at)}
                       </p>
+                      {inv.status === 'failed' && inv.error_message && (
+                        <p className="text-xs text-status-error mt-0.5 truncate max-w-sm" title={inv.error_message}>
+                          {inv.error_message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Middle: payment status */}
+                    <PaymentStatusCell
+                      paymentStatus={paymentStatus}
+                      label={paymentStatus === 'paid' ? tInvoices('paymentPaid') : tInvoices('paymentOpen')}
+                      className="shrink-0 text-xs"
+                    />
+
+                    {/* Right: amount */}
+                    {inv.total_amount != null && (
+                      <span className="shrink-0 text-sm font-semibold font-tabular-nums text-text-primary">
+                        {formatCurrency(inv.total_amount, locale)}
+                      </span>
                     )}
-                  </div>
-                  <span className="shrink-0 text-xs text-text-tertiary font-tabular-nums">
-                    {formatDate(inv.created_at)}
-                  </span>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </Card>

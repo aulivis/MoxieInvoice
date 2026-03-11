@@ -25,6 +25,7 @@ export interface CreateInvoiceInput {
   credentials: Record<string, unknown>;
   request: NormalizedInvoiceRequest;
   moxieInvoiceId?: string;
+  moxieInvoiceUuid?: string;
   moxieBaseUrl?: string;
   moxieApiKey?: string;
   /** Locale for validation error messages (Billingo / Számlázz.hu) (default 'hu'). */
@@ -115,17 +116,23 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
   if (!supabase) {
     return { success: false, errorMessage: 'Database client not available' };
   }
+  // Generate a one-time token for the PDF proxy endpoint.
+  // Stored in DB; cleared after successful Moxie attachment sync.
+  const pdfToken = globalThis.crypto.randomUUID();
+
   const totalAmount = computeTotalAmount(request);
   const { data: row, error: insertErr } = await supabase
     .from('invoices')
     .insert({
       org_id: orgId,
       moxie_invoice_id: moxieInvoiceId || null,
+      moxie_invoice_uuid: input.moxieInvoiceUuid || null,
       external_id: result.externalId,
       invoice_number: result.invoiceNumber || null,
       provider,
       status: 'created',
       pdf_url: result.pdfUrl || null,
+      pdf_token: pdfToken,
       total_amount: totalAmount,
       payload_snapshot: request as unknown as Record<string, unknown>,
     })
@@ -155,30 +162,55 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
     }
   }
 
-  if (moxieBaseUrl && moxieApiKey && result.pdfUrl) {
-    try {
-      const base = moxieBaseUrl.replace(/\/$/, '').replace(/\/api\/public\/?$/i, '');
-      const form = new FormData();
-      form.set('type', 'DELIVERABLE');
-      form.set('id', moxieInvoiceId || row.id);
-      form.set('fileUrl', result.pdfUrl);
-      form.set('fileName', `invoice-${result.invoiceNumber}.pdf`);
-      const moxieRes = await fetch(
-        `${base}/api/public/action/attachments/createFromUrl`,
-        {
-          method: 'POST',
-          headers: { 'X-API-KEY': moxieApiKey },
-          body: form,
+  if (moxieBaseUrl && moxieApiKey) {
+    // Build the PDF proxy URL. Moxie will download the actual PDF binary from this endpoint.
+    // NEXT_PUBLIC_APP_URL must be set to the public app URL (e.g. https://app.example.com).
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '');
+    const proxyUrl = appUrl
+      ? `${appUrl}/api/invoices/${row.id}/pdf?token=${pdfToken}`
+      : null;
+
+    // Fall back to viewer URL if app URL is not configured (Moxie may or may not handle HTML)
+    const fileUrl = proxyUrl ?? result.pdfUrl;
+
+    if (fileUrl) {
+      try {
+        const base = moxieBaseUrl.replace(/\/$/, '').replace(/\/api\/public\/?$/i, '');
+        const form = new FormData();
+        form.set('type', 'DELIVERABLE');
+        form.set('id', moxieInvoiceId || row.id);
+        form.set('fileUrl', fileUrl);
+        form.set('fileName', `invoice-${result.invoiceNumber}.pdf`);
+        const moxieRes = await fetch(
+          `${base}/api/public/action/attachments/createFromUrl`,
+          {
+            method: 'POST',
+            headers: { 'X-API-KEY': moxieApiKey },
+            body: form,
+          }
+        );
+        if (moxieRes.ok) {
+          // Clear the pdf_token after successful sync (one-time use)
+          await supabase
+            .from('invoices')
+            .update({ status: 'synced_to_moxie', pdf_token: null })
+            .eq('id', row.id);
+        } else {
+          const errText = await moxieRes.text().catch(() => '');
+          logError(new Error(`Moxie attachFileFromUrl failed: ${moxieRes.status} ${errText}`), {
+            step: 'moxie_attach_pdf',
+            orgId,
+            invoiceId: row.id,
+            invoiceNumber: result.invoiceNumber,
+          });
         }
-      );
-      if (moxieRes.ok) {
-        await supabase
-          .from('invoices')
-          .update({ status: 'synced_to_moxie' })
-          .eq('id', row.id);
+      } catch (err) {
+        logError(err instanceof Error ? err : new Error(String(err)), {
+          step: 'moxie_attach_pdf',
+          orgId,
+          invoiceId: row.id,
+        });
       }
-    } catch {
-      // Non-fatal: invoice was created, only Moxie sync failed
     }
   }
 

@@ -63,11 +63,13 @@ export interface Invoice {
   id: string;
   org_id: string;
   moxie_invoice_id: string | null;
+  moxie_invoice_uuid: string | null;
   external_id: string | null;
   provider: BillingProviderType;
   status: InvoiceStatus;
   payment_status: PaymentStatus;
   pdf_url: string | null;
+  pdf_token: string | null;
   total_amount: number | null;
   payload_snapshot: Record<string, unknown> | null;
   error_message: string | null;
