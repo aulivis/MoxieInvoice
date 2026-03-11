@@ -30,7 +30,7 @@ export default async function InvoicesListPage() {
   const [{ data: invoices }, { data: moxieConn }] = await Promise.all([
     supabase
       .from('invoices')
-      .select('id, external_id, invoice_number, moxie_invoice_id, status, payment_status, error_message, created_at, pdf_url, total_amount, payload_snapshot, provider')
+      .select('id, external_id, invoice_number, moxie_invoice_id, moxie_invoice_uuid, status, payment_status, error_message, created_at, pdf_url, total_amount, payload_snapshot, provider')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
       .limit(50),
