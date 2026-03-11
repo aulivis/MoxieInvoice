@@ -4,7 +4,7 @@ import { CreateInvoiceForm } from '@/components/CreateInvoiceForm';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('invoicesNew');
-  return { title: `${t('title')} – MoxieInvoice` };
+  return { title: `${t('title')} – Brixa` };
 }
 import { Card } from '@/components/ui/Card';
 

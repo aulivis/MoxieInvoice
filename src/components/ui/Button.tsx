@@ -8,7 +8,7 @@ const variants = {
   primary:
     'bg-primary text-primary-foreground hover:bg-primary-hover hover:scale-[1.02] border-none',
   gradient:
-    'bg-gradient-to-r from-primary to-[#E91E63] text-white hover:opacity-90 hover:scale-[1.02] border-none shadow-sm',
+    'bg-gradient-to-r from-[#C96E22] to-[#F4A85C] text-white hover:opacity-90 hover:scale-[1.02] border-none shadow-sm',
   secondary:
     'bg-background-card border border-border-medium text-text-primary hover:bg-background-hover',
   ghost:

@@ -20,7 +20,11 @@
       "WebFetch(domain:docs.szamlazz.hu)",
       "WebFetch(domain:api.billingo.hu)",
       "WebFetch(domain:app.swaggerhub.com)",
-      "Bash(ls -la \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\components\\\\ui\"\" | grep -i \"dialog|modal|confirm \")"
+      "Bash(ls -la \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\components\\\\ui\"\" | grep -i \"dialog|modal|confirm \")",
+      "Bash(find \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\app\\\\[locale]\\\\\\(app\\)\\\\settings\" -type f -name \"page.tsx\")",
+      "Bash(find \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\app\\\\[locale]\\\\\\(auth\\)\" -type f -name \"page.tsx\")",
+      "Bash(find \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\app\\\\[locale]\\\\\\(app\\)\" -type f -name \"page.tsx\")",
+      "Bash(ls \"D:\\\\Apps\\\\MoxieInvoice\\\\public\"\" 2>/dev/null || dir \"D:AppsMoxieInvoicepublic \")"
     ]
   }
 }

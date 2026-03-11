@@ -77,7 +77,7 @@ export function MobileBottomNav() {
                 <Link
                   href={href}
                   aria-label={t(key)}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary to-[#E91E63] text-white shadow-fab hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none"
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-[#C96E22] to-[#F4A85C] text-white shadow-fab hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none"
                 >
                   <PlusIcon />
                 </Link>

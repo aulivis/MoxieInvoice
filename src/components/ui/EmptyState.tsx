@@ -22,7 +22,7 @@ function DefaultIcon() {
       <rect x="21" y="21" width="10" height="2" rx="1" fill="#B8B4CC" />
       <rect x="21" y="25" width="14" height="2" rx="1" fill="#B8B4CC" />
       <rect x="21" y="29" width="8" height="2" rx="1" fill="#B8B4CC" />
-      <circle cx="36" cy="36" r="8" fill="#C2185B" />
+      <circle cx="36" cy="36" r="8" fill="#E8893A" />
       <path
         d="M33 36h6M36 33v6"
         stroke="white"

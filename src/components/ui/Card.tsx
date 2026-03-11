@@ -8,7 +8,7 @@ const variants = {
   elevated:
     'bg-background-elevated rounded-xl shadow-elevated border-none',
   gradient:
-    'rounded-xl border-none bg-gradient-to-br from-primary to-[#EC407A] text-primary-foreground',
+    'rounded-xl border-none bg-gradient-to-br from-[#C96E22] to-[#F4A85C] text-white',
   metric:
     'bg-background-card rounded-xl border border-border-light shadow-stat',
   glass:

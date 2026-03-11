@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" fill="none">
+  <!-- Navy background -->
+  <rect width="110" height="110" rx="28" fill="#1A2744"/>
+  <!-- Left arc (solid white) -->
+  <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- Right arc (dimmed white) -->
+  <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="white" stroke-opacity="0.35" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- Amber bridge -->
+  <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" stroke-width="9" stroke-linecap="round"/>
+  <!-- Amber apex dot -->
+  <circle cx="55" cy="28" r="6" fill="#E8893A"/>
+</svg>

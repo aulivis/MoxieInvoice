@@ -5,7 +5,7 @@ import { LocaleLayoutProps } from '@/types';
 import { AppShell } from '@/components/AppShell';
 
 export const metadata: Metadata = {
-  title: 'MoxieInvoice',
+  title: 'Brixa',
   description: 'Moxie → Billingo / Számlázz.hu számlázás',
 };
 

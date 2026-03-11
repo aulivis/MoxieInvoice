@@ -44,15 +44,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             {/* Logo – visible on mobile when signed in (sidebar is hidden), always when signed out */}
             {signedIn ? (
-              <span className="font-bold text-base text-text-primary md:hidden">
-                MoxieInvoice
+              <span className="flex items-center gap-2 md:hidden">
+                <svg width="24" height="24" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <rect width="110" height="110" rx="28" fill="#1A2744"/>
+                  <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                  <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="rgba(255,255,255,0.35)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                  <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
+                  <circle cx="55" cy="28" r="6" fill="#E8893A"/>
+                </svg>
+                <span className="font-extrabold text-base text-text-primary tracking-tight" style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}>Brixa</span>
               </span>
             ) : (
               <Link
                 href="/"
-                className="font-bold text-base text-text-primary hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md outline-none transition-colors"
+                className="flex items-center gap-2 hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md outline-none transition-opacity"
               >
-                MoxieInvoice
+                <svg width="24" height="24" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <rect width="110" height="110" rx="28" fill="#1A2744"/>
+                  <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                  <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="rgba(255,255,255,0.35)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                  <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
+                  <circle cx="55" cy="28" r="6" fill="#E8893A"/>
+                </svg>
+                <span className="font-extrabold text-base text-text-primary tracking-tight" style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}>Brixa</span>
               </Link>
             )}
           </div>

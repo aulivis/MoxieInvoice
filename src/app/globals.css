@@ -3,144 +3,147 @@
 @tailwind utilities;
 
 :root {
-  /* Design system – primary (darkened to #C2185B for WCAG AA: 5.5:1 on white) */
-  --ds-primary: #C2185B;
-  --ds-primary-light: #F06292;
-  --ds-primary-dark: #AD1457;
-  --ds-primary-gradient: linear-gradient(135deg, #C2185B 0%, #E91E63 100%);
+  /* ── Primary: Amber (Brixa) ────────────────────────────────────────────── */
+  --ds-primary:          #E8893A;
+  --ds-primary-light:    #F4A85C;
+  --ds-primary-dark:     #C96E22;
+  --ds-primary-gradient: linear-gradient(135deg, #C96E22 0%, #F4A85C 100%);
 
-  /* Backgrounds */
-  --ds-bg-main: #F8F7FA;
-  --ds-bg-sidebar: #FFFFFF;
-  --ds-bg-card: #FFFFFF;
-  --ds-bg-hover: #F5F5F5;
-  --ds-bg-selected: #FFF0F5;
+  /* ── Backgrounds ────────────────────────────────────────────────────────── */
+  --ds-bg-main:     #FAF8F4;
+  --ds-bg-sidebar:  #FFFFFF;
+  --ds-bg-card:     #FFFFFF;
+  --ds-bg-hover:    #F0EDE7;
+  --ds-bg-selected: rgba(232,137,58,0.08);
 
-  /* Text */
-  --ds-text-primary: #1A1A1A;
-  --ds-text-secondary: #666666;
-  --ds-text-tertiary: #999999;
-  --ds-text-disabled: #BDBDBD;
-  --ds-text-label: #757575;
+  /* ── Text ───────────────────────────────────────────────────────────────── */
+  --ds-text-primary:   #1C1917;
+  --ds-text-secondary: #6B6560;
+  --ds-text-tertiary:  #9E9894;
+  --ds-text-disabled:  #C2BFBA;
+  --ds-text-label:     #6B6560;
 
-  /* Border */
-  --ds-border-light: #EEEEEE;
-  --ds-border-medium: #E0E0E0;
-  --ds-border-focus: #C2185B;
+  /* ── Borders ────────────────────────────────────────────────────────────── */
+  --ds-border-light:  #EAE7E2;
+  --ds-border-medium: #E0DDD8;
+  --ds-border-focus:  #E8893A;
 
-  /* Status */
-  --ds-status-success: #4CAF50;
-  --ds-status-error: #F44336;
-  --ds-status-warning: #FF9800;
-  --ds-status-info: #2196F3;
+  /* ── Status ─────────────────────────────────────────────────────────────── */
+  --ds-status-success: #2AB27B;
+  --ds-status-error:   #E04444;
+  --ds-status-warning: #E8893A;
+  --ds-status-info:    #2196F3;
 
-  /* Focus ring */
-  --ds-focus-ring: 2px solid var(--ds-border-focus);
+  /* ── Focus ring ─────────────────────────────────────────────────────────── */
+  --ds-focus-ring:        2px solid var(--ds-border-focus);
   --ds-focus-ring-offset: 2px;
-  --ds-focus-ring-color: rgba(194, 24, 91, 0.1);
+  --ds-focus-ring-color:  rgba(232,137,58,0.1);
 
-  /* Dark sidebar */
-  --sidebar-bg: #0F0D16;
-  --sidebar-surface: #1A1726;
-  --sidebar-border: #1E1B2C;
-  --sidebar-text: #E8E6F0;
-  --sidebar-muted: #9490A8;
-  --sidebar-active-bg: rgba(194, 24, 91, 0.15);
-  --sidebar-active-text: #F06292;
-  --sidebar-hover: #1E1B2C;
+  /* ── Dark sidebar: Navy ─────────────────────────────────────────────────── */
+  --sidebar-bg:          #0E1628;
+  --sidebar-surface:     #1A2744;
+  --sidebar-border:      #1A2744;
+  --sidebar-text:        #EEF0F3;
+  --sidebar-muted:       rgba(255,255,255,0.35);
+  --sidebar-active-bg:   rgba(232,137,58,0.12);
+  --sidebar-active-text: #E8893A;
+  --sidebar-hover:       #1A2744;
 
-  /* Bottom nav */
+  /* ── Bottom nav ─────────────────────────────────────────────────────────── */
   --bottom-nav-height: 64px;
 }
 
 body {
+  font-family: var(--font-dm-sans), 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--ds-text-primary);
   background: var(--ds-bg-main);
-  font-size: 1rem;        /* 16px — matches the new base scale */
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Typography utilities from design system */
+/* ── Typography utilities ────────────────────────────────────────────────── */
 @layer utilities {
-  /* ─── Typography scale — 2026 standard ─────────────────────────────────────
-   *   xs   10 → 12px  |  sm   12 → 14px  |  base  14 → 16px  |  md  16 → 17px
-   * ──────────────────────────────────────────────────────────────────────── */
 
   .text-page-title {
-    font-size: 1.875rem;       /* 30px — was 28px, feels more commanding */
-    font-weight: 700;
-    line-height: 1.2;
+    font-family: var(--font-syne), 'Syne', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    font-weight: 800;
+    line-height: 1.15;
     color: var(--ds-text-primary);
-    letter-spacing: -0.025em;
+    letter-spacing: -0.03em;
   }
 
   .text-section-title {
-    font-size: 1rem;           /* 16px — was 14px, now proper section heading */
-    font-weight: 600;
+    font-family: var(--font-syne), 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
     line-height: 1.35;
     color: var(--ds-text-primary);
+    letter-spacing: -0.01em;
   }
 
   .text-metric-value {
-    font-size: 2.25rem;        /* 36px — unchanged, bento card numbers */
-    font-weight: 700;
+    font-family: var(--font-syne), 'Syne', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 800;
     line-height: 1;
     color: var(--ds-text-primary);
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em;
     font-variant-numeric: tabular-nums;
   }
 
   .text-metric-label {
-    font-size: 0.8125rem;      /* 13px — was 12px, label below metric */
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 600;
     line-height: 1.4;
     color: var(--ds-text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.12em;
   }
 
   .text-sidebar-item {
-    font-size: 0.9375rem;      /* 15px — was 14px, nav items */
+    font-size: 0.9375rem;
     font-weight: 500;
     line-height: 1.4;
     color: var(--sidebar-text);
   }
 
   .text-sidebar-section {
-    font-size: 0.6875rem;      /* 11px — was 10px, "MENU" label */
+    font-family: var(--font-syne), 'Syne', sans-serif;
+    font-size: 0.6875rem;
     font-weight: 700;
     line-height: 1.4;
     color: var(--sidebar-muted);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.16em;
   }
 
   .text-table-header {
-    font-size: 0.8125rem;      /* 13px — was 12px, column headers */
-    font-weight: 600;
+    font-family: var(--font-syne), 'Syne', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
     line-height: 1.4;
     color: var(--ds-text-tertiary);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.1em;
   }
 
   .text-table-cell {
-    font-size: 1rem;           /* 16px — was 14px, table body rows */
+    font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
     color: var(--ds-text-primary);
   }
 
   .text-caption {
-    font-size: 0.8125rem;      /* 13px — was 12px, captions & hints */
-    font-weight: 400;
+    font-size: 0.8125rem;
+    font-weight: 300;
     line-height: 1.45;
     color: var(--ds-text-tertiary);
   }
 
-  /* Animation delay utilities for stagger effects */
   .delay-0   { animation-delay: 0ms; }
   .delay-60  { animation-delay: 60ms; }
   .delay-120 { animation-delay: 120ms; }
@@ -148,57 +151,45 @@ body {
   .delay-240 { animation-delay: 240ms; }
   .delay-300 { animation-delay: 300ms; }
 
-  /* Opacity hidden before animation plays */
-  .opacity-0-init {
-    opacity: 0;
-  }
+  .opacity-0-init { opacity: 0; }
 
-  /* Safe area padding for bottom nav (iOS) */
   .bottom-nav-safe {
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 
-  /* Main content padding when bottom nav is visible */
   .pb-bottom-nav {
     padding-bottom: calc(var(--bottom-nav-height) + 16px);
   }
 }
 
-/* Tabular numbers for invoices and amounts */
+/* ── Tabular numbers ─────────────────────────────────────────────────────── */
 .font-tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Skeleton loading - shimmer */
+/* ── Skeleton loading ────────────────────────────────────────────────────── */
 @keyframes skeleton-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0;  }
 }
 
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #F0EEF5 25%,
-    #E8E5F0 50%,
-    #F0EEF5 75%
-  );
+  background: linear-gradient(90deg, #F0EDE7 25%, #E8E3DB 50%, #F0EDE7 75%);
   background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
   border-radius: 8px;
 }
 
-/* Gradient text utility */
+/* ── Gradient text ───────────────────────────────────────────────────────── */
 .text-gradient-primary {
-  background: linear-gradient(135deg, #C2185B 0%, #E91E63 100%);
+  background: linear-gradient(135deg, #C96E22 0%, #F4A85C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Sidebar nav active indicator */
-.sidebar-nav-active {
-  position: relative;
-}
+/* ── Sidebar nav active indicator ───────────────────────────────────────── */
+.sidebar-nav-active { position: relative; }
 
 .sidebar-nav-active::before {
   content: '';
@@ -208,26 +199,12 @@ body {
   transform: translateY(-50%);
   width: 3px;
   height: 60%;
-  background: #C2185B;
+  background: #E8893A;
   border-radius: 0 3px 3px 0;
 }
 
-/* Smooth scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #E0E0E0 transparent;
-}
-
-*::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: #E0E0E0;
-  border-radius: 3px;
-}
+/* ── Smooth scrollbar ───────────────────────────────────────────────────── */
+* { scrollbar-width: thin; scrollbar-color: #E0DDD8 transparent; }
+*::-webkit-scrollbar       { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background-color: #E0DDD8; border-radius: 3px; }

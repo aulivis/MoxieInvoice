@@ -27,6 +27,19 @@ function CheckCircleIcon() {
   );
 }
 
+/** Brixa "Broken Bridge" logo mark */
+function BrixaLogoMark({ size = 36 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <rect width="110" height="110" rx="28" fill="#1A2744"/>
+      <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
+      <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="rgba(255,255,255,0.35)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+      <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
+      <circle cx="55" cy="28" r="6" fill="#E8893A"/>
+    </svg>
+  );
+}
+
 function SubmitButton() {
   const { pending } = useFormStatus();
   const t = useTranslations('auth');
@@ -82,25 +95,31 @@ export default function LoginPage() {
       <div
         className="hidden lg:flex lg:w-[420px] xl:w-[480px] shrink-0 flex-col justify-between p-10"
         style={{
-          background: 'linear-gradient(160deg, #0F0D16 0%, #1E0A14 60%, #2A0D20 100%)',
+          background: 'linear-gradient(160deg, #0E1628 0%, #1A2744 60%, #2A3A5C 100%)',
         }}
       >
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-[#E91E63] flex items-center justify-center shadow-lg">
-            <span className="text-white font-bold text-lg leading-none">M</span>
-          </div>
-          <span className="text-white font-bold text-lg tracking-tight">MoxieInvoice</span>
+          <BrixaLogoMark size={36} />
+          <span
+            className="font-extrabold text-lg tracking-tight text-white"
+            style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
+          >
+            Brixa
+          </span>
         </div>
 
         {/* Center content */}
         <div>
-          <h2 className="text-3xl font-bold text-white leading-tight mb-3">
+          <h2
+            className="text-3xl font-bold text-white leading-tight mb-3"
+            style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
+          >
             {t('heroTitlePrefix')}{' '}
             <span
               className="text-transparent"
               style={{
-                background: 'linear-gradient(90deg, #F06292, #E91E63)',
+                background: 'linear-gradient(90deg, #E8893A, #F4A85C)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -109,14 +128,17 @@ export default function LoginPage() {
               {t('heroHighlight')}
             </span>
           </h2>
-          <p className="text-[#9490A8] text-base leading-relaxed mb-8">
+          <p className="text-base leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {t('heroDescription')}
           </p>
           <ul className="space-y-3">
             {features.map((f) => (
-              <li key={f} className="flex items-center gap-3 text-sm text-[#C8C4D8]">
-                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20 shrink-0">
-                  <svg className="w-3 h-3 text-[#F06292]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <li key={f} className="flex items-center gap-3 text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                <span
+                  className="flex items-center justify-center w-5 h-5 rounded-full shrink-0"
+                  style={{ background: 'rgba(232,137,58,0.2)' }}
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#E8893A" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 </span>
@@ -127,7 +149,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-[#9490A8] text-xs">
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
           {t('copyright')}
         </p>
       </div>
@@ -137,10 +159,13 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="flex items-center gap-2.5 mb-8 lg:hidden">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-[#E91E63] flex items-center justify-center">
-              <span className="text-white font-bold text-sm leading-none">M</span>
-            </div>
-            <span className="font-bold text-base text-text-primary">MoxieInvoice</span>
+            <BrixaLogoMark size={32} />
+            <span
+              className="font-extrabold text-base text-text-primary tracking-tight"
+              style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
+            >
+              Brixa
+            </span>
           </div>
 
           {showForm ? (

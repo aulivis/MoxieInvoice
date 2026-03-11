@@ -1,10 +1,18 @@
 import type { ReactNode } from 'react';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Syne, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
+const syne = Syne({
   subsets: ['latin'],
-  variable: '--font-inter',
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-syne',
+  display: 'swap',
+});
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-dm-sans',
   display: 'swap',
 });
 
@@ -16,8 +24,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="hu" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className={`${inter.className} min-h-screen bg-background-main antialiased`}>
+    <html lang="hu" suppressHydrationWarning className={`${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}>
+      <body className={`${dmSans.className} min-h-screen bg-background-main antialiased`}>
         {children}
       </body>
     </html>

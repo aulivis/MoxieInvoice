@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('invoices');
-  return { title: `${t('title')} – MoxieInvoice` };
+  return { title: `${t('title')} – Brixa` };
 }
 
 export default async function InvoicesListPage() {
@@ -60,7 +60,8 @@ export default async function InvoicesListPage() {
           <RefreshInvoicesButton />
           <Link
             href="/invoices/new"
-            className="hidden sm:inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-[#E91E63] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none shadow-sm shrink-0"
+            className="hidden sm:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none shadow-sm shrink-0"
+            style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)', boxShadow: '0 4px 14px rgba(232,137,58,0.3)' }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -80,7 +81,8 @@ export default async function InvoicesListPage() {
         <Link
           href="/invoices/new"
           aria-label={t('newInvoice')}
-          className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-primary to-[#E91E63] text-white shadow-fab hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none"
+          className="flex items-center justify-center w-14 h-14 rounded-full text-white shadow-fab hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none"
+          style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)' }}
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />

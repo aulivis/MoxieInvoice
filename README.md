@@ -1,111 +1,203 @@
 # MoxieInvoice
 
-Előfizetős SaaS: Moxie adatok → Billingo vagy Számlázz.hu számla → visszajelzés Moxie-nak. Supabase + Vercel, Stripe előfizetés, HU/EN többnyelvűség.
+> **Automatikus számlakészítő híd Moxie és a magyar számlázóprogramok között.**
+
+A MoxieInvoice egy előfizetéses SaaS alkalmazás, amely összeköti a [Moxie](https://withmoxie.com) projektmenedzsment platformot a Billingo és a Számlázz.hu számlázórendszerekkel. Amikor a Moxie-ban egy számlát „Elküldve" állapotba állítasz, a MoxieInvoice automatikusan elkészíti a hivatalos számlát a kiválasztott számlázóprogramban, csatolja a PDF-et vissza Moxie-hoz, majd fizetés esetén szinkronizálja a fizetési állapotot is. A teljes folyamat emberi beavatkozás nélkül zajlik.
+
+**Miért hasznos?**
+Moxie kiválóan kezeli az ügyfeleket és a projekteket, de nincs közvetlen integráció a magyar számviteli rendszerekkel. A MoxieInvoice ezt a hiányt tölti be: Moxie-ban rögzíted az üzleti adatokat, a számlát pedig a törvénynek megfelelő hazai számlázóprogram állítja ki – automatikusan.
+
+---
 
 ## Funkciók
 
-- **Moxie kapcsolat**: Base URL + API kulcs, webhook URL másolás, kapcsolat teszt
-- **Számlázó**: Billingo vagy Számlázz.hu kiválasztása, hitelesítő adatok, eladó adatok
-- **Számolás**: Webhook (Moxie → app) vagy manuális „Új számla” űrlap
-- **Visszajelzés**: PDF / számla adatok Moxie-nak (Attach File, Create Invoice)
-- **Fizetés szinkron**: Billingo/Számlázz.hu fizetés → Moxie Apply Payment (`POST /api/payments/sync-moxie`)
-- **Mező megfeleltetés**: Moxie custom field key → számlázó mező (pl. számla típusa), value_mapping
-- **Hibák**: Sikertelen számla `error_message` mentése, listában piros státusz, ok megjelenítése
-- **EUR → HUF**: Beállítás: fix árfolyam vagy napi MNB középárfolyam (MNB API)
-- **Ütemezés**: Számolás csak munkanapokon vagy munkaidőben (timezone + start/end time), queue + Vercel Cron
+### Számlázás
+- **Automatikus számlakiállítás** Moxie webhook alapján (`InvoiceSent` esemény)
+- **Manuális számla** létrehozása webes űrlapon keresztül
+- **Billingo v3** és **Számlázz.hu** (Számla Agent XML API) támogatás
+- PDF csatolása vissza Moxie-hoz (`attachFileFromUrl`)
+- Sikertelen számlák mentése hibaüzenettel, piros státusszal
+
+### Fizetési szinkronizáció
+- Billingo / Számlázz.hu fizetési állapot lekérése (Frissítés gomb + cron)
+- Fizetett számla esetén Moxie `Apply Payment` értesítés
+- Billingo webhook fogadása fizetési eseményekhez
+
+### Beállítások
+- **Moxie kapcsolat**: API kulcs, webhook URL generálása + másolása, kapcsolat teszt
+- **Számlázóprogram**: Billingo vagy Számlázz.hu kiválasztása, titkosított hitelesítő adatok
+- **Számla alapértékek**: alapértelmezett számlatömb (Billingo), nyelv, fizetési mód
+- **Eladó adatok**: cég neve, adószám, cím – ezek kerülnek a számlákra
+- **EUR → HUF árfolyam**: fix árfolyam vagy napi MNB középárfolyam (MNB API)
+- **Mező megfeleltetés**: Moxie custom field → számlázó mező (pl. számlatípus, áfakulcs), értékmapping
+- **Ütemezés**: számlázás csak munkanapokon / munkaidőben (timezone, start/end time), queue + Vercel Cron
+- **Billingo e-mail küldés**: számla automatikus elküldése emailben a vevőnek
+
+### Dashboard
+- Kinnlévő összeg (ki nem fizetett nyitott számlák)
+- Bevétel az elmúlt 30 napban
+- Sikertelen számlák száma
+- Legutóbbi 5 számla gyors áttekintése
+- 3 lépéses onboarding vezető (előfizetés → Moxie → számlázó)
+
+### Számlalista
+- Állapot szerint szűrhető lista (Létrehozva / Moxie-ba szinkronizálva / Sikertelen)
+- Vevő neve, számlaszám, összeg, fizetési állapot
+- Külső link: számla megnyitása Billingo / Számlázz.hu felületén
+- Moxie ikon gomb: számla megnyitása közvetlenül Moxie-ban
+- Törölhető bármelyik számla – inline pill megerősítéssel (popup nélkül)
+- Hibaüzenet kibontható részletes nézettel
+
+### Előfizetés és auth
+- **Magic Link** alapú bejelentkezés (jelszó nélkül), Supabase PKCE
+- **Stripe** előfizetés: Checkout, Customer Portal, webhook kezelés
+- Aktív/próba előfizetés ellenőrzése minden webhook kérésnél
+- Titkosított API kulcsok tárolása (AES-256-GCM)
+
+### Egyéb
+- **HU/EN kétnyelvűség** (next-intl, default: magyar)
+- Rate limiting webhookhoz (60 req/perc/kliens)
+- Vercel Cron: számlasor feldolgozása + fizetési szinkron
+- Vitest egységtesztek
+
+---
 
 ## Tech stack
 
-- **Next.js** (App Router), TypeScript, Tailwind
-- **Supabase**: Auth (Magic Link, PKCE), PostgreSQL, RLS
-- **Stripe**: Checkout, Customer Portal, webhook (subscription)
-- **next-intl**: HU (default), EN
+| Réteg | Technológia |
+|-------|-------------|
+| Frontend | Next.js 16 (App Router, Turbopack), React 19, TypeScript 5.6 |
+| Stílus | Tailwind CSS 3.4, egyedi design rendszer |
+| Auth + DB | Supabase (Magic Link PKCE, PostgreSQL, RLS) |
+| Fizetés | Stripe (Checkout, Customer Portal, webhooks) |
+| i18n | next-intl 4.8 (hu alapértelmezett, en) |
+| Tesztelés | Vitest |
+| Deploy | Vercel (App + Cron Jobs) |
+
+---
 
 ## Telepítés és beállítás
 
-### 1. Függőségek és környezeti változók
+### 1. Függőségek
 
 ```bash
 npm install
 ```
 
-Másold `.env.example` → `.env` és töltsd ki:
+### 2. Környezeti változók
+
+Másold `.env.example` → `.env.local` és töltsd ki:
 
 | Változó | Hol találod | Megjegyzés |
-|--------|-------------|------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard → Project Settings → API | Project URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Ugyanott → Publishable key | Klienshez (Auth, RLS) |
-| `SUPABASE_SECRET_KEY` | Ugyanott → Secret key | Szerverhez (pl. webhook, cron) |
-| `NEXT_PUBLIC_APP_URL` | Saját app URL | Dev: `http://localhost:3000`, prod: `https://<domain>` |
+|---------|-------------|------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL | |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Ugyanott → Publishable key | Kliens oldali auth |
+| `SUPABASE_SECRET_KEY` | Ugyanott → Secret key | Szerver oldali műveletek |
+| `NEXT_PUBLIC_APP_URL` | Saját app URL | Dev: `http://localhost:3000` |
 | `STRIPE_SECRET_KEY` | Stripe Dashboard → API keys | |
-| `STRIPE_WEBHOOK_SECRET` | Stripe → Webhooks → Add endpoint → Signing secret | |
-| `STRIPE_PRICE_ID` | Stripe → Products → ár ID | Előfizetéshez |
-| `CRON_SECRET` | Saját titkos string | Opcionális; Vercel Cron auth-hoz |
+| `STRIPE_WEBHOOK_SECRET` | Stripe → Webhooks → Signing secret | |
+| `STRIPE_PRICE_ID` | Stripe → Products → ár ID | Előfizetés ár azonosítója |
+| `ENCRYPTION_KEY` | Generált 64 jegyű hex | API kulcsok titkosításához¹ |
+| `CRON_SECRET` | Saját titkos string | Vercel Cron auth (opcionális) |
 
-### 2. Supabase: adatbázis
+> ¹ Generálás: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 
-Futtasd a migrációkat sorrendben (Supabase CLI vagy SQL Editor):
+### 3. Supabase – adatbázis migrációk
 
-1. `supabase/migrations/20250101000001_initial_schema.sql` – táblák, RLS, policy-k  
-2. `supabase/migrations/20250102000001_rls_and_search_path_fix.sql` – RLS finomítás
+Futtasd a migrációkat sorrendben (Supabase CLI: `supabase db push`, vagy Supabase SQL Editor-ban egyenként):
 
-### 3. Supabase: Auth (Magic Link)
+```
+supabase/migrations/
+├── 20250101000001_initial_schema.sql          – táblák, RLS, policy-k
+├── 20250102000001_rls_and_search_path_fix.sql – RLS finomítás
+├── 20250103000001_create_org_on_signup.sql    – org létrehozása regisztrációkor
+├── 20250310000001_moxie_last_tested_at.sql    – Moxie kapcsolat tesztelési ideje
+├── 20260310000001_stripe_idempotency.sql      – Stripe idempotencia + job retry
+├── 20260310000002_schedule_type.sql           – Ütemezés típusa (all_days, hours)
+├── 20260310000003_invoices_total_amount.sql   – Számla összeg mező
+├── 20260310000004_invoice_defaults.sql        – Alapértelmezett számlázási beállítások
+├── 20260310000005_invoices_payment_status.sql – Fizetési állapot mező
+├── 20260310000006_billingo_send_email.sql     – Billingo e-mail küldés beállítás
+├── 20260310000007_invoices_invoice_number.sql – Számlaszám mező
+├── 20260310000008_invoices_pdf_token.sql      – PDF proxy token
+└── 20260311000001_invoices_moxie_uuid.sql     – Moxie számla UUID
+```
 
-A bejelentkezés **Magic Link** (email link, jelszó nélkül). Beállítás a Supabase Dashboard-ban:
+### 4. Supabase – Auth (Magic Link)
+
+A bejelentkezés **Magic Link** alapú (email link, jelszó nélkül). Supabase Dashboard-on:
 
 - **Authentication → URL Configuration**
-  - **Site URL**: ugyanaz, mint `NEXT_PUBLIC_APP_URL` (pl. `http://localhost:3000` vagy `https://<domain>`).
-  - **Redirect URLs**: add hozzá a callback URL-t:
+  - **Site URL**: `NEXT_PUBLIC_APP_URL` értéke (pl. `http://localhost:3000`)
+  - **Redirect URLs**: adj hozzá callback URL-t:
     - Dev: `http://localhost:3000/auth/callback`
     - Prod: `https://<domain>/auth/callback`
-- **Authentication → Providers → Email**: Email provider engedélyezve (alapból be van).
-- *(Opcionális)* **Magic Link lejárat**: Auth → Providers → Email → Magic Link / OTP expiration. Alapértelmezett 1 óra; számlázási appnál ajánlott rövidebb (pl. 15 perc).
+- **Authentication → Providers → Email**: legyen engedélyezve (alapból az)
 
-A felhasználók a login oldalon csak emailt adnak meg; a linkre kattintva bejelentkeznek. Regisztráció = ugyanaz a flow (signup átirányít a loginra).
+### 5. Stripe
 
-### 4. Stripe
+1. Hozz létre előfizetési terméket és árat a Stripe Dashboard-on.
+2. **Webhook endpoint** hozzáadása:
+   - URL: `https://<APP_URL>/api/stripe/webhook`
+   - Esemény: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`
+   - Másold a **Signing secret**-et a `STRIPE_WEBHOOK_SECRET` env-be.
 
-- Hozz létre terméket és árat (előfizetéshez).
-- Webhook: **Add endpoint** → URL: `https://<APP_URL>/api/stripe/webhook` → események: pl. `checkout.session.completed`, `customer.subscription.*` → másold a **Signing secret**-et a `STRIPE_WEBHOOK_SECRET` env-be.
-
-### 5. Indítás
+### 6. Indítás
 
 ```bash
 npm run dev
 ```
 
-→ http://localhost:3000 — a login oldalon email megadásával Magic Linket kapsz.
+→ `http://localhost:3000` — email megadásával Magic Link-et kapsz.
 
-## Moxie webhook
+---
 
-A Moxie-ban regisztráld a webhook URL-t **org paraméterrel**:  
-`https://<APP_URL>/api/webhooks/moxie?org=<ORGANIZATION_UUID>`
+## Moxie webhook beállítása
+
+A Moxie platformon regisztráld a webhook URL-t az alábbi formátumban:
+
+```
+https://<APP_URL>/api/webhooks/moxie?org=<ORGANIZATION_UUID>&secret=<WEBHOOK_SECRET>
+```
+
+Az `ORGANIZATION_UUID` és a `WEBHOOK_SECRET` a MoxieInvoice Beállítások → Moxie kapcsolat oldalán található (automatikusan generált). A webhook az `InvoiceSent` eseményt figyeli.
+
+---
 
 ## Vercel Cron
 
-Ütemezett számlázás (pending_invoice_jobs) feldolgozása:  
-`GET /api/cron/process-invoice-queue` – 5 percenként (vercel.json).  
-Beállítsd a `CRON_SECRET` env-et és a Vercel Cron auth header-t.
+A `vercel.json`-ban konfigurált cron job-ok:
 
-## GitHub (first-time push)
+| Endpoint | Ütemezés | Leírás |
+|----------|----------|--------|
+| `GET /api/cron/process-invoice-queue` | 5 percenként | Pending számlasor feldolgozása |
+| `POST /api/cron/sync-billingo-payments` | Óránként | Fizetési állapot szinkron |
 
-If the repo is not yet on GitHub:
+Állítsd be a `CRON_SECRET` env-et; a Vercel automatikusan küldi az `Authorization: Bearer <CRON_SECRET>` headert.
 
-1. On [GitHub](https://github.com/new) create a new repository named **MoxieInvoice** (no README, no .gitignore).
-2. In this folder run:
-   ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/MoxieInvoice.git
-   git branch -M main
-   git push -u origin main
-   ```
-   Replace `YOUR_USERNAME` with your GitHub username or org.
+---
 
-## Deploy to Vercel
+## GitHub – első push
 
-1. Push this repo to GitHub and import the project in [Vercel](https://vercel.com).
-2. Set **Environment Variables** in Vercel (Project → Settings → Environment Variables) from `.env.example`. Use **Vercel Cron** auth: set `CRON_SECRET` and ensure the cron job sends `Authorization: Bearer <CRON_SECRET>` (Vercel does this automatically for configured crons).
-3. Optional: set **NEXT_PUBLIC_APP_URL** to your production URL (e.g. `https://your-app.vercel.app`) for Stripe redirects and auth callbacks.
-4. Redeploy after adding or changing env vars.
+Ha a repo még nincs GitHub-on:
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/MoxieInvoice.git
+git branch -M main
+git push -u origin main
+```
+
+---
+
+## Deploy Vercel-re
+
+1. Push a repo GitHub-ra, majd importáld a projektet [Vercel](https://vercel.com)-en.
+2. **Environment Variables** beállítása: Project → Settings → Environment Variables (`.env.example` alapján).
+3. `NEXT_PUBLIC_APP_URL` legyen a produkciós URL (pl. `https://your-app.vercel.app`).
+4. Cron job-ok: a `vercel.json` automatikusan konfigurálja őket deploy után.
+5. Változó hozzáadása vagy módosítása után **Redeploy** szükséges.
+
+---
 
 ## Licenc
 

@@ -5,7 +5,7 @@ import { SettingsTabs } from '@/components/SettingsTabs';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('settings');
-  return { title: `${t('title')} – MoxieInvoice` };
+  return { title: `${t('title')} – Brixa` };
 }
 
 export default async function SettingsPage() {
