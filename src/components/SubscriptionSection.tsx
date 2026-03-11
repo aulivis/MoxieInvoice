@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 
-export function SubscriptionSection() {
+export function SubscriptionSection({ returnTo }: { returnTo?: string } = {}) {
   const [loading, setLoading] = useState<'checkout' | 'portal' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('subscription');
@@ -15,7 +15,11 @@ export function SubscriptionSection() {
     setError(null);
     setLoading('checkout');
     try {
-      const res = await fetch('/api/stripe/checkout', { method: 'POST' });
+      const body = returnTo ? JSON.stringify({ returnTo }) : undefined;
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        ...(body ? { headers: { 'Content-Type': 'application/json' }, body } : {}),
+      });
       const data = await res.json();
       if (!res.ok) {
         const msg = data.errorCode ? tErrors(data.errorCode as 'checkoutFailed') : (data.error || tCommon('error'));

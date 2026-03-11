@@ -40,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className={signedIn ? 'min-h-screen md:ml-[240px]' : 'min-h-screen'}>
         {/* Header */}
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-light bg-background-card/95 backdrop-blur-sm px-4 md:px-6">
+        <header className={`sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-light bg-background-card/95 backdrop-blur-sm px-4 md:px-6${signedIn ? ' md:hidden' : ''}`}>
           <div className="flex items-center gap-3">
             {/* Logo – visible on mobile when signed in (sidebar is hidden), always when signed out */}
             {signedIn ? (
@@ -83,7 +83,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <main
           id="main-content"
-          className={`min-h-[calc(100vh-56px)] bg-surface-50 p-4 md:p-6 ${signedIn ? 'pb-bottom-nav md:pb-6' : ''}`}
+          className={`bg-surface-50 p-4 md:p-6 ${signedIn ? 'min-h-[calc(100vh-56px)] md:min-h-screen pb-bottom-nav md:pb-6' : 'min-h-[calc(100vh-56px)]'}`}
           tabIndex={-1}
         >
           {children}

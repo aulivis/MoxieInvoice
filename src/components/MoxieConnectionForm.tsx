@@ -11,7 +11,7 @@ const disabledInputClass =
 
 const LIVE_THRESHOLD_MS = 24 * 60 * 60 * 1000;
 
-export function MoxieConnectionForm({ hasSubscription = true }: { hasSubscription?: boolean }) {
+export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSubscription?: boolean; onSaved?: () => void }) {
   const [baseUrl, setBaseUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [hasApiKey, setHasApiKey] = useState(false);
@@ -81,6 +81,7 @@ export function MoxieConnectionForm({ hasSubscription = true }: { hasSubscriptio
       }
       setSaveSuccess(true);
       await fetchConnection();
+      onSaved?.();
     } catch {
       setSaveError(tCommon('error'));
     } finally {

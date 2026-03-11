@@ -8,7 +8,7 @@ function getStripe() {
   return new Stripe(key);
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -55,11 +55,28 @@ export async function POST() {
   }
 
   const origin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+  // Support wizard return: if caller passes { returnTo: '/onboarding' } in body,
+  // redirect back to the onboarding wizard with checkout=success on completion
+  let returnTo: string | null = null;
+  try {
+    const body = await request.json().catch(() => ({}));
+    if (typeof body?.returnTo === 'string' && body.returnTo.startsWith('/')) {
+      returnTo = body.returnTo;
+    }
+  } catch {
+    // ignore body parse errors
+  }
+
+  const successPath = returnTo
+    ? `${returnTo}${returnTo.includes('?') ? '&' : '?'}checkout=success`
+    : '/?success=1';
+
   const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
     mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${origin}/?success=1`,
+    success_url: `${origin}${successPath}`,
     cancel_url: `${origin}/?canceled=1`,
     subscription_data: { metadata: { org_id: profile.organization_id } },
     // Idempotency: prevent duplicate sessions if user clicks twice

@@ -1,0 +1,19 @@
+import { redirect } from 'next/navigation';
+import { getLocale } from 'next-intl/server';
+import { getAppLayoutContext } from '@/lib/auth';
+import { AppShell } from '@/components/AppShell';
+
+// Wizard layout: requires auth, has AppShell (sidebar), but NO SubscriptionGuard
+// (the wizard itself guides the user through subscription setup)
+export default async function WizardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const ctx = await getAppLayoutContext();
+  if (!ctx) {
+    const locale = await getLocale();
+    redirect(`/${locale}/login`);
+  }
+  return <AppShell>{children}</AppShell>;
+}

@@ -8,6 +8,7 @@
     "errorTitle": "Something went wrong",
     "tryAgain": "Try again",
     "skipToContent": "Skip to content",
+    "selectLanguage": "Select language",
     "errorFallback": "An unexpected error occurred.",
     "notFound": "Page not found",
     "notFoundDescription": "The page you're looking for doesn't exist.",
@@ -25,6 +26,11 @@
     "signup": "Sign up"
   },
   "auth": {
+    "errors": {
+      "emailRequired": "Email address is required.",
+      "emailRateLimit": "Too many sign-in emails requested in a short time. Please wait a moment and try again.",
+      "retryAfterSeconds": "For security reasons you can request a new link only after {seconds} seconds. Please wait and try again."
+    },
     "loginTitle": "Log in",
     "signupTitle": "Sign up",
     "email": "Email",
@@ -52,6 +58,8 @@
     "feature4": "Automatic payment confirmation back to Moxie"
   },
   "dashboard": {
+    "ariaStepDone": "Done",
+    "ariaStepMissing": "Missing",
     "title": "Dashboard",
     "recentInvoices": "Recent invoices",
     "recentInvoicesCount": "{count, plural, =0 {No recent invoices} one {# recent invoice} other {# recent invoices}}",
@@ -69,10 +77,11 @@
     "statPaidMonth": "Revenue (30d)",
     "quickActionsTitle": "Quick actions",
     "quickActionsDesc": "Create a new invoice or check your settings.",
-    "setupGuideTitle": "Getting started",
+    "setupGuideTitle": "Setup required",
     "setupStep1": "Activate subscription",
     "setupStep2": "Set up Moxie connection",
-    "setupStep3": "Configure billing provider"
+    "setupStep3": "Configure billing provider",
+    "wizardCta": "Start setup →"
   },
   "invoices": {
     "title": "Invoices",
@@ -277,7 +286,10 @@
     "defaultPaymentMethod": "Payment method",
     "billingoSendByEmailTitle": "Email sending",
     "billingoSendByEmailLabel": "Automatically send invoice by email (Billingo)",
-    "billingoSendByEmailHint": "This only works when the customer has an email address set (e.g. in Moxie client details)."
+    "billingoSendByEmailHint": "This only works when the customer has an email address set (e.g. in Moxie client details).",
+    "paymentMethodWireTransfer": "Wire transfer",
+    "paymentMethodCash": "Cash",
+    "paymentMethodBankcard": "Bank card"
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF conversion",
@@ -320,5 +332,59 @@
   },
   "loading": {
     "default": "Loading..."
+  },
+  "onboarding": {
+    "title": "Setup wizard",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Go to Dashboard",
+    "stepOf": "Step {current} of {total}",
+    "estimatedTime": "~5 minutes to complete",
+    "skipTweaks": "Skip, use defaults",
+    "restartButton": "Restart setup wizard",
+    "welcomeTitle": "Welcome to Brixa!",
+    "welcomeSubtitle": "Let's set up everything you need for automatic invoicing in just a few steps.",
+    "welcomeCta": "Let's get started",
+    "welcomeAlreadyDone": "Everything is set up!",
+    "welcomeViewDashboard": "Go to Dashboard",
+    "welcomeViewSettings": "View settings",
+    "welcomeBullet1": "Connect your Moxie account",
+    "welcomeBullet2": "Set up your billing provider",
+    "welcomeBullet3": "Fine-tune currency and schedule",
+    "subscriptionTitle": "Activate your subscription",
+    "subscriptionDesc": "A subscription is required to use the Moxie and billing integrations.",
+    "subscriptionCheckoutSuccess": "Subscription activated! Continuing with setup.",
+    "moxieTitle": "Connect your Moxie account",
+    "moxieDesc": "Enter your Moxie instance URL and API key.",
+    "moxieHelpBaseUrl": "Where do I find the Base URL?",
+    "moxieHelpBaseUrlText": "In your Moxie admin panel, go to Settings → API to find your instance URL.",
+    "moxieHelpApiKey": "Where do I find the API key?",
+    "moxieHelpApiKeyText": "In your Moxie admin panel, go to Settings → API to create an API key.",
+    "moxieHelpWebhook": "How do I set up the webhook in Moxie?",
+    "moxieHelpWebhookText": "In Moxie, go to Settings → Webhooks, add the URL above as an endpoint, and map the InvoiceSent event.",
+    "moxieSavedNext": "Moxie connection saved! Click Next to continue.",
+    "billingTitle": "Connect your billing provider",
+    "billingDesc": "Choose your billing software and enter your access credentials.",
+    "billingHelpBillingo": "Where do I find the Billingo API key?",
+    "billingHelpBillingoText": "In the Billingo admin panel, go to Settings → API connection to find and create your API key.",
+    "billingHelpSzamlazz": "Where do I find the Számlázz.hu agent key?",
+    "billingHelpSzamlazzText": "In Számlázz.hu, go to Settings → Connected apps to create your agent key.",
+    "billingAdvancedSettings": "Advanced Billingo settings (invoice block, payment method, etc.) can be changed on the Settings page.",
+    "billingSavedNext": "Billing provider saved! Click Next to continue.",
+    "tweaksTitle": "Fine-tuning",
+    "tweaksDesc": "These are optional – the defaults work well in most cases. You can change them anytime in Settings.",
+    "completeTitle": "All set!",
+    "completeSubtitle": "Automatic invoicing is ready to go.",
+    "completeCheckSubscription": "Subscription activated",
+    "completeCheckMoxie": "Moxie connection configured",
+    "completeCheckBilling": "Billing provider connected",
+    "completeGoSettings": "Advanced settings",
+    "imageSoon": "Image coming soon",
+    "stepSubscription": "Subscription",
+    "stepMoxie": "Moxie",
+    "stepBilling": "Billing",
+    "stepTweaks": "Fine-tuning",
+    "stepComplete": "Done"
   }
 }

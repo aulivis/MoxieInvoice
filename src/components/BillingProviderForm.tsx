@@ -11,7 +11,7 @@ import { Select } from '@/components/ui/Select';
 const disabledInputClass =
   'disabled:opacity-60 disabled:cursor-not-allowed';
 
-export function BillingProviderForm({ hasSubscription = true }: { hasSubscription?: boolean }) {
+export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMode = false }: { hasSubscription?: boolean; onSaved?: () => void; wizardMode?: boolean }) {
   const [provider, setProvider] = useState<'billingo' | 'szamlazz'>('billingo');
   const [sellerName, setSellerName] = useState('');
   const [hasCredentials, setHasCredentials] = useState(false);
@@ -64,8 +64,11 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
   }, [fetchBilling]);
 
   useEffect(() => {
-    if (state?.success) fetchBilling();
-  }, [state?.success, fetchBilling]);
+    if (state?.success) {
+      fetchBilling();
+      onSaved?.();
+    }
+  }, [state?.success, fetchBilling, onSaved]);
 
   useEffect(() => {
     if (provider !== 'billingo') {
@@ -210,7 +213,7 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
         {state?.success && <Alert variant="success">{t('saved')}</Alert>}
       </form>
 
-      {provider === 'billingo' && (
+      {provider === 'billingo' && !wizardMode && (
         <div className="mt-8 pt-6 border-t border-border-light">
           <h3 className="text-sm font-semibold text-text-primary mb-1">{t('invoiceDefaultsTitle')}</h3>
           <p className="text-xs text-text-secondary mb-4">{t('invoiceDefaultsHint')}</p>
@@ -343,9 +346,9 @@ export function BillingProviderForm({ hasSubscription = true }: { hasSubscriptio
                   id="default-payment-method"
                   value={defaultPaymentMethod}
                   options={[
-                    { value: 'wire_transfer', label: 'wire transfer' },
-                    { value: 'cash', label: 'cash' },
-                    { value: 'bankcard', label: 'bankcard' },
+                    { value: 'wire_transfer', label: t('paymentMethodWireTransfer') },
+                    { value: 'cash', label: t('paymentMethodCash') },
+                    { value: 'bankcard', label: t('paymentMethodBankcard') },
                   ]}
                   onChange={setDefaultPaymentMethod}
                   disabled={disabled}

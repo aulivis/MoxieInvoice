@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { locales, localeNames, localeFlags } from '@/i18n';
 import type { Locale } from '@/i18n';
@@ -20,6 +20,7 @@ export function LanguageSwitcher({ dark = false }: LanguageSwitcherProps) {
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations('common');
 
   return (
     <Select<Locale>
@@ -29,7 +30,7 @@ export function LanguageSwitcher({ dark = false }: LanguageSwitcherProps) {
       variant={dark ? 'compact' : 'default'}
       dark={dark}
       placement={dark ? 'top' : 'bottom'}
-      aria-label="Select language"
+      aria-label={t('selectLanguage')}
     />
   );
 }

@@ -59,6 +59,19 @@ function parseMagicLinkErrorFromHash(): boolean {
   return false;
 }
 
+function getTranslatedAuthError(
+  rawError: string,
+  t: (key: string, values?: Record<string, number | string>) => string
+): string {
+  if (rawError === 'AUTH_EMAIL_REQUIRED') return t('errors.emailRequired');
+  if (rawError === 'AUTH_EMAIL_RATE_LIMIT') return t('errors.emailRateLimit');
+  if (rawError.startsWith('AUTH_RETRY_AFTER:')) {
+    const seconds = rawError.slice('AUTH_RETRY_AFTER:'.length);
+    return t('errors.retryAfterSeconds', { seconds });
+  }
+  return rawError;
+}
+
 export default function LoginPage() {
   const [state, formAction] = useActionState<AuthState | null, FormData>(
     loginAction,
@@ -78,7 +91,10 @@ export default function LoginPage() {
 
   const showSuccess = state?.success === true;
   const showForm = !showSuccess;
-  const errorMessage = state?.error || (hashError || errorAuth ? t('linkExpired') : null);
+  const rawError = state?.error;
+  const errorMessage =
+    (rawError && getTranslatedAuthError(rawError, t)) ||
+    (hashError || errorAuth ? t('linkExpired') : null);
 
   const features = [t('feature1'), t('feature2'), t('feature3'), t('feature4')];
 

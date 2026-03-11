@@ -24,7 +24,12 @@
       "Bash(find \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\app\\\\[locale]\\\\\\(app\\)\\\\settings\" -type f -name \"page.tsx\")",
       "Bash(find \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\app\\\\[locale]\\\\\\(auth\\)\" -type f -name \"page.tsx\")",
       "Bash(find \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\app\\\\[locale]\\\\\\(app\\)\" -type f -name \"page.tsx\")",
-      "Bash(ls \"D:\\\\Apps\\\\MoxieInvoice\\\\public\"\" 2>/dev/null || dir \"D:AppsMoxieInvoicepublic \")"
+      "Bash(ls \"D:\\\\Apps\\\\MoxieInvoice\\\\public\"\" 2>/dev/null || dir \"D:AppsMoxieInvoicepublic \")",
+      "Bash(ls -la /d/Apps/MoxieInvoice/src/app/[locale]/\\\\\\(app\\\\\\)/)",
+      "Bash(ls D:AppsMoxieInvoicesrcmiddleware*)",
+      "Bash(ls D:AppsMoxieInvoicemiddleware*)",
+      "Bash(dir \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\middleware*\")",
+      "Bash(dir \"D:\\\\Apps\\\\MoxieInvoice\\\\middleware*\")"
     ]
   }
 }
