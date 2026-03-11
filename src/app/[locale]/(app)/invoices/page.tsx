@@ -41,9 +41,8 @@ export default async function InvoicesListPage() {
       .maybeSingle(),
   ]);
 
-  const moxieWebBaseUrl = moxieConn?.base_url
-    ? moxieConn.base_url.replace(/\/$/, '').replace(/\/api\/public\/?$/i, '')
-    : undefined;
+  // Moxie web app is always at create.withmoxie.com regardless of which API pod is in use.
+  const moxieWebBaseUrl = moxieConn?.base_url ? 'https://create.withmoxie.com' : undefined;
 
   const count = invoices?.length ?? 0;
 

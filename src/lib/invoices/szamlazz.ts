@@ -90,17 +90,24 @@ function parseResponseXml(xml: string): { invoiceNumber?: string; pdfUrl?: strin
   const errorMatch = xml.match(/<hiba(?:kód)?>([^<]*)<\/hiba(?:kód)?>/i) ?? xml.match(/<hiba>([^<]*)<\/hiba>/i);
   if (errorMatch) return { error: errorMatch[1].trim() };
   const numMatch = xml.match(/<szamlaszam>([^<]*)<\/szamlaszam>/i);
-  // szamlakulcsar (or szamlakulcs in some response versions) is a public access key
-  // for viewing the invoice online. We build a viewer URL from it.
-  const kulcsarMatch =
-    xml.match(/<szamlakulcsar>([^<]*)<\/szamlakulcsar>/i) ??
-    xml.match(/<szamlakulcs>([^<]*)<\/szamlakulcs>/i);
+  // Official doc (valaszVerzio=2): <vevoifiokurl> contains the full viewer URL when vevői fiók is used.
+  const vevoifiokurlMatch = xml.match(/<vevoifiokurl>([^<]*)<\/vevoifiokurl>/i);
   let pdfUrl: string | undefined;
-  if (numMatch && kulcsarMatch) {
-    const szamlaszam = numMatch[1].trim();
-    const kulcsar = kulcsarMatch[1].trim();
-    if (szamlaszam && kulcsar) {
-      pdfUrl = `https://www.szamlazz.hu/szamla/printpreview?szamlaszam=${encodeURIComponent(szamlaszam)}&keyman=${encodeURIComponent(kulcsar)}`;
+  if (vevoifiokurlMatch) {
+    const url = vevoifiokurlMatch[1].trim();
+    if (url && url.startsWith('http')) pdfUrl = url;
+  }
+  // Fallback: szamlakulcsar/szamlakulcs + szamlaszam → printpreview URL (when API returns key but not vevoifiokurl).
+  if (!pdfUrl) {
+    const kulcsarMatch =
+      xml.match(/<szamlakulcsar>([^<]*)<\/szamlakulcsar>/i) ??
+      xml.match(/<szamlakulcs>([^<]*)<\/szamlakulcs>/i);
+    if (numMatch && kulcsarMatch) {
+      const szamlaszam = numMatch[1].trim();
+      const kulcsar = kulcsarMatch[1].trim();
+      if (szamlaszam && kulcsar) {
+        pdfUrl = `https://www.szamlazz.hu/szamla/printpreview?szamlaszam=${encodeURIComponent(szamlaszam)}&keyman=${encodeURIComponent(kulcsar)}`;
+      }
     }
   }
   return {
@@ -197,9 +204,19 @@ export async function createSzamlazzInvoice(
     throw new Error(`Számlázz.hu: No invoice number in response. ${text.slice(0, 500)}`);
   }
 
+  // Use PDF URL from XML body (vevoifiokurl or printpreview); fallback to response header if present (doc: szlahu_vevoifiokurl).
+  let pdfUrl = parsed.pdfUrl;
+  if (!pdfUrl && res.headers) {
+    const headerUrl =
+      res.headers.get('szlahu_vevoifiokurl') ?? res.headers.get('Szlahu_Vevoifiokurl');
+    if (headerUrl && headerUrl.trim().startsWith('http')) {
+      pdfUrl = decodeURIComponent(headerUrl.trim());
+    }
+  }
+
   return {
     externalId: parsed.invoiceNumber,
     invoiceNumber: parsed.invoiceNumber,
-    pdfUrl: parsed.pdfUrl,
+    pdfUrl,
   };
 }

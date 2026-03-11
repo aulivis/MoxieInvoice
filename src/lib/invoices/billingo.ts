@@ -367,22 +367,20 @@ export async function createBillingoInvoice(
   const doc = (await invoiceRes.json()) as {
     id: number;
     invoice_number?: string;
-    public_url?: string;
   };
 
-  // Billingo does not always return public_url in the POST response.
-  // Fall back to GET /documents/{id} to retrieve it.
-  let publicUrl: string | undefined = doc.public_url;
-  if (!publicUrl) {
-    try {
-      const getRes = await fetch(`${BILLINGO_API_BASE}/documents/${doc.id}`, { headers });
-      if (getRes.ok) {
-        const getDoc = (await getRes.json()) as { public_url?: string };
-        publicUrl = getDoc.public_url ?? undefined;
-      }
-    } catch {
-      // Non-fatal — invoice was created, just the URL is missing
+  // Document schema (OpenAPI) does not include public_url; it is only from GET /documents/{id}/public-url.
+  let publicUrl: string | undefined;
+  try {
+    const publicUrlRes = await fetch(`${BILLINGO_API_BASE}/documents/${doc.id}/public-url`, {
+      headers: { Accept: 'application/json', 'X-API-KEY': credentials.apiKey },
+    });
+    if (publicUrlRes.ok) {
+      const body = (await publicUrlRes.json()) as { public_url?: string };
+      publicUrl = body.public_url ?? undefined;
     }
+  } catch {
+    // Non-fatal — invoice was created, just the URL is missing
   }
 
   return {

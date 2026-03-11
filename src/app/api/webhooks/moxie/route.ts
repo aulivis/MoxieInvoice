@@ -145,6 +145,23 @@ export async function POST(request: NextRequest) {
 }
 
 /** Moxie InvoiceSent payload uses clientInfo; optional legacy payload uses client + items */
+
+/**
+ * Try to extract a proper UUID (8-4-4-4-12 format) from common Moxie invoice ID fields.
+ * body.id is often a MongoDB ObjectId (24-char hex, no hyphens) which is not the UUID
+ * used in Moxie's web app URLs. Prioritize fields that contain a real UUID.
+ */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function extractMoxieInvoiceUuid(body: Record<string, unknown>): string | undefined {
+  const candidates = [body.uuid, body.invoiceUuid, body.invoice_uuid, body.id, body.invoice_id];
+  for (const c of candidates) {
+    const s = String(c ?? '').trim();
+    if (UUID_RE.test(s)) return s;
+  }
+  return undefined;
+}
+
 type MoxieLineItem = {
   name?: string;
   description?: string;
@@ -221,7 +238,7 @@ function normalizeMoxiePayload(
     return {
       request,
       moxieInvoiceId: (String(body.invoiceNumberFormatted ?? body.invoiceNumber ?? body.id ?? body.invoice_id ?? '').trim()) || undefined,
-      moxieInvoiceUuid: (String(body.id ?? body.invoice_id ?? '').trim()) || undefined,
+      moxieInvoiceUuid: extractMoxieInvoiceUuid(body),
     };
   }
 
@@ -258,6 +275,6 @@ function normalizeMoxiePayload(
   return {
     request,
     moxieInvoiceId: (body.invoiceNumberFormatted ?? (body.invoiceNumber != null ? String(body.invoiceNumber) : undefined) ?? body.invoice_id) as string | undefined,
-    moxieInvoiceUuid: (String(body.id ?? body.invoice_id ?? '').trim()) || undefined,
+    moxieInvoiceUuid: extractMoxieInvoiceUuid(body),
   };
 }
