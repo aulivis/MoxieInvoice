@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 import { getAppLayoutContext } from '@/lib/auth';
 import { SubscriptionGuard } from '@/components/SubscriptionGuard';
+import { AppShell } from '@/components/AppShell';
 
 export default async function AppLayout({
   children,
@@ -14,8 +15,10 @@ export default async function AppLayout({
     redirect(`/${locale}/login`);
   }
   return (
-    <SubscriptionGuard hasSubscription={ctx.hasSubscription}>
-      {children}
-    </SubscriptionGuard>
+    <AppShell>
+      <SubscriptionGuard hasSubscription={ctx.hasSubscription}>
+        {children}
+      </SubscriptionGuard>
+    </AppShell>
   );
 }

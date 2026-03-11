@@ -44,9 +44,12 @@
     "emailHint": "Enter your email and we'll send you a sign-in link.",
     "linkSent": "Link sent!",
     "copyright": "© 2026 Brixa",
+    "heroTagline": "The bridge between your project and your invoice.",
+    "noPassword": "No password, no registration – just enter your email and you're in.",
     "feature1": "Automatic invoice generation from Moxie",
     "feature2": "Billingo & Számlázz.hu integration",
-    "feature3": "Real-time EUR → HUF conversion"
+    "feature3": "Real-time EUR → HUF conversion",
+    "feature4": "Automatic payment confirmation back to Moxie"
   },
   "dashboard": {
     "title": "Dashboard",

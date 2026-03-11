@@ -4,10 +4,10 @@ import { useActionState, useState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { Link } from '@/i18n/navigation';
 import { loginAction, type AuthState } from '@/app/actions/auth';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 function EmailIcon() {
   return (
@@ -27,13 +27,12 @@ function CheckCircleIcon() {
   );
 }
 
-/** Brixa "Broken Bridge" logo mark */
-function BrixaLogoMark({ size = 36 }: { size?: number }) {
+function BrixaLogoMark({ size = 48 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
       <rect width="110" height="110" rx="28" fill="#1A2744"/>
       <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
-      <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="rgba(255,255,255,0.35)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+      <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="white" strokeOpacity="0.35" strokeWidth="11" strokeLinecap="round" fill="none"/>
       <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
       <circle cx="55" cy="28" r="6" fill="#E8893A"/>
     </svg>
@@ -69,52 +68,46 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const errorAuth = searchParams.get('error') === 'auth';
   const t = useTranslations('auth');
-  const tNav = useTranslations('nav');
 
   useEffect(() => {
     if (parseMagicLinkErrorFromHash()) {
       setHashError(true);
-      window.history.replaceState(
-        null,
-        '',
-        window.location.pathname + window.location.search
-      );
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   }, []);
 
   const showSuccess = state?.success === true;
   const showForm = !showSuccess;
-  const errorMessage =
-    state?.error || (hashError || errorAuth ? t('linkExpired') : null);
+  const errorMessage = state?.error || (hashError || errorAuth ? t('linkExpired') : null);
 
-  const features = [t('feature1'), t('feature2'), t('feature3')];
+  const features = [t('feature1'), t('feature2'), t('feature3'), t('feature4')];
 
   return (
-    <div className="min-h-[calc(100vh-56px)] flex">
-      {/* Left brand panel – hidden on mobile */}
+    <div className="min-h-screen flex">
+      {/* ── Left brand panel (md+, 50%) ─────────────────────────────────── */}
       <div
-        className="hidden lg:flex lg:w-[420px] xl:w-[480px] shrink-0 flex-col justify-between p-10"
-        style={{
-          background: 'linear-gradient(160deg, #0E1628 0%, #1A2744 60%, #2A3A5C 100%)',
-        }}
+        className="hidden md:flex md:w-1/2 shrink-0 flex-col justify-between p-12 xl:p-16"
+        style={{ background: 'linear-gradient(160deg, #0E1628 0%, #1A2744 60%, #2A3A5C 100%)' }}
       >
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <BrixaLogoMark size={36} />
-          <span
-            className="font-extrabold text-lg tracking-tight text-white"
-            style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
-          >
-            Brixa
-          </span>
+        {/* Logo + tagline */}
+        <div>
+          <div className="flex items-center gap-4 mb-5">
+            <BrixaLogoMark size={52} />
+            <span
+              className="font-extrabold text-2xl tracking-tight text-white"
+              style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
+            >
+              Brixa
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            {t('heroTagline')}
+          </p>
         </div>
 
-        {/* Center content */}
+        {/* Hero + features */}
         <div>
-          <h2
-            className="text-3xl font-bold text-white leading-tight mb-3"
-            style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
-          >
+          <h2 className="text-4xl font-bold text-white leading-tight mb-4">
             {t('heroTitlePrefix')}{' '}
             <span
               className="text-transparent"
@@ -128,12 +121,12 @@ export default function LoginPage() {
               {t('heroHighlight')}
             </span>
           </h2>
-          <p className="text-base leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {t('heroDescription')}
           </p>
           <ul className="space-y-3">
             {features.map((f) => (
-              <li key={f} className="flex items-center gap-3 text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              <li key={f} className="flex items-center gap-3 text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>
                 <span
                   className="flex items-center justify-center w-5 h-5 rounded-full shrink-0"
                   style={{ background: 'rgba(232,137,58,0.2)' }}
@@ -148,78 +141,76 @@ export default function LoginPage() {
           </ul>
         </div>
 
-        {/* Footer */}
-        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        {/* Copyright */}
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
           {t('copyright')}
         </p>
       </div>
 
-      {/* Right form panel */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
-          {/* Mobile logo */}
-          <div className="flex items-center gap-2.5 mb-8 lg:hidden">
-            <BrixaLogoMark size={32} />
-            <span
-              className="font-extrabold text-base text-text-primary tracking-tight"
-              style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
-            >
-              Brixa
-            </span>
-          </div>
+      {/* ── Right form panel ─────────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-h-screen bg-surface-50">
+        {/* Language switcher top-right */}
+        <div className="flex justify-end p-4">
+          <LanguageSwitcher />
+        </div>
 
-          {showForm ? (
-            <>
-              <h1 className="text-2xl font-bold text-text-primary mb-1">{t('loginTitle')}</h1>
-              <p className="text-sm text-text-secondary mb-6">
-                {t('emailHint')}
-              </p>
-
-              <form action={formAction} className="space-y-4">
-                <Input
-                  id="login-email"
-                  type="email"
-                  name="email"
-                  label={t('email')}
-                  required
-                  autoComplete="email"
-                  inputMode="email"
-                  placeholder={t('emailPlaceholder')}
-                  leadingIcon={<EmailIcon />}
-                  aria-invalid={!!errorMessage}
-                  aria-describedby={errorMessage ? 'login-error' : undefined}
-                  error={errorMessage ?? undefined}
-                />
-                <SubmitButton />
-              </form>
-
-              <p className="mt-5 text-sm text-text-secondary text-center">
-                {t('noAccount')}{' '}
-                <Link
-                  href="/signup"
-                  className="text-primary font-medium hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
-                >
-                  {tNav('signup')}
-                </Link>
-              </p>
-            </>
-          ) : (
-            <div className="text-center animate-bounce-in" role="status">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success-muted mb-4">
-                <span className="text-status-success">
-                  <CheckCircleIcon />
-                </span>
-              </div>
-              <h2 className="text-xl font-bold text-text-primary mb-2">
-                {t('linkSent')}
-              </h2>
-              <p className="text-sm text-text-secondary mb-1">
-                {t('magicLinkSent', { email: state?.email ?? '' })}
-              </p>
-              <p className="text-sm text-text-tertiary mb-1">{t('checkInbox')}</p>
-              <p className="text-xs text-text-tertiary">{t('resendAfter')}</p>
+        {/* Centered form */}
+        <div className="flex-1 flex items-center justify-center px-6 pb-12">
+          <div className="w-full max-w-sm">
+            {/* Mobile logo */}
+            <div className="flex items-center gap-3 mb-8 md:hidden">
+              <BrixaLogoMark size={36} />
+              <span
+                className="font-extrabold text-lg text-text-primary tracking-tight"
+                style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
+              >
+                Brixa
+              </span>
             </div>
-          )}
+
+            {showForm ? (
+              <>
+                <h1 className="text-2xl font-bold text-text-primary mb-1">{t('loginTitle')}</h1>
+                <p className="text-sm text-text-secondary mb-6">{t('emailHint')}</p>
+
+                <form action={formAction} className="space-y-4">
+                  <Input
+                    id="login-email"
+                    type="email"
+                    name="email"
+                    label={t('email')}
+                    required
+                    autoComplete="email"
+                    inputMode="email"
+                    placeholder={t('emailPlaceholder')}
+                    leadingIcon={<EmailIcon />}
+                    aria-invalid={!!errorMessage}
+                    aria-describedby={errorMessage ? 'login-error' : undefined}
+                    error={errorMessage ?? undefined}
+                  />
+                  <SubmitButton />
+                </form>
+
+                <p className="mt-5 text-xs text-text-tertiary text-center leading-relaxed">
+                  {t('noPassword')}
+                </p>
+              </>
+            ) : (
+              <div className="text-center animate-bounce-in" role="status">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success-muted mb-4">
+                  <span className="text-status-success">
+                    <CheckCircleIcon />
+                  </span>
+                </div>
+                <h2 className="text-xl font-bold text-text-primary mb-2">{t('linkSent')}</h2>
+                <p className="text-sm text-text-secondary mb-1">
+                  {t('magicLinkSent', { email: state?.email ?? '' })}
+                </p>
+                <p className="text-sm text-text-tertiary mb-1">{t('checkInbox')}</p>
+                <p className="text-xs text-text-tertiary">{t('resendAfter')}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

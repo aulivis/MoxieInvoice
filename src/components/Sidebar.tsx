@@ -123,7 +123,6 @@ export function Sidebar() {
           style={{
             background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)',
             boxShadow: '0 4px 14px rgba(232,137,58,0.35)',
-            fontFamily: "var(--font-syne), 'Syne', sans-serif",
           }}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>

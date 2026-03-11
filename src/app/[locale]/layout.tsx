@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { LocaleLayoutProps } from '@/types';
-import { AppShell } from '@/components/AppShell';
 
 export const metadata: Metadata = {
   title: 'Brixa',
@@ -16,7 +15,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
   return (
     <NextIntlClientProvider messages={messages}>
-      <AppShell>{children}</AppShell>
+      {children}
     </NextIntlClientProvider>
   );
 }

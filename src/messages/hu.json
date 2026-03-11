@@ -44,9 +44,12 @@
     "emailHint": "Írd be az e-mail-címed, és küldünk egy bejelentkezési linket.",
     "linkSent": "Link elküldve!",
     "copyright": "© 2026 Brixa",
+    "heroTagline": "A híd a projekted és a számlád között.",
+    "noPassword": "Nincs jelszó, nincs regisztráció – add meg az e-mail-címed és máris bent vagy.",
     "feature1": "Automatikus számlagenerálás Moxie-ból",
     "feature2": "Billingo & Számlázz.hu integráció",
-    "feature3": "Valós idejű EUR → HUF konverzió"
+    "feature3": "Valós idejű EUR → HUF konverzió",
+    "feature4": "Automatikus fizetés visszaigazolás Moxie-ba"
   },
   "dashboard": {
     "title": "Dashboard",
