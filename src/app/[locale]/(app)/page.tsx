@@ -217,6 +217,7 @@ export default async function HomePage() {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const snapshot = inv.payload_snapshot as Record<string, any> | null;
                 const clientName =
+                  snapshot?.buyer?.name ??
                   snapshot?.partner?.name ??
                   snapshot?.client_name ??
                   inv.external_id ??
