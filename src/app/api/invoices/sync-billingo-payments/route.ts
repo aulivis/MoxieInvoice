@@ -4,7 +4,7 @@ import { syncBillingoPaymentsForOrg } from '@/lib/invoices/sync-billingo-payment
 
 /**
  * POST /api/invoices/sync-billingo-payments
- * Pull payment status from Billingo for the current org's open invoices and update DB + Moxie.
+ * Pull payment status from Billingo or Számlázz.hu for the current org's open invoices and update DB + Moxie.
  * Used by the Invoice list "Refresh" button.
  */
 export async function POST() {

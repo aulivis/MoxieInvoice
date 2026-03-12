@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { syncBillingoPaymentsForOrg } from '@/lib/invoices/sync-billingo-payments';
 
 /**
- * Vercel Cron: sync Billingo payment status for all orgs using Billingo.
+ * Vercel Cron: sync payment status from Billingo or Számlázz.hu for all orgs.
  * Runs hourly. Secured with CRON_SECRET.
  */
 export const dynamic = 'force-dynamic';
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
   const { data: rows } = await supabase
     .from('billing_providers')
     .select('org_id')
-    .eq('provider', 'billingo')
+    .in('provider', ['billingo', 'szamlazz'])
     .not('credentials_encrypted', 'is', null);
 
   const orgIds = [...new Set((rows ?? []).map((r) => r.org_id))];

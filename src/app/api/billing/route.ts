@@ -17,6 +17,7 @@ export async function GET() {
     .maybeSingle();
 
   return NextResponse.json({
+    orgId,
     provider: data?.provider ?? null,
     sellerName: data?.seller_name ?? null,
     hasCredentials: !!data?.credentials_encrypted,

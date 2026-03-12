@@ -289,7 +289,11 @@
     "billingoSendByEmailHint": "This only works when the customer has an email address set (e.g. in Moxie client details).",
     "paymentMethodWireTransfer": "Wire transfer",
     "paymentMethodCash": "Cash",
-    "paymentMethodBankcard": "Bank card"
+    "paymentMethodBankcard": "Bank card",
+    "ipnUrl": "IPN URL (payment notification)",
+    "ipnHint": "Paste this URL in the field at the bottom of Számlázz.hu Account settings / Invoicing basics. When a document's paid amount changes, Számlázz.hu will send the payment notification to this URL.",
+    "copyIpnUrl": "Copy IPN URL",
+    "ipnCopied": "Copied!"
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF conversion",

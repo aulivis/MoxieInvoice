@@ -31,6 +31,8 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
   const [billingoLanguages, setBillingoLanguages] = useState<Array<{ value: string; label: string }>>([]);
   const [billingoOptionsLoading, setBillingoOptionsLoading] = useState(false);
   const [billingoSendByEmail, setBillingoSendByEmail] = useState(false);
+  const [orgId, setOrgId] = useState<string | null>(null);
+  const [ipnCopied, setIpnCopied] = useState(false);
   const t = useTranslations('billing');
   const tCommon = useTranslations('common');
   const tSub = useTranslations('subscription');
@@ -53,6 +55,7 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
         setFetched(true);
         if (data.provider) setProvider(data.provider);
         setHasCredentials(!!data.hasCredentials);
+        setOrgId(data.orgId ?? null);
       })
       .catch(() => setFetched(true));
   }, []);
@@ -196,6 +199,54 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
         {displayActionError && <Alert variant="error">{displayActionError}</Alert>}
         {state?.success && <Alert variant="success">{t('saved')}</Alert>}
       </form>
+
+      {provider === 'szamlazz' && !wizardMode && orgId && (
+        <div className="mt-8 pt-6 border-t border-border-light">
+          <p className="text-sm text-text-secondary mb-1">{t('ipnUrl')}</p>
+          <div className="flex items-start gap-2 flex-wrap">
+            <div className="flex-1 min-w-0">
+              <code className="block bg-background-hover px-1.5 py-1 rounded text-xs font-mono text-text-primary break-all">
+                {typeof window !== 'undefined'
+                  ? `${window.location.origin}/api/webhooks/szamlazz-ipn?org=${orgId}`
+                  : `[APP_URL]/api/webhooks/szamlazz-ipn?org=${orgId}`}
+              </code>
+              <p className="text-xs text-text-secondary mt-1.5">{t('ipnHint')}</p>
+            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                const url =
+                  typeof window !== 'undefined'
+                    ? `${window.location.origin}/api/webhooks/szamlazz-ipn?org=${orgId}`
+                    : '';
+                if (url && navigator.clipboard?.writeText) {
+                  await navigator.clipboard.writeText(url);
+                  setIpnCopied(true);
+                  setTimeout(() => setIpnCopied(false), 2000);
+                }
+              }}
+              className="mt-6 inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-md border border-border-medium bg-background-card text-text-secondary hover:bg-background-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              title={ipnCopied ? t('ipnCopied') : t('copyIpnUrl')}
+              aria-label={ipnCopied ? t('ipnCopied') : t('copyIpnUrl')}
+            >
+              {ipnCopied ? (
+                <svg className="w-4 h-4 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
 
       {provider === 'billingo' && !wizardMode && (
         <div className="mt-8 pt-6 border-t border-border-light">

@@ -289,7 +289,11 @@
     "billingoSendByEmailHint": "Ez csak akkor működik, ha a vevőhöz meg van adva e-mail cím (pl. a Moxie ügyféladatokban).",
     "paymentMethodWireTransfer": "Átutalás",
     "paymentMethodCash": "Készpénz",
-    "paymentMethodBankcard": "Bankkártya"
+    "paymentMethodBankcard": "Bankkártya",
+    "ipnUrl": "IPN URL (kifizetési értesítés)",
+    "ipnHint": "Ezt az URL-t a Számlázz.hu Fiók beállítások / Számlázás alapadatok oldal alján megadott mezőbe illeszd be. Ha egy számla kifizetett összege megváltozik, a Számlázz.hu erre a címre küldi a kifizetési értesítést.",
+    "copyIpnUrl": "IPN URL másolása",
+    "ipnCopied": "Másolva!"
   },
   "orgSettings": {
     "currencyTitle": "EUR → HUF konverzió",
