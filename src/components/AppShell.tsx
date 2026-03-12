@@ -45,14 +45,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             {/* Logo – visible on mobile when signed in (sidebar is hidden), always when signed out */}
             {signedIn ? (
-              <span className="flex items-center gap-2 md:hidden">
+              <span className="flex items-end gap-1.5 md:hidden">
                 <BrixaLogoMark size={36} />
                 <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
               </span>
             ) : (
               <Link
                 href="/"
-                className="flex items-center gap-2 hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md outline-none transition-opacity"
+                className="flex items-end gap-1.5 hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md outline-none transition-opacity"
               >
                 <BrixaLogoMark size={36} />
                 <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>

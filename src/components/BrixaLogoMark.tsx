@@ -2,16 +2,19 @@
 
 import { useId } from 'react';
 
-/** Brixa brand logo: robot with bridge visor and invoice lines. Uses brand colors (primary/primary-light/primary-dark). */
+/** Brixa brand logo: robot with bridge visor and invoice lines. Uses brand colors (primary/primary-light/primary-dark). Size = visual height; bottom aligns with text baseline when container uses items-end. */
 export function BrixaLogoMark({ size = 48 }: { size?: number }) {
   const id = useId().replace(/:/g, '');
   const brixaGrad = `brixaGradient-${id}`;
   const accentGrad = `accentGradient-${id}`;
+  const viewBoxHeight = 145;
+  const viewBoxWidth = 220;
+  const width = (size * viewBoxWidth) / viewBoxHeight;
   return (
     <svg
-      width={size}
+      width={width}
       height={size}
-      viewBox="0 0 220 220"
+      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
