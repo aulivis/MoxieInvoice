@@ -84,8 +84,8 @@
     "setupStep1": "Előfizetés aktiválása",
     "setupStep2": "Moxie kapcsolat beállítása",
     "setupStep3": "Számlázó beállítása",
-    "wizardCta": "Beállítás indítása →",
-    "wizardCtaContinue": "Beállítás folytatása →"
+    "wizardCta": "Beállítás indítása",
+    "wizardCtaContinue": "Beállítás folytatása"
   },
   "invoices": {
     "title": "Számlák",

@@ -84,8 +84,8 @@
     "setupStep1": "Activate subscription",
     "setupStep2": "Set up Moxie connection",
     "setupStep3": "Configure billing provider",
-    "wizardCta": "Start setup →",
-    "wizardCtaContinue": "Continue setup →"
+    "wizardCta": "Start setup",
+    "wizardCtaContinue": "Continue setup"
   },
   "invoices": {
     "title": "Invoices",

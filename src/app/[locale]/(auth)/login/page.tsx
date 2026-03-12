@@ -141,7 +141,7 @@ export default function LoginPage() {
             </span>
           </h2>
           <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            <TextWithMoxieLogo>{t('heroDescription')}</TextWithMoxieLogo>
+            <TextWithMoxieLogo logoVariant="white">{t('heroDescription')}</TextWithMoxieLogo>
           </p>
           <ul className="space-y-3">
             {features.map((f) => (
@@ -154,7 +154,7 @@ export default function LoginPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 </span>
-                <TextWithMoxieLogo>{f}</TextWithMoxieLogo>
+                <TextWithMoxieLogo logoVariant="white">{f}</TextWithMoxieLogo>
               </li>
             ))}
           </ul>
