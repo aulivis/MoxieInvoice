@@ -3,22 +3,11 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/Button';
+import { BrixaLogoMark } from '@/components/BrixaLogoMark';
 
 interface WelcomeStepProps {
   allSetupDone: boolean;
   onNext: () => void;
-}
-
-function BrixaLogoMark({ size = 72 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-      <rect width="110" height="110" rx="28" fill="#1A2744"/>
-      <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
-      <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="white" strokeOpacity="0.35" strokeWidth="11" strokeLinecap="round" fill="none"/>
-      <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
-      <circle cx="55" cy="28" r="6" fill="#E8893A"/>
-    </svg>
-  );
 }
 
 export function WelcomeStep({ allSetupDone, onNext }: WelcomeStepProps) {

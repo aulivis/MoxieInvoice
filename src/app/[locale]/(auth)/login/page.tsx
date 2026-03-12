@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { TextWithMoxieLogo } from '@/components/MoxieLogoInline';
+import { BrixaLogoMark } from '@/components/BrixaLogoMark';
 
 function EmailIcon() {
   return (
@@ -25,18 +26,6 @@ function CheckCircleIcon() {
     <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  );
-}
-
-function BrixaLogoMark({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-      <rect width="110" height="110" rx="28" fill="#1A2744"/>
-      <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
-      <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="white" strokeOpacity="0.35" strokeWidth="11" strokeLinecap="round" fill="none"/>
-      <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
-      <circle cx="55" cy="28" r="6" fill="#E8893A"/>
     </svg>
   );
 }

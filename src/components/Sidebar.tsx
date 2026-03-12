@@ -6,6 +6,7 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { HeaderAuth } from '@/components/HeaderAuth';
 import { ConnectionStatusBadge } from '@/components/ui/ConnectionStatusBadge';
+import { BrixaLogoMark } from '@/components/BrixaLogoMark';
 
 const navLinks = [
   { href: '/', key: 'dashboard' as const },
@@ -47,17 +48,10 @@ function SettingsIcon({ active }: { active: boolean }) {
   );
 }
 
-/** Brixa "Broken Bridge" logo mark */
-function BrixaLogoMark() {
+function SidebarLogo() {
   return (
     <div className="flex items-center gap-2.5">
-      <svg width="32" height="32" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-        <rect width="110" height="110" rx="28" fill="#1A2744"/>
-        <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
-        <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="rgba(255,255,255,0.35)" strokeWidth="11" strokeLinecap="round" fill="none"/>
-        <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
-        <circle cx="55" cy="28" r="6" fill="#E8893A"/>
-      </svg>
+      <BrixaLogoMark size={32} />
       <span
         style={{ color: 'var(--sidebar-text)', fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '23px', lineHeight: 1 }}
       >
@@ -110,7 +104,7 @@ export function Sidebar() {
           href="/"
           className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1628]"
         >
-          <BrixaLogoMark />
+          <SidebarLogo />
         </Link>
       </div>
 

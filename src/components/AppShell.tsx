@@ -8,6 +8,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { HeaderAuth } from '@/components/HeaderAuth';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { BrixaLogoMark } from '@/components/BrixaLogoMark';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [signedIn, setSignedIn] = useState(false);
@@ -45,13 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Logo – visible on mobile when signed in (sidebar is hidden), always when signed out */}
             {signedIn ? (
               <span className="flex items-center gap-2 md:hidden">
-                <svg width="24" height="24" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <rect width="110" height="110" rx="28" fill="#1A2744"/>
-                  <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
-                  <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="rgba(255,255,255,0.35)" strokeWidth="11" strokeLinecap="round" fill="none"/>
-                  <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
-                  <circle cx="55" cy="28" r="6" fill="#E8893A"/>
-                </svg>
+                <BrixaLogoMark size={24} />
                 <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
               </span>
             ) : (
@@ -59,13 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href="/"
                 className="flex items-center gap-2 hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md outline-none transition-opacity"
               >
-                <svg width="24" height="24" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <rect width="110" height="110" rx="28" fill="#1A2744"/>
-                  <path d="M22 75 L22 50 Q22 28 44 28 L55 28" stroke="white" strokeWidth="11" strokeLinecap="round" fill="none"/>
-                  <path d="M88 75 L88 50 Q88 28 66 28 L55 28" stroke="rgba(255,255,255,0.35)" strokeWidth="11" strokeLinecap="round" fill="none"/>
-                  <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
-                  <circle cx="55" cy="28" r="6" fill="#E8893A"/>
-                </svg>
+                <BrixaLogoMark size={24} />
                 <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
               </Link>
             )}
