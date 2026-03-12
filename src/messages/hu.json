@@ -164,9 +164,17 @@
   "subscription": {
     "guardTitle": "Előfizetés szükséges",
     "guardMessage": "A Moxie és számlázó kapcsolat használatához aktiváld az előfizetést a Beállításokban.",
-    "sectionDescription": "Az előfizetés szükséges a Moxie és számlázó kapcsolat használatához.",
+    "sectionDescription": "Válaszd a havi vagy éves csomagot. Az előfizetés szükséges a Moxie és számlázó kapcsolat használatához.",
     "subscribe": "Előfizetés",
-    "manage": "Előfizetés kezelése"
+    "manage": "Előfizetés kezelése",
+    "planMonthly": "Havi",
+    "planYearly": "Éves",
+    "perMonth": "havonta",
+    "perYear": "évente",
+    "twoMonthsFree": "2 hónap ingyen",
+    "bestValue": "Legjobb érték",
+    "securePayment": "Biztonságos fizetés (Stripe)",
+    "cancelAnytime": "Bármikor lemondható"
   },
   "moxie": {
     "baseUrl": "Moxie Base URL",
@@ -207,7 +215,8 @@
     "invoiceCreateFailed": "A számla létrehozása sikertelen. Próbáld újra, vagy ellenőrizd a beállításokat.",
     "checkoutFailed": "A fizetés indítása sikertelen. Próbáld újra.",
     "portalFailed": "Az előfizetés kezelő megnyitása sikertelen. Próbáld újra.",
-    "noSubscription": "Még nincs előfizetésed. Először fizess elő."
+    "noSubscription": "Még nincs előfizetésed. Először fizess elő.",
+    "invalidPriceId": "Érvénytelen csomag. Válaszd újra a csomagot."
   },
   "billingoValidation": {
     "blocked": "A számla generálását a Billingo követelményei miatt blokkoltuk, mert egy vagy több adat hiányzik vagy érvénytelen.",

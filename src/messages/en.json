@@ -164,9 +164,17 @@
   "subscription": {
     "guardTitle": "Subscription required",
     "guardMessage": "Activate your subscription in Settings to use Moxie and billing connection.",
-    "sectionDescription": "Subscription is required to use Moxie and billing connection.",
+    "sectionDescription": "Choose a monthly or yearly plan. Subscription is required to use Moxie and billing connection.",
     "subscribe": "Subscribe",
-    "manage": "Manage subscription"
+    "manage": "Manage subscription",
+    "planMonthly": "Monthly",
+    "planYearly": "Yearly",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "twoMonthsFree": "2 months free",
+    "bestValue": "Best value",
+    "securePayment": "Secure payment (Stripe)",
+    "cancelAnytime": "Cancel anytime"
   },
   "moxie": {
     "baseUrl": "Moxie Base URL",
@@ -207,7 +215,8 @@
     "invoiceCreateFailed": "Failed to create invoice. Try again or check your settings.",
     "checkoutFailed": "Failed to start checkout. Please try again.",
     "portalFailed": "Failed to open subscription management. Please try again.",
-    "noSubscription": "No subscription found. Please subscribe first."
+    "noSubscription": "No subscription found. Please subscribe first.",
+    "invalidPriceId": "Invalid plan selected. Please choose a plan again."
   },
   "billingoValidation": {
     "blocked": "Invoice generation was blocked because of Billingo requirements: one or more fields are missing or invalid.",

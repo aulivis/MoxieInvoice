@@ -140,7 +140,7 @@ export function SettingsTabs({ hasSubscription }: SettingsTabsProps) {
       <div role="tabpanel" className="animate-fade-in">
         {activeTab === 'subscription' && (
           <Card>
-            <SubscriptionSection />
+            <SubscriptionSection hasSubscription={hasSubscription} />
           </Card>
         )}
         {activeTab === 'moxie' && (

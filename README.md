@@ -96,7 +96,8 @@ Másold `.env.example` → `.env.local` és töltsd ki:
 | `NEXT_PUBLIC_APP_URL` | Saját app URL | Dev: `http://localhost:3000` |
 | `STRIPE_SECRET_KEY` | Stripe Dashboard → API keys | |
 | `STRIPE_WEBHOOK_SECRET` | Stripe → Webhooks → Signing secret | |
-| `STRIPE_PRICE_ID` | Stripe → Products → ár ID | Előfizetés ár azonosítója |
+| `STRIPE_PRICE_ID_MONTHLY` | Stripe → Products → havi ár ID | Havi előfizetés price ID |
+| `STRIPE_PRICE_ID_YEARLY` | Stripe → Products → éves ár ID | Éves előfizetés price ID (pl. 2 hónap ingyen) |
 | `ENCRYPTION_KEY` | Generált 64 jegyű hex | API kulcsok titkosításához¹ |
 | `CRON_SECRET` | Saját titkos string | Vercel Cron auth (opcionális) |
 
@@ -189,10 +190,45 @@ git push -u origin main
 
 ---
 
+## Környezeti változók platformonként (Vercel, Supabase)
+
+Az alábbi env-eket hol kell beállítani:
+
+### Vercel (Next.js app + API + Cron)
+
+A **Project → Settings → Environment Variables** alatt add meg az összes változót (Production, Preview, Development szükség szerint):
+
+| Változó | Kötelező | Megjegyzés |
+|---------|----------|------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Igen | Supabase Project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Igen | Supabase anon/public key |
+| `SUPABASE_SECRET_KEY` | Igen | Supabase service role (API, migrációk) |
+| `NEXT_PUBLIC_APP_URL` | Igen prod | Pl. `https://your-app.vercel.app` |
+| `STRIPE_SECRET_KEY` | Igen | Stripe secret key |
+| `STRIPE_WEBHOOK_SECRET` | Igen | Stripe webhook signing secret |
+| `STRIPE_PRICE_ID_MONTHLY` | Igen | Havi előfizetés Stripe price ID |
+| `STRIPE_PRICE_ID_YEARLY` | Igen | Éves előfizetés Stripe price ID |
+| `ENCRYPTION_KEY` | Igen | 64 jegyű hex (Moxie/Billingo titkosítás) |
+| `CRON_SECRET` | Igen prod | Cron endpointok védelme |
+
+Változó módosítás után **Redeploy** (Vercel automatikusan használja a legújabb env-eket az új deploynál).
+
+### Supabase
+
+Supabase-ban **csak** azok a dolgok kellenek, amit a Dashboard vagy a szolgáltatás kezel:
+
+- **Project Settings → API**: itt kapsz `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon key), `SUPABASE_SECRET_KEY` (service_role). Ezeket másold be a **Vercel** env-be (és lokálisan `.env.local`-ba).
+- **Authentication → URL Configuration**: Site URL és Redirect URLs (lásd fentebb, Magic Link).
+- **Database**: a migrációkat lokálisan vagy CI-ből futtatod (`supabase db push`), nem kell Supabase-hoz külön env.
+
+Tehát: **Supabase-en nem kell env változókat „beállítani”** — a titkokat és az app URL-t a Vercel (és a lokális `.env`) tárolja; a Supabase csak az adatbázis és az Auth konfigját tartalmazza a Dashboardon.
+
+---
+
 ## Deploy Vercel-re
 
 1. Push a repo GitHub-ra, majd importáld a projektet [Vercel](https://vercel.com)-en.
-2. **Environment Variables** beállítása: Project → Settings → Environment Variables (`.env.example` alapján).
+2. **Environment Variables** beállítása: Project → Settings → Environment Variables (a fenti táblázat és `.env.example` alapján). Minden Stripe/Supabase/App URL/ENCRYPTION_KEY/CRON_SECRET a **Vercel**-en legyen.
 3. `NEXT_PUBLIC_APP_URL` legyen a produkciós URL (pl. `https://your-app.vercel.app`).
 4. Cron job-ok: a `vercel.json` automatikusan konfigurálja őket deploy után.
 5. Változó hozzáadása vagy módosítása után **Redeploy** szükséges.

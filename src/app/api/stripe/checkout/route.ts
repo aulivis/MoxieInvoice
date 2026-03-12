@@ -24,10 +24,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No organization', errorCode: 'noOrganization' }, { status: 400 });
   }
 
-  const priceId = process.env.STRIPE_PRICE_ID;
-  if (!priceId) {
+  const priceIdMonthly = process.env.STRIPE_PRICE_ID_MONTHLY;
+  const priceIdYearly = process.env.STRIPE_PRICE_ID_YEARLY;
+  const allowedPriceIds = [priceIdMonthly, priceIdYearly].filter(Boolean);
+  if (allowedPriceIds.length === 0) {
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
   }
+
+  let body: { priceId?: string; returnTo?: string } = {};
+  try {
+    body = await request.json();
+  } catch {
+    // empty body ok
+  }
+
+  const requestedPriceId = typeof body?.priceId === 'string' ? body.priceId.trim() : null;
+  if (requestedPriceId && !allowedPriceIds.includes(requestedPriceId)) {
+    return NextResponse.json(
+      { error: 'Invalid price', errorCode: 'invalidPriceId' },
+      { status: 400 }
+    );
+  }
+  const chosenPriceId =
+    requestedPriceId && allowedPriceIds.includes(requestedPriceId)
+      ? requestedPriceId
+      : (priceIdMonthly ?? allowedPriceIds[0]);
 
   const stripe = getStripe();
 
@@ -58,15 +79,8 @@ export async function POST(request: Request) {
 
   // Support wizard return: if caller passes { returnTo: '/onboarding' } in body,
   // redirect back to the onboarding wizard with checkout=success on completion
-  let returnTo: string | null = null;
-  try {
-    const body = await request.json().catch(() => ({}));
-    if (typeof body?.returnTo === 'string' && body.returnTo.startsWith('/')) {
-      returnTo = body.returnTo;
-    }
-  } catch {
-    // ignore body parse errors
-  }
+  const returnTo =
+    typeof body?.returnTo === 'string' && body.returnTo.startsWith('/') ? body.returnTo : null;
 
   const successPath = returnTo
     ? `${returnTo}${returnTo.includes('?') ? '&' : '?'}checkout=success`
@@ -75,7 +89,7 @@ export async function POST(request: Request) {
   const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
     mode: 'subscription',
-    line_items: [{ price: priceId, quantity: 1 }],
+    line_items: [{ price: chosenPriceId, quantity: 1 }],
     success_url: `${origin}${successPath}`,
     cancel_url: `${origin}/?canceled=1`,
     subscription_data: { metadata: { org_id: profile.organization_id } },

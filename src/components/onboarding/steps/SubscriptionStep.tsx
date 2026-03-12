@@ -39,7 +39,7 @@ export function SubscriptionStep({ hasSubscription, onNext, onBack }: Subscripti
 
       {/* Subscription section from settings */}
       <div className="bg-background-card rounded-xl border border-border-light p-6 mb-8">
-        <SubscriptionSection returnTo="/onboarding?step=subscription" />
+        <SubscriptionSection returnTo="/onboarding?step=subscription" hasSubscription={hasSubscription} />
       </div>
 
       {/* Navigation */}
