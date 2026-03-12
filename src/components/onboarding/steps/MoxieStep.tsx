@@ -14,15 +14,8 @@ interface MoxieStepProps {
   onBack: () => void;
 }
 
-export function MoxieStep({ hasSubscription, moxieConnected, onNext, onBack }: MoxieStepProps) {
+export function MoxieHelpPanel() {
   const t = useTranslations('onboarding');
-  const [savedThisSession, setSavedThisSession] = useState(false);
-  const canAdvance = moxieConnected || savedThisSession;
-
-  function handleSaved() {
-    setSavedThisSession(true);
-  }
-
   const helpItems = [
     {
       question: t('moxieHelpBaseUrl'),
@@ -46,9 +39,20 @@ export function MoxieStep({ hasSubscription, moxieConnected, onNext, onBack }: M
       imageType: 'gif' as const,
     },
   ];
+  return <HelpAccordion items={helpItems} />;
+}
+
+export function MoxieStep({ hasSubscription, moxieConnected, onNext, onBack }: MoxieStepProps) {
+  const t = useTranslations('onboarding');
+  const [savedThisSession, setSavedThisSession] = useState(false);
+  const canAdvance = moxieConnected || savedThisSession;
+
+  function handleSaved() {
+    setSavedThisSession(true);
+  }
 
   return (
-    <div className="flex-1 flex flex-col p-6 md:p-12 max-w-2xl mx-auto w-full">
+    <div className="flex-1 flex flex-col p-6 md:p-8 w-full">
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-text-primary mb-2">{t('moxieTitle')}</h2>
@@ -64,9 +68,6 @@ export function MoxieStep({ hasSubscription, moxieConnected, onNext, onBack }: M
       {savedThisSession && (
         <Alert variant="success" className="mt-4">{t('moxieSavedNext')}</Alert>
       )}
-
-      {/* Help accordion */}
-      <HelpAccordion items={helpItems} />
 
       {/* Navigation */}
       <div className="flex items-center justify-between gap-3 mt-8 pt-4 border-t border-border-light">

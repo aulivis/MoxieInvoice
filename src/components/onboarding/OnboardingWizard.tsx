@@ -7,8 +7,8 @@ import { useRouter } from '@/i18n/navigation';
 import { WizardLayout } from './WizardLayout';
 import { WelcomeStep } from './steps/WelcomeStep';
 import { SubscriptionStep } from './steps/SubscriptionStep';
-import { MoxieStep } from './steps/MoxieStep';
-import { BillingStep } from './steps/BillingStep';
+import { MoxieStep, MoxieHelpPanel } from './steps/MoxieStep';
+import { BillingStep, BillingHelpPanel } from './steps/BillingStep';
 import { TweaksStep } from './steps/TweaksStep';
 import { CompleteStep } from './steps/CompleteStep';
 
@@ -103,11 +103,18 @@ export function OnboardingWizard({
   // Panel steps completed
   const panelCompleted = completedSteps.filter((s) => PANEL_STEPS.includes(s));
 
+  // Right-panel help content per step
+  const helpPanel =
+    currentStep === 'moxie' ? <MoxieHelpPanel /> :
+    currentStep === 'billing' ? <BillingHelpPanel /> :
+    null;
+
   return (
     <WizardLayout
       steps={wizardSteps}
       currentStep={showSidebar ? currentStep : wizardSteps[0]?.id ?? 'subscription'}
       completedSteps={panelCompleted}
+      helpPanel={helpPanel}
       showSkip={currentStep !== 'welcome' && currentStep !== 'complete'}
     >
       {currentStep === 'welcome' && (

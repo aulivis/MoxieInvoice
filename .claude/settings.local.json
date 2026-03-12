@@ -42,7 +42,11 @@
       "Bash(grep -E \"^-.*\\\\.\\(toml|json|yaml|yml\\)$\")",
       "Bash(grep -r \"NEXT_PUBLIC_SUPABASE\\\\|SUPABASE_SECRET\" /d/Apps/MoxieInvoice/.env*)",
       "Bash(grep -r \"mail\\\\|email\\\\|template\" /d/Apps/MoxieInvoice/supabase/migrations/*.sql)",
-      "Bash(find /d/Apps/MoxieInvoice -type f -path */supabase/* \\\\\\(-name *.json -o -name *.toml -o -name *.sql \\\\\\))"
+      "Bash(find /d/Apps/MoxieInvoice -type f -path */supabase/* \\\\\\(-name *.json -o -name *.toml -o -name *.sql \\\\\\))",
+      "Bash(mkdir -p \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(wizard\\)/onboarding\")",
+      "Bash(mv \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(app\\)/onboarding/page.tsx\" \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(wizard\\)/onboarding/page.tsx\")",
+      "Bash(rmdir \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(app\\)/onboarding\")",
+      "Bash(ls \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(wizard\\)/\")"
     ]
   }
 }

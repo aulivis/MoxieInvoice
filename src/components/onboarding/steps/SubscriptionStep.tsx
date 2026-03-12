@@ -26,7 +26,7 @@ export function SubscriptionStep({ hasSubscription, onNext, onBack }: Subscripti
   }, [hasSubscription, onNext]);
 
   return (
-    <div className="flex-1 flex flex-col p-6 md:p-12 max-w-2xl mx-auto w-full">
+    <div className="flex-1 flex flex-col p-6 md:p-8 w-full">
       {/* Header */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-text-primary mb-2">{t('subscriptionTitle')}</h2>

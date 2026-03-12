@@ -11,10 +11,11 @@ interface WizardLayoutProps {
   currentStep: string;
   completedSteps: string[];
   children: React.ReactNode;
+  helpPanel?: React.ReactNode;
   showSkip?: boolean;
 }
 
-export function WizardLayout({ steps, currentStep, completedSteps, children, showSkip = true }: WizardLayoutProps) {
+export function WizardLayout({ steps, currentStep, completedSteps, children, helpPanel, showSkip = true }: WizardLayoutProps) {
   const t = useTranslations('onboarding');
   const router = useRouter();
 
@@ -110,8 +111,8 @@ export function WizardLayout({ steps, currentStep, completedSteps, children, sho
         </div>
       </aside>
 
-      {/* ── Right panel – main content ── */}
-      <div className="flex-1 flex flex-col min-h-screen md:min-h-0 bg-surface-50">
+      {/* ── Center panel – main content ── */}
+      <div className="flex-1 flex flex-col min-h-screen md:min-h-0 bg-surface-50 min-w-0">
 
         {/* Skip button top-right */}
         {showSkip && (
@@ -133,7 +134,46 @@ export function WizardLayout({ steps, currentStep, completedSteps, children, sho
         <div className="flex-1 flex flex-col">
           {children}
         </div>
+
+        {/* Mobile help panel – shown below form content on small screens */}
+        {helpPanel && (
+          <div className="md:hidden px-6 pb-8 pt-2">
+            <div className="border-t border-border-light pt-5">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 shrink-0">
+                  <svg className="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Segítség</span>
+              </div>
+              {helpPanel}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* ── Right help panel (desktop only) ── */}
+      {helpPanel && (
+        <aside className="hidden md:flex md:w-[284px] shrink-0 flex-col border-l border-border-light bg-background-card/40">
+          <div className="sticky top-0 h-screen overflow-y-auto">
+            {/* Panel header */}
+            <div className="flex items-center gap-2 px-5 pt-8 pb-4 border-b border-border-light">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full shrink-0" style={{ background: 'rgba(232,137,58,0.12)' }}>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="#E8893A" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Segítség</span>
+            </div>
+
+            {/* Panel content */}
+            <div className="px-4 py-4">
+              {helpPanel}
+            </div>
+          </div>
+        </aside>
+      )}
     </div>
   );
 }

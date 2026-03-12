@@ -14,15 +14,8 @@ interface BillingStepProps {
   onBack: () => void;
 }
 
-export function BillingStep({ hasSubscription, billingConfigured, onNext, onBack }: BillingStepProps) {
+export function BillingHelpPanel() {
   const t = useTranslations('onboarding');
-  const [savedThisSession, setSavedThisSession] = useState(false);
-  const canAdvance = billingConfigured || savedThisSession;
-
-  function handleSaved() {
-    setSavedThisSession(true);
-  }
-
   const helpItems = [
     {
       question: t('billingHelpBillingo'),
@@ -39,9 +32,20 @@ export function BillingStep({ hasSubscription, billingConfigured, onNext, onBack
       imageType: 'image' as const,
     },
   ];
+  return <HelpAccordion items={helpItems} />;
+}
+
+export function BillingStep({ hasSubscription, billingConfigured, onNext, onBack }: BillingStepProps) {
+  const t = useTranslations('onboarding');
+  const [savedThisSession, setSavedThisSession] = useState(false);
+  const canAdvance = billingConfigured || savedThisSession;
+
+  function handleSaved() {
+    setSavedThisSession(true);
+  }
 
   return (
-    <div className="flex-1 flex flex-col p-6 md:p-12 max-w-2xl mx-auto w-full">
+    <div className="flex-1 flex flex-col p-6 md:p-8 w-full">
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-text-primary mb-2">{t('billingTitle')}</h2>
@@ -65,9 +69,6 @@ export function BillingStep({ hasSubscription, billingConfigured, onNext, onBack
         </svg>
         {t('billingAdvancedSettings')}
       </p>
-
-      {/* Help accordion */}
-      <HelpAccordion items={helpItems} />
 
       {/* Navigation */}
       <div className="flex items-center justify-between gap-3 mt-8 pt-4 border-t border-border-light">
