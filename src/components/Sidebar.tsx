@@ -197,7 +197,7 @@ export function Sidebar() {
                   {Icon && <Icon active={isActive} />}
                   <span>{t(key)}</span>
                   {showConnectionBadge && (
-                    <span className="ml-auto shrink-0">
+                    <span className="ml-auto shrink-0 flex items-center">
                       <ConnectionStatusBadge
                         connected={moxieLive && billingConfigured}
                         connectedLabel={tMoxie('statusConnected')}

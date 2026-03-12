@@ -145,7 +145,7 @@ export function WizardLayout({ steps, currentStep, completedSteps, children, hel
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Segítség</span>
+                <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">{t('helpPanelTitle')}</span>
               </div>
               {helpPanel}
             </div>
@@ -155,7 +155,7 @@ export function WizardLayout({ steps, currentStep, completedSteps, children, hel
 
       {/* ── Right help panel (desktop only) ── */}
       {helpPanel && (
-        <aside className="hidden md:flex md:w-[284px] shrink-0 flex-col border-l border-border-light bg-background-card/40">
+        <aside className="hidden md:flex md:w-[360px] shrink-0 flex-col border-l border-border-light bg-background-card/40">
           <div className="sticky top-0 h-screen overflow-y-auto">
             {/* Panel header */}
             <div className="flex items-center gap-2 px-5 pt-8 pb-4 border-b border-border-light">
@@ -164,7 +164,7 @@ export function WizardLayout({ steps, currentStep, completedSteps, children, hel
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Segítség</span>
+              <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">{t('helpPanelTitle')}</span>
             </div>
 
             {/* Panel content */}
