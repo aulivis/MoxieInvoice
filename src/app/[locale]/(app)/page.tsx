@@ -133,6 +133,7 @@ export default async function HomePage() {
     .reduce((sum, i) => sum + (i.total_amount ?? 0), 0);
 
   const allSetupDone = hasSubscription && moxieConnected && billingConfigured;
+  const anyStepDone = hasSubscription || moxieConnected || billingConfigured;
 
   function formatDate(dateStr: string) {
     const d = new Date(dateStr);
@@ -187,7 +188,7 @@ export default async function HomePage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {t('wizardCta')}
+              {t(anyStepDone ? 'wizardCtaContinue' : 'wizardCta')}
             </Link>
           </div>
         </div>

@@ -84,7 +84,8 @@
     "setupStep1": "Előfizetés aktiválása",
     "setupStep2": "Moxie kapcsolat beállítása",
     "setupStep3": "Számlázó beállítása",
-    "wizardCta": "Beállítás indítása →"
+    "wizardCta": "Beállítás indítása →",
+    "wizardCtaContinue": "Beállítás folytatása →"
   },
   "invoices": {
     "title": "Számlák",
@@ -214,7 +215,18 @@
     "twoMonthsFree": "2 hónap ingyen",
     "bestValue": "Legjobb érték",
     "securePayment": "Biztonságos fizetés (Stripe)",
-    "cancelAnytime": "Bármikor lemondható"
+    "cancelAnytime": "Bármikor lemondható",
+    "currentPlan": "Jelenlegi csomag",
+    "nextBilling": "Következő terhelés",
+    "renewsOn": "Megújul",
+    "accessUntil": "Hozzáférés",
+    "cancelsOn": "Lemondva, hozzáférés",
+    "manageSubscriptionHint": "Számla, fizetési mód és lemondás a Stripe felületén.",
+    "statusActive": "Aktív",
+    "statusTrialing": "Próbaidő",
+    "statusPastDue": "Fizetésre vár",
+    "statusCanceled": "Lemondva",
+    "billingPeriod": "Számlázási időszak"
   },
   "moxie": {
     "baseUrl": "Moxie Base URL",
@@ -398,6 +410,7 @@
     "estimatedTime": "~5 perc a teljes beállítás",
     "skipTweaks": "Kihagyom, alapértelmezetteket használom",
     "restartButton": "Beállítás varázsló újraindítása",
+    "continueButton": "Beállítás folytatása →",
     "welcomeTitle": "Üdvözlünk a Brixen!",
     "welcomeSubtitle": "Néhány lépésben beállítjuk az automatikus számlázáshoz szükséges kapcsolatokat.",
     "welcomeCta": "Kezdjük el",

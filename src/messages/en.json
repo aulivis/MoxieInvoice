@@ -84,7 +84,8 @@
     "setupStep1": "Activate subscription",
     "setupStep2": "Set up Moxie connection",
     "setupStep3": "Configure billing provider",
-    "wizardCta": "Start setup →"
+    "wizardCta": "Start setup →",
+    "wizardCtaContinue": "Continue setup →"
   },
   "invoices": {
     "title": "Invoices",
@@ -214,7 +215,18 @@
     "twoMonthsFree": "2 months free",
     "bestValue": "Best value",
     "securePayment": "Secure payment (Stripe)",
-    "cancelAnytime": "Cancel anytime"
+    "cancelAnytime": "Cancel anytime",
+    "currentPlan": "Current plan",
+    "nextBilling": "Next billing date",
+    "renewsOn": "Renews on",
+    "accessUntil": "Access until",
+    "cancelsOn": "Cancels on",
+    "manageSubscriptionHint": "Invoice, payment method, and cancellation in Stripe.",
+    "statusActive": "Active",
+    "statusTrialing": "Trial",
+    "statusPastDue": "Past due",
+    "statusCanceled": "Canceled",
+    "billingPeriod": "Billing period"
   },
   "moxie": {
     "baseUrl": "Moxie Base URL",
@@ -398,6 +410,7 @@
     "estimatedTime": "~5 minutes to complete",
     "skipTweaks": "Skip, use defaults",
     "restartButton": "Restart setup wizard",
+    "continueButton": "Continue setup →",
     "welcomeTitle": "Welcome to Brixa!",
     "welcomeSubtitle": "Let's set up everything you need for automatic invoicing in just a few steps.",
     "welcomeCta": "Let's get started",

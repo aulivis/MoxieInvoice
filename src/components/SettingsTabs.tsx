@@ -180,44 +180,45 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
         )}
         {activeTab === 'dataHandling' && (
           <Card>
-            <div className="space-y-4">
-              <p className="text-sm text-text-secondary leading-relaxed">
-                {t('dataHandlingParagraph1')}
-              </p>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                {t('dataHandlingParagraph2')}{' '}
-                {process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL ? (
-                  <a
-                    href={process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline hover:no-underline"
-                  >
-                    {t('dataHandlingLinkText')}
-                  </a>
-                ) : (
-                  <Link href="/settings?tab=dataHandling" className="text-primary underline hover:no-underline">
-                    {t('dataHandlingLinkText')}
-                  </Link>
-                )}
-                .
-              </p>
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  {t('dataHandlingParagraph1')}
+                </p>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  {t('dataHandlingParagraph2')}{' '}
+                  {process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL ? (
+                    <a
+                      href={process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline hover:no-underline"
+                    >
+                      {t('dataHandlingLinkText')}
+                    </a>
+                  ) : (
+                    <Link href="/settings?tab=dataHandling" className="text-primary underline hover:no-underline">
+                      {t('dataHandlingLinkText')}
+                    </Link>
+                  )}
+                  .
+                </p>
+              </div>
+              {/* Danger zone: delete account — only on data handling tab */}
+              <div className="pt-6 border-t border-border-light">
+                <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{t('dangerZone')}</p>
+                <p className="text-sm text-text-secondary mb-3">{t('deleteAccountDescription')}</p>
+                <button
+                  type="button"
+                  onClick={() => setDeleteDialogOpen(true)}
+                  className="rounded-lg border border-status-error/50 bg-status-error/5 px-4 py-2 text-sm font-medium text-status-error hover:bg-status-error/10 focus:outline-none focus:ring-2 focus:ring-status-error focus:ring-offset-2"
+                >
+                  {t('deleteAccount')}
+                </button>
+              </div>
             </div>
           </Card>
         )}
-      </div>
-
-      {/* Danger zone: delete account */}
-      <div className="mt-8 pt-6 border-t border-border-light">
-        <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{t('dangerZone')}</p>
-        <p className="text-sm text-text-secondary mb-3">{t('deleteAccountDescription')}</p>
-        <button
-          type="button"
-          onClick={() => setDeleteDialogOpen(true)}
-          className="rounded-lg border border-status-error/50 bg-status-error/5 px-4 py-2 text-sm font-medium text-status-error hover:bg-status-error/10 focus:outline-none focus:ring-2 focus:ring-status-error focus:ring-offset-2"
-        >
-          {t('deleteAccount')}
-        </button>
       </div>
 
       {/* Mobile-only: language + logout (desktop has these in sidebar) */}

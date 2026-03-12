@@ -1,29 +1,11 @@
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
+import { formatStripePrice } from '@/lib/stripe-format';
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error('STRIPE_SECRET_KEY not set');
   return new Stripe(key);
-}
-
-/** Zero-decimal currencies: amount is the full value (no minor units). */
-const ZERO_DECIMAL_CURRENCIES = new Set([
-  'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga', 'pyg', 'rwf',
-  'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf',
-]);
-
-function formatPrice(amount: number, currency: string, interval: 'month' | 'year'): string {
-  const code = currency.toLowerCase();
-  const value = ZERO_DECIMAL_CURRENCIES.has(code) ? amount : amount / 100;
-  const formatted = new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: code.toUpperCase(),
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value);
-  const suffix = interval === 'month' ? '/month' : '/year';
-  return `${formatted}${suffix}`;
 }
 
 export type PriceInfo = {
@@ -59,7 +41,7 @@ export async function GET() {
         amount: price.unit_amount,
         currency: price.currency,
         interval,
-        formatted: formatPrice(price.unit_amount, price.currency, interval),
+        formatted: formatStripePrice(price.unit_amount, price.currency, interval),
       };
       if (interval === 'month') result.monthly = info;
       else result.yearly = info;
