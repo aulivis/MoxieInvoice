@@ -8,9 +8,9 @@ export const scheduleTypeEnum = z.enum([
 ]);
 
 export const currencySettingsSchema = z.object({
-  currency_convert_to_huf: z.boolean().optional(),
-  conversion_source: z.enum(['fixed', 'mnb_daily']).optional(),
-  fixed_eur_huf_rate: z.coerce.number().positive().optional().nullable(),
+  conversion_source: z.enum(['mnb_daily', 'manual']).optional(),
+  manual_eur_huf: z.coerce.number().positive().optional().nullable(),
+  manual_usd_huf: z.coerce.number().positive().optional().nullable(),
 });
 
 export const scheduleSettingsSchema = z.object({

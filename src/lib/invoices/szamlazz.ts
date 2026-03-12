@@ -55,8 +55,9 @@ function buildXml(
 
   const isHuf = request.currency === 'HUF';
   const fejlecMegjegyzes = request.comment ? `<megjegyzes>${escapeXml(request.comment)}</megjegyzes>` : '';
+  // Non-HUF: amounts are already in target currency (we convert before calling). Use rate 1.0 so no double conversion.
   const fejlecArfolyam = !isHuf ? `<arfolyamBank>MNB</arfolyamBank>
-    <arfolyam>0.0</arfolyam>` : '';
+    <arfolyam>1.0</arfolyam>` : '';
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <xmlszamla xmlns="http://www.szamlazz.hu/xmlszamla" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.szamlazz.hu/xmlszamla https://www.szamlazz.hu/szamla/docs/xsds/agent/xmlszamla.xsd">

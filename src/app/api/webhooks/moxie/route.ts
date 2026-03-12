@@ -3,11 +3,13 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createInvoice } from '@/lib/invoices/orchestrator';
 import { mergeInvoiceRequestWithDefaults } from '@/lib/invoices/merge-defaults';
+import { applyCurrencyConversion } from '@/lib/invoices/apply-currency-conversion';
 import { computeTotalAmount } from '@/lib/invoices/total-amount';
 import type { NormalizedInvoiceRequest } from '@/lib/invoices/types';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { decrypt } from '@/lib/crypto';
 import { logError } from '@/lib/logger';
+import { createMoxieClient } from '@/lib/moxie/client';
 
 const WEBHOOK_LIMIT_PER_MIN = 60;
 
@@ -106,18 +108,29 @@ export async function POST(request: NextRequest) {
 
   const { data: orgSettings } = await supabase
     .from('org_settings')
-    .select('default_invoice_block_id, default_invoice_language, default_payment_method')
+    .select('default_invoice_block_id, default_invoice_language, default_payment_method, default_moxie_project_name, conversion_source, manual_eur_huf, manual_usd_huf, fixed_eur_huf_rate')
     .eq('org_id', orgId)
     .maybeSingle();
 
   const mergedRequest = mergeInvoiceRequestWithDefaults(normalized.request, orgSettings ?? null);
+
+  let finalRequest: NormalizedInvoiceRequest;
+  try {
+    finalRequest = await applyCurrencyConversion(mergedRequest, orgSettings ?? null);
+  } catch (err) {
+    logError(err, { orgId, step: 'apply_currency_conversion' });
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Currency conversion failed' },
+      { status: 500 }
+    );
+  }
 
   const locale = (request.headers.get('Accept-Language')?.toLowerCase().startsWith('en') ? 'en' : 'hu') as 'hu' | 'en';
   const result = await createInvoice({
     orgId,
     provider: billing.provider,
     credentials,
-    request: mergedRequest,
+    request: finalRequest,
     moxieInvoiceId: normalized.moxieInvoiceId,
     moxieInvoiceUuid: normalized.moxieInvoiceUuid,
     moxieBaseUrl: moxie.base_url,
@@ -128,7 +141,7 @@ export async function POST(request: NextRequest) {
 
   if (!result.success) {
     logError(new Error(result.errorMessage ?? 'Invoice creation failed'), { orgId, step: 'webhook_create_invoice' });
-    const totalAmount = computeTotalAmount(mergedRequest);
+    const totalAmount = computeTotalAmount(finalRequest);
     await supabase.from('invoices').insert({
       org_id: orgId,
       provider: billing.provider,
@@ -137,8 +150,27 @@ export async function POST(request: NextRequest) {
       moxie_invoice_id: normalized.moxieInvoiceId || null,
       moxie_invoice_uuid: normalized.moxieInvoiceUuid || null,
       total_amount: totalAmount,
-      payload_snapshot: mergedRequest as unknown as Record<string, unknown>,
+      payload_snapshot: finalRequest as unknown as Record<string, unknown>,
     });
+
+    const clientName = finalRequest.buyer?.name?.trim();
+    const projectName = extractProjectName(body, orgSettings ?? null);
+    if (clientName && projectName && result.errorMessage) {
+      try {
+        const moxieClient = createMoxieClient(moxie.base_url, moxieApiKey);
+        await moxieClient.createTask({
+          name: 'Számla létrehozás sikertelen',
+          clientName,
+          projectName,
+          description: result.errorMessage,
+        });
+      } catch (taskErr) {
+        logError(taskErr instanceof Error ? taskErr : new Error(String(taskErr)), {
+          step: 'moxie_create_task_failed_invoice',
+          orgId,
+        });
+      }
+    }
   }
 
   return NextResponse.json({ received: true });
@@ -160,6 +192,23 @@ function extractMoxieInvoiceUuid(body: Record<string, unknown>): string | undefi
     if (UUID_RE.test(s)) return s;
   }
   return undefined;
+}
+
+/**
+ * Extract project name for Create Task: from webhook body first, then org default.
+ * Create Task API requires exact match of a project owned by the client.
+ */
+function extractProjectName(
+  body: Record<string, unknown>,
+  orgSettings: { default_moxie_project_name?: string | null } | null
+): string | undefined {
+  const fromBody =
+    (body.projectName as string)?.trim() ||
+    (body.projectNameFormatted as string)?.trim() ||
+    ((body.project as Record<string, unknown>)?.name as string)?.trim();
+  if (fromBody) return fromBody;
+  const fromOrg = orgSettings?.default_moxie_project_name?.trim();
+  return fromOrg || undefined;
 }
 
 type MoxieLineItem = {
@@ -209,6 +258,36 @@ function extractBuyerTaxNumber(
   );
 }
 
+const INV_CURRENCY_KEY = 'inv-currency';
+const ALLOWED_CURRENCIES = ['EUR', 'HUF', 'USD'] as const;
+
+/** Resolve target currency from inv-currency custom field. Empty or "Alapértelmezett" => use default (no conversion). */
+function resolveTargetCurrency(
+  defaultCurrency: string,
+  body: Record<string, unknown>,
+  clientOrClientInfo: Record<string, unknown> | undefined
+): string {
+  const raw =
+    getCustomFieldValue(body, INV_CURRENCY_KEY) ??
+    getCustomFieldValue(clientOrClientInfo, INV_CURRENCY_KEY);
+  const v = String(raw ?? '').trim();
+  if (!v || v.toLowerCase() === 'alapértelmezett') return defaultCurrency;
+  const upper = v.toUpperCase();
+  if (ALLOWED_CURRENCIES.includes(upper as (typeof ALLOWED_CURRENCIES)[number])) return upper;
+  return defaultCurrency;
+}
+
+/** Map Moxie rm-inv-type custom field to normalized invoiceType for Billingo/Számlázz.hu. */
+function mapRmInvTypeToInvoiceType(
+  value: string | undefined
+): 'proforma' | 'invoice' | 'advance' {
+  const v = String(value ?? '').trim().toLowerCase();
+  if (v === 'díjbekérő') return 'proforma';
+  if (v === 'előleg' || v === 'advance') return 'advance';
+  // számla, ismétlődő, végszámla, üres, ismeretlen → normál számla
+  return 'invoice';
+}
+
 function normalizeMoxiePayload(
   body: Record<string, unknown>,
   _eventType: string
@@ -256,6 +335,11 @@ function normalizeMoxiePayload(
       ];
     }
 
+    const rmInvType =
+      getCustomFieldValue(body, 'rm-inv-type') ??
+      getCustomFieldValue(clientInfo, 'rm-inv-type');
+    const defaultCurrency = (body.currency as string) || (clientInfo?.currency as string) || 'HUF';
+    const targetCurrency = resolveTargetCurrency(defaultCurrency, body, clientInfo);
     const request: NormalizedInvoiceRequest = {
       buyer: {
         name,
@@ -267,10 +351,12 @@ function normalizeMoxiePayload(
         email,
       },
       items,
-      currency: (body.currency as string) || 'HUF',
+      currency: defaultCurrency,
+      ...(targetCurrency !== defaultCurrency ? { targetCurrency } : {}),
       fulfillmentDate: (body.dateSent as string) || (body.dateCreated as string) || new Date().toISOString().slice(0, 10),
       dueDate: (body.dateDue as string) || body.due_date as string | undefined,
       comment: body.comment as string | undefined,
+      invoiceType: mapRmInvTypeToInvoiceType(rmInvType),
     };
     return {
       request,
@@ -286,6 +372,10 @@ function normalizeMoxiePayload(
 
   const name = String(client.name ?? '');
   const address = (client.address as Record<string, unknown>) || {};
+  const rmInvType =
+    getCustomFieldValue(body, 'rm-inv-type') ?? getCustomFieldValue(client, 'rm-inv-type');
+  const defaultCurrency = (body.currency as string) || (client.currency as string) || 'HUF';
+  const targetCurrency = resolveTargetCurrency(defaultCurrency, body, client);
   const request: NormalizedInvoiceRequest = {
     buyer: {
       name,
@@ -307,10 +397,12 @@ function normalizeMoxiePayload(
       netUnitPrice: Number(item.rate ?? item.unit_price ?? 0),
       vatPercent: Number(item.vat ?? 0),
     })),
-    currency: (body.currency as string) || 'HUF',
+    currency: defaultCurrency,
+    ...(targetCurrency !== defaultCurrency ? { targetCurrency } : {}),
     fulfillmentDate: (body.fulfillment_date as string) || new Date().toISOString().slice(0, 10),
     dueDate: body.due_date as string | undefined,
     comment: body.comment as string | undefined,
+    invoiceType: mapRmInvTypeToInvoiceType(rmInvType),
   };
 
   return {

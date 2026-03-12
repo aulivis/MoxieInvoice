@@ -2,8 +2,11 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { isInvoicingAllowed } from '@/lib/schedule';
 import { createInvoice } from '@/lib/invoices/orchestrator';
+import { applyCurrencyConversion } from '@/lib/invoices/apply-currency-conversion';
 import { logError } from '@/lib/logger';
 import { decrypt } from '@/lib/crypto';
+import { createMoxieClient } from '@/lib/moxie/client';
+import type { NormalizedInvoiceRequest } from '@/lib/invoices/types';
 
 function getSupabase(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -47,7 +50,8 @@ export async function GET(request: Request) {
       .update({ status: 'processing' })
       .eq('id', job.id);
 
-    const payload = job.payload as { request: unknown; moxieInvoiceId?: string };
+    const payload = job.payload as { request: NormalizedInvoiceRequest; moxieInvoiceId?: string };
+    const rawRequest = payload.request;
     const { data: billing } = await supabase
       .from('billing_providers')
       .select('provider, credentials_encrypted')
@@ -56,6 +60,11 @@ export async function GET(request: Request) {
     const { data: moxie } = await supabase
       .from('moxie_connections')
       .select('base_url, api_key_encrypted')
+      .eq('org_id', job.org_id)
+      .maybeSingle();
+    const { data: orgSettings } = await supabase
+      .from('org_settings')
+      .select('conversion_source, manual_eur_huf, manual_usd_huf, fixed_eur_huf_rate')
       .eq('org_id', job.org_id)
       .maybeSingle();
 
@@ -86,11 +95,24 @@ export async function GET(request: Request) {
       continue;
     }
 
+    let finalRequest: NormalizedInvoiceRequest;
+    try {
+      finalRequest = await applyCurrencyConversion(rawRequest, orgSettings ?? null);
+    } catch (err) {
+      logError(err instanceof Error ? err : new Error(String(err)), { jobId: job.id, step: 'apply_currency_conversion' });
+      await supabase
+        .from('pending_invoice_jobs')
+        .update({ status: 'failed', error_message: err instanceof Error ? err.message : 'Currency conversion failed', processed_at: new Date().toISOString() })
+        .eq('id', job.id);
+      processed++;
+      continue;
+    }
+
     const result = await createInvoice({
       orgId: job.org_id,
       provider: billing.provider,
       credentials,
-      request: payload.request as Parameters<typeof createInvoice>[0]['request'],
+      request: finalRequest,
       moxieInvoiceId: payload.moxieInvoiceId,
       moxieBaseUrl: moxie?.base_url,
       moxieApiKey,
@@ -128,6 +150,31 @@ export async function GET(request: Request) {
             processed_at: new Date().toISOString(),
           })
           .eq('id', job.id);
+
+        const clientName = finalRequest.buyer?.name?.trim();
+        const { data: orgSettingsForTask } = await supabase
+          .from('org_settings')
+          .select('default_moxie_project_name')
+          .eq('org_id', job.org_id)
+          .maybeSingle();
+        const projectName = orgSettingsForTask?.default_moxie_project_name?.trim();
+        if (clientName && projectName && result.errorMessage && moxie?.base_url && moxieApiKey) {
+          try {
+            const moxieClient = createMoxieClient(moxie.base_url, moxieApiKey);
+            await moxieClient.createTask({
+              name: 'Számla létrehozás sikertelen',
+              clientName,
+              projectName,
+              description: result.errorMessage,
+            });
+          } catch (taskErr) {
+            logError(taskErr instanceof Error ? taskErr : new Error(String(taskErr)), {
+              step: 'moxie_create_task_failed_job',
+              jobId: job.id,
+              orgId: job.org_id,
+            });
+          }
+        }
       }
     }
     processed++;

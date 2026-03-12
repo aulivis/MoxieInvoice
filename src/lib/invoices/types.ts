@@ -28,11 +28,14 @@ export interface NormalizedInvoiceRequest {
     unitPriceType?: UnitPriceType;
   }>;
   currency: string;
+  /** When set and different from currency, amounts must be converted to this before issuing. */
+  targetCurrency?: string;
   fulfillmentDate: string; // YYYY-MM-DD
   dueDate?: string;
   paymentMethod?: string;
   comment?: string;
-  invoiceType?: string; // e.g. 'invoice', 'proforma', 'advance'
+  /** Normalized from Moxie rm-inv-type: 'proforma' | 'invoice' | 'advance'; default 'invoice'. */
+  invoiceType?: string;
   /** Billingo: invoice block id (required). */
   blockId?: number;
   /** Billingo: document language e.g. 'hu', 'en' (required). */

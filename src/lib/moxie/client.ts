@@ -99,6 +99,26 @@ export class MoxieClient {
       body: JSON.stringify(payload),
     });
   }
+
+  /** Create task. @see https://help.withmoxie.com/en/articles/8160423-create-task */
+  async createTask(payload: {
+    name: string;
+    clientName: string;
+    projectName: string;
+    description?: string;
+    status?: string;
+    dueDate?: string;
+    startDate?: string;
+    priority?: number;
+    tasks?: string[];
+    assignedTo?: string[];
+    customValues?: Record<string, string>;
+  }): Promise<unknown> {
+    return this.request('/action/tasks/create', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
 }
 
 export function createMoxieClient(baseUrl: string, apiKey: string): MoxieClient {

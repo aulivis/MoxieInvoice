@@ -298,10 +298,7 @@
     "ipnCopied": "Copied!"
   },
   "orgSettings": {
-    "currencyTitle": "EUR → HUF conversion",
-    "convertLabel": "Convert to HUF when source is EUR",
-    "fixedRate": "Fixed rate (user-defined)",
-    "mnbDaily": "Daily MNB rate",
+    "currencyTitle": "Currency / exchange rate",
     "scheduleTitle": "Invoicing schedule",
     "scheduleAlways": "Always",
     "scheduleWeekdays": "Weekdays only",
@@ -310,14 +307,17 @@
     "saved": "Saved."
   },
   "currencySettings": {
-    "convertLabel": "Enable EUR → HUF conversion",
-    "convertHint": "When a Moxie payment arrives in EUR, it will be automatically converted to HUF.",
+    "sourceIntro": "When conversion is needed (client or invoice in another currency), choose the exchange rate source here.",
     "sourceLabel": "Exchange rate source",
     "mnbDaily": "MNB daily mid-rate",
     "mnbDailyHint": "The current MNB mid-rate is applied every day.",
-    "fixedRate": "Fixed rate",
-    "fixedRateHint": "You set the EUR/HUF rate to use for all conversions.",
+    "manualRate": "Manual rates",
+    "manualRateHint": "You set the rates to use (1 unit of currency = N HUF).",
+    "manualEurHuf": "1 EUR = … HUF",
+    "manualUsdHuf": "1 USD = … HUF",
     "liveRate": "1 EUR = {rate} HUF",
+    "liveRateEur": "1 EUR = {rate} HUF",
+    "liveRateUsd": "1 USD = {rate} HUF",
     "rateUnavailable": "Rate unavailable",
     "saved": "Saved."
   },

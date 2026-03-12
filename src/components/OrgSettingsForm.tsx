@@ -11,9 +11,9 @@ const disabledInputClass =
   'disabled:opacity-60 disabled:cursor-not-allowed';
 
 export function OrgSettingsForm({ hasSubscription = true }: { hasSubscription?: boolean }) {
-  const [convertToHuf, setConvertToHuf] = useState(false);
-  const [conversionSource, setConversionSource] = useState<'fixed' | 'mnb_daily'>('mnb_daily');
-  const [fixedRate, setFixedRate] = useState('');
+  const [conversionSource, setConversionSource] = useState<'mnb_daily' | 'manual'>('mnb_daily');
+  const [manualEurHuf, setManualEurHuf] = useState('');
+  const [manualUsdHuf, setManualUsdHuf] = useState('');
   const [scheduleType, setScheduleType] = useState<'always' | 'weekdays_only' | 'business_hours_only'>('always');
   const [timezone, setTimezone] = useState('Europe/Budapest');
   const [startTime, setStartTime] = useState('08:00');
@@ -21,6 +21,7 @@ export function OrgSettingsForm({ hasSubscription = true }: { hasSubscription?: 
   const [fetched, setFetched] = useState(false);
   const [state, formAction] = useActionState<SettingsState | null, FormData>(saveOrgSettingsAction, null);
   const t = useTranslations('orgSettings');
+  const tCur = useTranslations('currencySettings');
   const tCommon = useTranslations('common');
   const tSub = useTranslations('subscription');
   const tErrors = useTranslations('errors');
@@ -43,9 +44,10 @@ export function OrgSettingsForm({ hasSubscription = true }: { hasSubscription?: 
     fetch('/api/settings/org')
       .then((r) => r.json())
       .then((d) => {
-        if (d.currency_convert_to_huf != null) setConvertToHuf(d.currency_convert_to_huf);
-        if (d.conversion_source) setConversionSource(d.conversion_source);
-        if (d.fixed_eur_huf_rate != null) setFixedRate(String(d.fixed_eur_huf_rate));
+        const src = d.conversion_source === 'manual' ? 'manual' : 'mnb_daily';
+        setConversionSource(src);
+        setManualEurHuf(d.manual_eur_huf != null ? String(d.manual_eur_huf) : (d.fixed_eur_huf_rate != null ? String(d.fixed_eur_huf_rate) : ''));
+        setManualUsdHuf(d.manual_usd_huf != null ? String(d.manual_usd_huf) : '');
         if (d.schedule_type) setScheduleType(d.schedule_type);
         if (d.timezone) setTimezone(d.timezone);
         if (d.start_time) setStartTime(d.start_time.slice(0, 5));
@@ -65,32 +67,65 @@ export function OrgSettingsForm({ hasSubscription = true }: { hasSubscription?: 
       <form action={formAction} className="space-y-4 max-w-lg">
         <div>
           <h3 className="text-section-title mb-2">{t('currencyTitle')}</h3>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              name="currency_convert_to_huf"
-              checked={convertToHuf}
-              onChange={(e) => setConvertToHuf(e.target.checked)}
-              className="rounded focus-visible:ring-2 focus-visible:ring-primary"
-              disabled={disabled}
-            />
-            {t('convertLabel')}
-          </label>
-          {convertToHuf && (
-            <div className="mt-2 space-y-2">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="conversion_source" value="fixed" checked={conversionSource === 'fixed'} onChange={() => setConversionSource('fixed')} className="focus-visible:ring-2 focus-visible:ring-primary" disabled={disabled} />
-                {t('fixedRate')}
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="conversion_source" value="mnb_daily" checked={conversionSource === 'mnb_daily'} onChange={() => setConversionSource('mnb_daily')} className="focus-visible:ring-2 focus-visible:ring-primary" disabled={disabled} />
-                {t('mnbDaily')}
-              </label>
-              {conversionSource === 'fixed' && (
-                <input type="number" name="fixed_eur_huf_rate" step={0.01} placeholder="395" value={fixedRate} onChange={(e) => setFixedRate(e.target.value)} className={`mt-2 ${inputClass}`} disabled={disabled} />
-              )}
-            </div>
-          )}
+          <p className="text-sm text-text-secondary mb-2">{tCur('sourceIntro')}</p>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="conversion_source"
+                value="mnb_daily"
+                checked={conversionSource === 'mnb_daily'}
+                onChange={() => setConversionSource('mnb_daily')}
+                className="focus-visible:ring-2 focus-visible:ring-primary"
+                disabled={disabled}
+              />
+              {tCur('mnbDaily')}
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="conversion_source"
+                value="manual"
+                checked={conversionSource === 'manual'}
+                onChange={() => setConversionSource('manual')}
+                className="focus-visible:ring-2 focus-visible:ring-primary"
+                disabled={disabled}
+              />
+              {tCur('manualRate')}
+            </label>
+            {conversionSource === 'manual' && (
+              <div className="ml-6 mt-2 space-y-2">
+                <div>
+                  <label className="text-xs text-text-tertiary block mb-1">{tCur('manualEurHuf')}</label>
+                  <input
+                    type="number"
+                    name="manual_eur_huf"
+                    step={0.01}
+                    min={1}
+                    placeholder="395"
+                    value={manualEurHuf}
+                    onChange={(e) => setManualEurHuf(e.target.value)}
+                    className={inputClass}
+                    disabled={disabled}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-text-tertiary block mb-1">{tCur('manualUsdHuf')}</label>
+                  <input
+                    type="number"
+                    name="manual_usd_huf"
+                    step={0.01}
+                    min={1}
+                    placeholder="360"
+                    value={manualUsdHuf}
+                    onChange={(e) => setManualUsdHuf(e.target.value)}
+                    className={inputClass}
+                    disabled={disabled}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <div>
           <h3 className="text-section-title mb-2">{t('scheduleTitle')}</h3>

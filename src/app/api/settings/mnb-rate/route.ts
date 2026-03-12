@@ -56,6 +56,9 @@ function fetchMnbCurrentRate(currency: string): Promise<number | null> {
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const rate = await fetchMnbCurrentRate('EUR');
-  return NextResponse.json({ rate });
+  const [eur, usd] = await Promise.all([
+    fetchMnbCurrentRate('EUR'),
+    fetchMnbCurrentRate('USD'),
+  ]);
+  return NextResponse.json({ rate: eur, eur, usd });
 }

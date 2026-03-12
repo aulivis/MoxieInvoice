@@ -57,15 +57,14 @@ export async function POST(request: Request) {
     // Ensure NOT NULL columns when creating a new row (no existing org_settings)
     ...(current == null
       ? {
-          currency_convert_to_huf: false,
           schedule_type: 'always',
           timezone: 'Europe/Budapest',
         }
       : {}),
   };
-  if (body.currency_convert_to_huf !== undefined) payload.currency_convert_to_huf = body.currency_convert_to_huf;
   if (body.conversion_source !== undefined) payload.conversion_source = body.conversion_source;
-  if (body.fixed_eur_huf_rate !== undefined) payload.fixed_eur_huf_rate = body.fixed_eur_huf_rate;
+  if (body.manual_eur_huf !== undefined) payload.manual_eur_huf = body.manual_eur_huf;
+  if (body.manual_usd_huf !== undefined) payload.manual_usd_huf = body.manual_usd_huf;
   if (body.schedule_type !== undefined) payload.schedule_type = body.schedule_type;
   if (body.timezone !== undefined) payload.timezone = body.timezone;
   if (body.start_time !== undefined) payload.start_time = body.start_time;

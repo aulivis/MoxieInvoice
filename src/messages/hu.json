@@ -298,10 +298,7 @@
     "ipnCopied": "Másolva!"
   },
   "orgSettings": {
-    "currencyTitle": "EUR → HUF konverzió",
-    "convertLabel": "Számoljunk forintban, ha a forrás EUR",
-    "fixedRate": "Fix árfolyam (user megadja)",
-    "mnbDaily": "Napi MNB középárfolyam",
+    "currencyTitle": "Pénznem / árfolyam",
     "scheduleTitle": "Számolás időkorlát",
     "scheduleAlways": "Mindig",
     "scheduleWeekdays": "Csak hétköznap",
@@ -310,14 +307,17 @@
     "saved": "Mentve."
   },
   "currencySettings": {
-    "convertLabel": "EUR → HUF átváltás bekapcsolása",
-    "convertHint": "Ha a Moxie-ban EUR-ban érkezett a fizetés, automatikusan forintra számítjuk.",
+    "sourceIntro": "Ha az ügyfél vagy a számla adatai miatt devizát kell számolni (átváltás kell), itt választhatod az árfolyam forrását.",
     "sourceLabel": "Árfolyam forrása",
     "mnbDaily": "MNB napi középárfolyam",
     "mnbDailyHint": "Minden nap az MNB aktuális középárfolyamát alkalmazzuk.",
-    "fixedRate": "Fix árfolyam",
-    "fixedRateHint": "Te adod meg az alkalmazott EUR/HUF árfolyamot.",
+    "manualRate": "Kézi árfolyamok",
+    "manualRateHint": "Te adod meg az alkalmazott árfolyamokat (1 egység deviza = N HUF).",
+    "manualEurHuf": "1 EUR = … HUF",
+    "manualUsdHuf": "1 USD = … HUF",
     "liveRate": "1 EUR = {rate} HUF",
+    "liveRateEur": "1 EUR = {rate} HUF",
+    "liveRateUsd": "1 USD = {rate} HUF",
     "rateUnavailable": "Árfolyam nem elérhető",
     "saved": "Mentve."
   },

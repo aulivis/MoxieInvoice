@@ -79,13 +79,15 @@ export interface Invoice {
 export interface OrgSettings {
   id: string;
   org_id: string;
-  currency_convert_to_huf: boolean;
-  conversion_source: 'fixed' | 'mnb_daily' | null;
-  fixed_eur_huf_rate: number | null;
+  conversion_source: 'mnb_daily' | 'manual' | null;
+  manual_eur_huf: number | null;
+  manual_usd_huf: number | null;
+  fixed_eur_huf_rate: number | null; // deprecated, use manual_eur_huf
   schedule_type: ScheduleType;
   timezone: string;
   start_time: string | null;
   end_time: string | null;
+  default_moxie_project_name?: string | null;
   created_at: string;
   updated_at: string;
 }
