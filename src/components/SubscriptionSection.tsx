@@ -78,14 +78,23 @@ export function SubscriptionSection({ returnTo, hasSubscription = false }: Subsc
         headers: { 'Content-Type': 'application/json' },
         body,
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: { url?: string; error?: string; errorCode?: string };
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        setError(res.ok ? tCommon('error') : tErrors('checkoutFailed'));
+        return;
+      }
       if (!res.ok) {
         const msg = data.errorCode
           ? tErrors(data.errorCode as 'checkoutFailed' | 'invalidPriceId')
           : (data.error || tCommon('error'));
-        throw new Error(msg);
+        setError(msg);
+        return;
       }
       if (data.url) window.location.href = data.url;
+      else setError(tErrors('checkoutFailed'));
     } catch (e) {
       setError(e instanceof Error ? e.message : tCommon('error'));
     } finally {
@@ -98,12 +107,21 @@ export function SubscriptionSection({ returnTo, hasSubscription = false }: Subsc
     setLoading('portal');
     try {
       const res = await fetch('/api/stripe/portal', { method: 'POST' });
-      const data = await res.json();
+      const text = await res.text();
+      let data: { url?: string; error?: string; errorCode?: string };
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        setError(res.ok ? tCommon('error') : tErrors('portalFailed'));
+        return;
+      }
       if (!res.ok) {
-        const msg = data.errorCode ? tErrors(data.errorCode as 'noSubscription') : (data.error || tCommon('error'));
-        throw new Error(msg);
+        const msg = data.errorCode ? tErrors(data.errorCode as 'noSubscription' | 'portalFailed' | 'stripeCustomerInvalid') : (data.error || tCommon('error'));
+        setError(msg);
+        return;
       }
       if (data.url) window.location.href = data.url;
+      else setError(tErrors('portalFailed'));
     } catch (e) {
       setError(e instanceof Error ? e.message : tCommon('error'));
     } finally {

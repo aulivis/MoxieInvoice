@@ -30,6 +30,7 @@ export interface Profile {
   organization_id: string | null;
   display_name: string | null;
   preferred_lang: 'hu' | 'en';
+  deletion_requested_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -9,12 +9,19 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${t('title')} – Brixa` };
 }
 
-export default async function SettingsPage() {
+type SettingsPageProps = {
+  searchParams: Promise<{ tab?: string }> | { tab?: string };
+};
+
+export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const t = await getTranslations('settings');
   const ctx = await getAppLayoutContext();
   const hasSubscription = ctx?.hasSubscription ?? false;
 
   const tOnboarding = await getTranslations('onboarding');
+
+  const resolvedParams = await Promise.resolve(searchParams);
+  const initialTab = resolvedParams?.tab === 'dataHandling' ? 'dataHandling' : undefined;
 
   return (
     <div className="space-y-6 max-w-7xl animate-fade-in">
@@ -36,7 +43,7 @@ export default async function SettingsPage() {
         </Link>
       </header>
 
-      <SettingsTabs hasSubscription={hasSubscription} />
+      <SettingsTabs hasSubscription={hasSubscription} initialTab={initialTab} />
     </div>
   );
 }

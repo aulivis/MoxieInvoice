@@ -50,6 +50,9 @@
     "emailHint": "Írd be az e-mail-címed, és küldünk egy bejelentkezési linket.",
     "linkSent": "Link elküldve!",
     "copyright": "© 2026 Brixa",
+    "cookieNoticePrefix": "Csak a szolgáltatás működéséhez elengedhetetlenül szükséges sütiket használunk. Részletek: ",
+    "privacyPolicyLinkText": "Adatkezelési tájékoztató",
+    "cookieNoticeSuffix": ".",
     "heroTagline": "A híd a projekted és a számláid között.",
     "noPassword": "Nincs jelszó, nincs regisztráció – add meg az e-mail-címed és máris bent vagy.",
     "feature1": "Automatikus számlagenerálás Moxie-ból",
@@ -159,7 +162,44 @@
     "subscription": "Előfizetés",
     "currencyAndSchedule": "Pénznem és ütemezés",
     "currency": "Pénznem",
-    "schedule": "Ütemezés"
+    "schedule": "Ütemezés",
+    "dangerZone": "Veszélyes zóna",
+    "deleteAccount": "Fiók végleges törlése",
+    "deleteAccountDescription": "Fióktörlés kérése. Az előfizetésed azonnal megszűnik; a fiókod 14 napig felfüggesztve marad, és belépéssel visszaállíthatod.",
+    "dataHandling": "Adatkezelés",
+    "dataHandlingParagraph1": "Csak a szolgáltatás működéséhez elengedhetetlenül szükséges sütiket használunk: munkamenet és hitelesítés, biztonság, valamint (ha számlázót használsz) a fizetéssel kapcsolatos sütik. Nem használunk analitikai vagy marketing sütiket, és nem követünk nyomon más oldalakon. Ezért nem jelenítünk meg süti hozzájárulási ablakot.",
+    "dataHandlingParagraph2": "Az adataid kezelésének teljes leírásáért, jogaidról és az adatmegőrzési időkről lásd az adatkezelési tájékoztatónkat.",
+    "dataHandlingLinkText": "Adatkezelési tájékoztató"
+  },
+  "deleteAccount": {
+    "title": "Fiók végleges törlése?",
+    "step1Intro": "Törlés kérésekor:",
+    "subscriptionCancelled": "Az előfizetésed azonnal megszűnik (többet nem terhelünk).",
+    "accountSuspended": "A fiókod 14 napig felfüggesztve marad; ezalatt megőrizzük az adataidat.",
+    "restoreWithin14": "Ha 14 napon belül belépsz, egy kattintással visszaállíthatod a fiókot, és az adataid megmaradnak. (Az előfizetést külön újra kell aktiválnod, ha azt is szeretnéd.)",
+    "deleteAfter14": "Ha 14 napon belül nem lépsz be, a fiókot és az adatokat véglegesen töröljük, és e-mailben értesítünk.",
+    "dataDeleted": "A profilt, szervezetet, számlákat, beállításokat és előfizetés adatokat véglegesen töröljük. A törlés után ezeket nem őrizzük meg (kivéve, ha törvény mást ír elő).",
+    "understandContinue": "Megértettem, folytatom",
+    "cancel": "Mégse",
+    "step2Title": "Törlés kérés megerősítése",
+    "typeToConfirm": "Írd be alább a TÖRÖL szót a megerősítéshez:",
+    "confirmPlaceholder": "TÖRÖL",
+    "requestDeletion": "Törlés kérése",
+    "suspendedToast": "A fiókod felfüggesztve. 14 napod van visszaállításra belépéssel.",
+    "restoredToast": "A fiókod visszaállítva.",
+    "deletedEmailSubject": "A fiókod véglegesen törölve lett",
+    "pendingTitle": "A fiókod törlésre van kérve",
+    "pendingDescription": "Fióktörlést kértél. Ha nem teszel semmit, a fiókod és az adatok 14 nap után véglegesen törlődnek, és e-mailben értesítünk.",
+    "restoreAccount": "Fiók visszaállítása",
+    "signOut": "Kijelentkezés",
+    "deadline": "Határidő"
+  },
+  "deleteAccountErrors": {
+    "alreadyRequested": "A törlést már kérted.",
+    "requestFailed": "A törlés kérése sikertelen. Próbáld újra.",
+    "restoreFailed": "A fiók visszaállítása sikertelen. Próbáld újra.",
+    "restoreExpired": "A 14 napos határidő letelt. A fiókod véglegesen törölve lett vagy hamarosan törlődik.",
+    "invalidConfirm": "A megerősítéshez pontosan írd be: TÖRÖL."
   },
   "subscription": {
     "guardTitle": "Előfizetés szükséges",
@@ -216,7 +256,8 @@
     "checkoutFailed": "A fizetés indítása sikertelen. Próbáld újra.",
     "portalFailed": "Az előfizetés kezelő megnyitása sikertelen. Próbáld újra.",
     "noSubscription": "Még nincs előfizetésed. Először fizess elő.",
-    "invalidPriceId": "Érvénytelen csomag. Válaszd újra a csomagot."
+    "invalidPriceId": "Érvénytelen csomag. Válaszd újra a csomagot.",
+    "stripeCustomerInvalid": "Az előfizetés rögzítése érvénytelen vagy teszt célból készült. Fizess elő újra lent."
   },
   "billingoValidation": {
     "blocked": "A számla generálását a Billingo követelményei miatt blokkoltuk, mert egy vagy több adat hiányzik vagy érvénytelen.",

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Card } from '@/components/ui/Card';
 import { SubscriptionSection } from '@/components/SubscriptionSection';
 import { MoxieConnectionForm } from '@/components/MoxieConnectionForm';
@@ -10,11 +11,13 @@ import { CurrencyForm } from '@/components/CurrencyForm';
 import { ScheduleForm } from '@/components/ScheduleForm';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { HeaderAuth } from '@/components/HeaderAuth';
+import { DeleteAccountDialog } from '@/components/DeleteAccountDialog';
 
-type TabKey = 'subscription' | 'moxie' | 'billing' | 'currency' | 'schedule';
+type TabKey = 'subscription' | 'moxie' | 'billing' | 'currency' | 'schedule' | 'dataHandling';
 
 interface SettingsTabsProps {
   hasSubscription: boolean;
+  initialTab?: TabKey;
 }
 
 function SubscriptionIcon() {
@@ -62,16 +65,26 @@ function ScheduleIcon() {
   );
 }
 
+function DataHandlingIcon() {
+  return (
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+  );
+}
+
 function ConfiguredDot() {
   return (
     <span className="w-2 h-2 rounded-full bg-status-success shrink-0" aria-hidden />
   );
 }
 
-export function SettingsTabs({ hasSubscription }: SettingsTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabKey>('subscription');
+export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps) {
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab ?? 'subscription');
   const [moxieConnected, setMoxieConnected] = useState(false);
   const [billingConfigured, setBillingConfigured] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const t = useTranslations('settings');
 
   useEffect(() => {
@@ -91,6 +104,7 @@ export function SettingsTabs({ hasSubscription }: SettingsTabsProps) {
     billing: billingConfigured,
     currency: false,
     schedule: false,
+    dataHandling: false,
   };
 
   const tabs: { key: TabKey; labelKey: string; Icon: React.ComponentType }[] = [
@@ -99,6 +113,7 @@ export function SettingsTabs({ hasSubscription }: SettingsTabsProps) {
     { key: 'billing', labelKey: 'billing', Icon: BillingIcon },
     { key: 'currency', labelKey: 'currency', Icon: CurrencyIcon },
     { key: 'schedule', labelKey: 'schedule', Icon: ScheduleIcon },
+    { key: 'dataHandling', labelKey: 'dataHandling', Icon: DataHandlingIcon },
   ];
 
   return (
@@ -163,6 +178,46 @@ export function SettingsTabs({ hasSubscription }: SettingsTabsProps) {
             <ScheduleForm hasSubscription={hasSubscription} />
           </Card>
         )}
+        {activeTab === 'dataHandling' && (
+          <Card>
+            <div className="space-y-4">
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {t('dataHandlingParagraph1')}
+              </p>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {t('dataHandlingParagraph2')}{' '}
+                {process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL ? (
+                  <a
+                    href={process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:no-underline"
+                  >
+                    {t('dataHandlingLinkText')}
+                  </a>
+                ) : (
+                  <Link href="/settings?tab=dataHandling" className="text-primary underline hover:no-underline">
+                    {t('dataHandlingLinkText')}
+                  </Link>
+                )}
+                .
+              </p>
+            </div>
+          </Card>
+        )}
+      </div>
+
+      {/* Danger zone: delete account */}
+      <div className="mt-8 pt-6 border-t border-border-light">
+        <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{t('dangerZone')}</p>
+        <p className="text-sm text-text-secondary mb-3">{t('deleteAccountDescription')}</p>
+        <button
+          type="button"
+          onClick={() => setDeleteDialogOpen(true)}
+          className="rounded-lg border border-status-error/50 bg-status-error/5 px-4 py-2 text-sm font-medium text-status-error hover:bg-status-error/10 focus:outline-none focus:ring-2 focus:ring-status-error focus:ring-offset-2"
+        >
+          {t('deleteAccount')}
+        </button>
       </div>
 
       {/* Mobile-only: language + logout (desktop has these in sidebar) */}
@@ -173,6 +228,12 @@ export function SettingsTabs({ hasSubscription }: SettingsTabsProps) {
           <HeaderAuth />
         </div>
       </div>
+
+      <DeleteAccountDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        hasSubscription={hasSubscription}
+      />
     </div>
   );
 }

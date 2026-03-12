@@ -16,9 +16,6 @@ export default async function AppLayout({
     redirect(`/${locale}/login`);
   }
 
-  // Skip SubscriptionGuard on the onboarding wizard – it handles subscription
-  // setup itself and the warning banner would interfere with the wizard layout.
-  // Try multiple headers since availability depends on Next.js version/deployment.
   const headersList = await headers();
   const nextUrl =
     headersList.get('next-url') ??
@@ -26,10 +23,19 @@ export default async function AppLayout({
     headersList.get('x-url') ??
     '';
   const isOnboarding = nextUrl.includes('/onboarding');
+  const isPendingDeletionPage = nextUrl.includes('/account-pending-deletion');
+
+  const deletionRequestedAt = ctx.profile.deletion_requested_at;
+  if (deletionRequestedAt && !isPendingDeletionPage) {
+    const locale = await getLocale();
+    redirect(`/${locale}/account-pending-deletion`);
+  }
+
+  const skipGuard = isOnboarding || isPendingDeletionPage;
 
   return (
     <AppShell>
-      {isOnboarding ? (
+      {skipGuard ? (
         children
       ) : (
         <SubscriptionGuard hasSubscription={ctx.hasSubscription}>

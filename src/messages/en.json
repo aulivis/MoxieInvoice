@@ -50,6 +50,9 @@
     "emailHint": "Enter your email and we'll send you a sign-in link.",
     "linkSent": "Link sent!",
     "copyright": "© 2026 Brixa",
+    "cookieNoticePrefix": "We only use cookies that are strictly necessary for the operation of the service. See our ",
+    "privacyPolicyLinkText": "Privacy Policy",
+    "cookieNoticeSuffix": ".",
     "heroTagline": "The bridge between your project and your invoice.",
     "noPassword": "No password, no registration – just enter your email and you're in.",
     "feature1": "Automatic invoice generation from Moxie",
@@ -159,7 +162,44 @@
     "subscription": "Subscription",
     "currencyAndSchedule": "Currency and schedule",
     "currency": "Currency",
-    "schedule": "Schedule"
+    "schedule": "Schedule",
+    "dangerZone": "Danger zone",
+    "deleteAccount": "Permanently delete account",
+    "deleteAccountDescription": "Request account deletion. Your subscription will be cancelled immediately; your account will be suspended for 14 days and can be restored by logging in.",
+    "dataHandling": "Data & privacy",
+    "dataHandlingParagraph1": "We only use cookies that are strictly necessary for the operation of the service: session and authentication, security, and (when you use billing) payment-related cookies. We do not use analytics or marketing cookies, and we do not track you across sites. For this reason we do not show a cookie consent banner.",
+    "dataHandlingParagraph2": "For a full description of how we process your data, your rights, and how long we keep data, see our data protection notice.",
+    "dataHandlingLinkText": "Full data protection notice"
+  },
+  "deleteAccount": {
+    "title": "Permanently delete account?",
+    "step1Intro": "When you request deletion:",
+    "subscriptionCancelled": "Your subscription is cancelled immediately (you will not be charged again).",
+    "accountSuspended": "Your account is suspended for 14 days; we keep your data during this period.",
+    "restoreWithin14": "If you log in within 14 days, you can restore your account with one click and your data will remain. (You will need to subscribe again if you want the subscription.)",
+    "deleteAfter14": "If you do not log in within 14 days, we permanently delete your account and all data, and we will email you to confirm.",
+    "dataDeleted": "We permanently delete your profile, organization, invoices, settings and subscription data. We do not retain this data after deletion (except where required by law).",
+    "understandContinue": "I understand, continue",
+    "cancel": "Cancel",
+    "step2Title": "Confirm deletion request",
+    "typeToConfirm": "Type DELETE below to confirm:",
+    "confirmPlaceholder": "DELETE",
+    "requestDeletion": "Request deletion",
+    "suspendedToast": "Your account has been suspended. You have 14 days to restore it by logging in.",
+    "restoredToast": "Your account has been restored.",
+    "deletedEmailSubject": "Your account has been permanently deleted",
+    "pendingTitle": "Your account is scheduled for deletion",
+    "pendingDescription": "You requested account deletion. If you do nothing, your account and data will be permanently deleted after 14 days and we will email you.",
+    "restoreAccount": "Restore account",
+    "signOut": "Sign out",
+    "deadline": "Deadline"
+  },
+  "deleteAccountErrors": {
+    "alreadyRequested": "Deletion has already been requested.",
+    "requestFailed": "Failed to request deletion. Please try again.",
+    "restoreFailed": "Failed to restore account. Please try again.",
+    "restoreExpired": "The 14-day period has passed. Your account has been or will be permanently deleted.",
+    "invalidConfirm": "Please type DELETE exactly to confirm."
   },
   "subscription": {
     "guardTitle": "Subscription required",
@@ -216,7 +256,8 @@
     "checkoutFailed": "Failed to start checkout. Please try again.",
     "portalFailed": "Failed to open subscription management. Please try again.",
     "noSubscription": "No subscription found. Please subscribe first.",
-    "invalidPriceId": "Invalid plan selected. Please choose a plan again."
+    "invalidPriceId": "Invalid plan selected. Please choose a plan again.",
+    "stripeCustomerInvalid": "Subscription record is invalid or was created for testing. Please subscribe again below."
   },
   "billingoValidation": {
     "blocked": "Invoice generation was blocked because of Billingo requirements: one or more fields are missing or invalid.",

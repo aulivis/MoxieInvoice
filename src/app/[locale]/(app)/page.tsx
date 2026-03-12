@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { redirect } from 'next/navigation';
@@ -7,6 +8,7 @@ import { StatCard } from '@/components/ui/StatCard';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PaymentStatusCell } from '@/components/ui/PaymentStatusCell';
+import { RestoredToast } from '@/components/RestoredToast';
 
 // ── Icons for stat cards ────────────────────────────────────────────────────
 
@@ -144,6 +146,9 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-6 max-w-7xl animate-fade-in">
+      <Suspense fallback={null}>
+        <RestoredToast />
+      </Suspense>
       {/* Page header */}
       <div className="flex items-center justify-between">
         <h1 className="text-page-title">{t('title')}</h1>

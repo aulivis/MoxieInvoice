@@ -5,6 +5,7 @@ import { useFormStatus } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { loginAction, type AuthState } from '@/app/actions/auth';
+import { Link } from '@/i18n/navigation';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -80,7 +81,9 @@ export default function LoginPage() {
   const [hashError, setHashError] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const errorAuth = searchParams.get('error') === 'auth';
+  const messageSuspended = searchParams.get('message') === 'account_suspended';
   const t = useTranslations('auth');
+  const tDelete = useTranslations('deleteAccount');
 
   useEffect(() => {
     if (parseMagicLinkErrorFromHash()) {
@@ -156,10 +159,30 @@ export default function LoginPage() {
           </ul>
         </div>
 
-        {/* Copyright */}
-        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          {t('copyright')}
-        </p>
+        {/* Copyright and cookie notice */}
+        <div className="space-y-1.5">
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            {t('copyright')}
+          </p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            {t('cookieNoticePrefix')}
+            {process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL ? (
+              <a
+                href={process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:opacity-90"
+              >
+                {t('privacyPolicyLinkText')}
+              </a>
+            ) : (
+              <Link href="/settings?tab=dataHandling" className="underline hover:opacity-90">
+                {t('privacyPolicyLinkText')}
+              </Link>
+            )}
+            {t('cookieNoticeSuffix')}
+          </p>
+        </div>
       </div>
 
       {/* ── Right form panel ─────────────────────────────────────────────── */}
@@ -182,6 +205,11 @@ export default function LoginPage() {
               </span>
             </div>
 
+            {messageSuspended && (
+              <div className="mb-6 rounded-lg border border-border-medium bg-background-card p-4 text-sm text-text-primary" role="status">
+                {tDelete('suspendedToast')}
+              </div>
+            )}
             {showForm ? (
               <>
                 <h1 className="text-2xl font-bold text-text-primary mb-1">{t('loginTitle')}</h1>
