@@ -101,7 +101,7 @@ export default function LoginPage() {
         {/* Logo + tagline */}
         <div>
           <div className="flex items-end gap-[1ch] mb-5">
-            <BrixaLogoMark size={43} />
+            <BrixaLogoMark size={52} />
             <span
               style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '38px', lineHeight: 1, color: 'white' }}
             >
@@ -187,7 +187,7 @@ export default function LoginPage() {
           <div className="w-full max-w-sm">
             {/* Mobile logo */}
             <div className="flex items-end gap-[1ch] mb-8 md:hidden">
-              <BrixaLogoMark size={29} />
+              <BrixaLogoMark size={35} />
               <span
                 style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '26px', lineHeight: 1, color: 'var(--color-text-primary)' }}
               >

@@ -8,13 +8,14 @@ export function BrixaLogoMark({ size = 48 }: { size?: number }) {
   const brixaGrad = `brixaGradient-${id}`;
   const accentGrad = `accentGradient-${id}`;
   const viewBoxHeight = 160;
-  const viewBoxWidth = 220;
+  const viewBoxWidth = 120;
+  const viewBoxMinX = 50;
   const width = (size * viewBoxWidth) / viewBoxHeight;
   return (
     <svg
       width={width}
       height={size}
-      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+      viewBox={`${viewBoxMinX} 0 ${viewBoxWidth} ${viewBoxHeight}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden

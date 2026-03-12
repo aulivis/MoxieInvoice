@@ -46,7 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Logo – visible on mobile when signed in (sidebar is hidden), always when signed out */}
             {signedIn ? (
               <span className="flex items-end gap-[1ch] md:hidden">
-                <BrixaLogoMark size={20} />
+                <BrixaLogoMark size={24} />
                 <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
               </span>
             ) : (
@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href="/"
                 className="flex items-end gap-[1ch] hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md outline-none transition-opacity"
               >
-                <BrixaLogoMark size={20} />
+                <BrixaLogoMark size={24} />
                 <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
               </Link>
             )}
