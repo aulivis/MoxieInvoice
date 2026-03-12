@@ -144,22 +144,36 @@ export default async function HomePage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <h1 className="text-page-title">{t('title')}</h1>
-        <Link
-          href="/invoices/new"
-          className="hidden sm:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none shadow-sm"
-          style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)', boxShadow: '0 4px 14px rgba(232,137,58,0.3)' }}
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-          </svg>
-          {t('newInvoice')}
-        </Link>
+        {allSetupDone ? (
+          <Link
+            href="/invoices/new"
+            className="hidden sm:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)', boxShadow: '0 4px 14px rgba(232,137,58,0.3)' }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('newInvoice')}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="hidden sm:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white opacity-50 cursor-not-allowed"
+            style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)', boxShadow: '0 4px 14px rgba(232,137,58,0.3)' }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('newInvoice')}
+          </button>
+        )}
       </div>
 
       {/* Setup wizard CTA — shown until all steps are done */}
       {!allSetupDone && (
-        <div className="opacity-0 animate-fade-up bg-background-card border border-amber-200 rounded-xl p-5 shadow-subtle"
-          style={{ borderColor: 'rgba(232,137,58,0.3)', background: 'linear-gradient(135deg, rgba(232,137,58,0.04) 0%, rgba(255,255,255,1) 60%)' }}
+        <div className="opacity-0 animate-fade-up bg-background-card border rounded-xl p-5 animate-setup-glow"
+          style={{ borderColor: 'rgba(232,137,58,0.35)', background: 'linear-gradient(135deg, rgba(232,137,58,0.04) 0%, rgba(255,255,255,1) 60%)' }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             {/* Icon */}
@@ -193,6 +207,9 @@ export default async function HomePage() {
           </div>
         </div>
       )}
+
+      {/* KPI cards + recent invoices: blurred until setup is complete */}
+      <div className={['space-y-6', !allSetupDone ? 'blur-sm pointer-events-none select-none' : ''].filter(Boolean).join(' ')}>
 
       {/* Bento: Stats row */}
       <div className="grid grid-cols-3 gap-4">
@@ -246,7 +263,7 @@ export default async function HomePage() {
               title={t('noInvoices')}
               description={t('noInvoicesDesc')}
               ctaLabel={t('newInvoice')}
-              ctaHref="/invoices/new"
+              ctaHref={allSetupDone ? '/invoices/new' : undefined}
             />
           ) : (
             <ul className="divide-y divide-border-light">
@@ -301,6 +318,8 @@ export default async function HomePage() {
           )}
         </Card>
       </div>
+
+      </div>{/* end blur wrapper */}
     </div>
   );
 }

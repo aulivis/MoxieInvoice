@@ -29,7 +29,20 @@
       "Bash(ls D:AppsMoxieInvoicesrcmiddleware*)",
       "Bash(ls D:AppsMoxieInvoicemiddleware*)",
       "Bash(dir \"D:\\\\Apps\\\\MoxieInvoice\\\\src\\\\middleware*\")",
-      "Bash(dir \"D:\\\\Apps\\\\MoxieInvoice\\\\middleware*\")"
+      "Bash(dir \"D:\\\\Apps\\\\MoxieInvoice\\\\middleware*\")",
+      "Bash(npx tsc --noEmit --pretty)",
+      "Bash(find /d/Apps/MoxieInvoice -type f -name *.toml)",
+      "Bash(find /d/Apps/MoxieInvoice -type f \\\\\\(-name *.html -o -name *.txt \\\\\\))",
+      "Bash(find /d/Apps/MoxieInvoice -type f -name *auth*)",
+      "Bash(find /d/Apps/MoxieInvoice -type f \\\\\\(-name *email* -o -name *template* \\\\\\))",
+      "Bash(grep -r \"Brixa\\\\|brixa\" /d/Apps/MoxieInvoice --include=*.ts --include=*.tsx --include=*.json --include=*.toml --include=*.md)",
+      "Bash(find /d/Apps/MoxieInvoice/src/app -type d -path *auth*)",
+      "Bash(ls -la /d/Apps/MoxieInvoice/src/app/[locale]/\\\\\\(auth\\\\\\)/)",
+      "Bash(grep -r \"supabase.*config\\\\|supabase.*email\" /d/Apps/MoxieInvoice --include=*.ts --include=*.tsx --include=*.md)",
+      "Bash(grep -E \"^-.*\\\\.\\(toml|json|yaml|yml\\)$\")",
+      "Bash(grep -r \"NEXT_PUBLIC_SUPABASE\\\\|SUPABASE_SECRET\" /d/Apps/MoxieInvoice/.env*)",
+      "Bash(grep -r \"mail\\\\|email\\\\|template\" /d/Apps/MoxieInvoice/supabase/migrations/*.sql)",
+      "Bash(find /d/Apps/MoxieInvoice -type f -path */supabase/* \\\\\\(-name *.json -o -name *.toml -o -name *.sql \\\\\\))"
     ]
   }
 }

@@ -13,7 +13,6 @@ const disabledInputClass =
 
 export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMode = false }: { hasSubscription?: boolean; onSaved?: () => void; wizardMode?: boolean }) {
   const [provider, setProvider] = useState<'billingo' | 'szamlazz'>('billingo');
-  const [sellerName, setSellerName] = useState('');
   const [hasCredentials, setHasCredentials] = useState(false);
   const [fetched, setFetched] = useState(false);
   const [state, formAction] = useActionState<SettingsState | null, FormData>(saveBillingAction, null);
@@ -53,7 +52,6 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
       .then((data) => {
         setFetched(true);
         if (data.provider) setProvider(data.provider);
-        if (data.sellerName != null) setSellerName(data.sellerName ?? '');
         setHasCredentials(!!data.hasCredentials);
       })
       .catch(() => setFetched(true));
@@ -192,20 +190,6 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
             </div>
           </>
         )}
-        <div>
-          <label htmlFor="billing-sellerName" className={labelClass}>
-            {t('sellerName')}
-          </label>
-          <input
-            id="billing-sellerName"
-            type="text"
-            name="sellerName"
-            value={sellerName}
-            onChange={(e) => setSellerName(e.target.value)}
-            className={inputClass}
-            disabled={disabled}
-          />
-        </div>
         <Button type="submit" variant="primary" disabled={disabled}>
           {tCommon('save')}
         </Button>

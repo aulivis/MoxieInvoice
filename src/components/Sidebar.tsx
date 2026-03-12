@@ -60,8 +60,7 @@ function BrixaLogoMark() {
         <circle cx="55" cy="28" r="6" fill="#E8893A"/>
       </svg>
       <span
-        className="font-extrabold text-base tracking-tight"
-        style={{ color: 'var(--sidebar-text)', fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
+        style={{ color: 'var(--sidebar-text)', fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '23px', lineHeight: 1 }}
       >
         Brixa
       </span>
@@ -80,20 +79,27 @@ export function Sidebar() {
   const t = useTranslations('nav');
   const tMoxie = useTranslations('moxie');
   const [moxieLive, setMoxieLive] = useState(false);
+  const [billingConfigured, setBillingConfigured] = useState(false);
 
   useEffect(() => {
-    fetch('/api/moxie/connection')
-      .then((r) => r.json())
-      .then((data) => {
-        const at = data?.lastTestedAt;
+    Promise.all([
+      fetch('/api/moxie/connection').then((r) => r.json()),
+      fetch('/api/billing', { cache: 'no-store' }).then((r) => r.json()),
+    ])
+      .then(([moxieData, billingData]) => {
+        const at = moxieData?.lastTestedAt;
         setMoxieLive(
-          !!data?.connected &&
-            !!data?.hasApiKey &&
+          !!moxieData?.connected &&
+            !!moxieData?.hasApiKey &&
             !!at &&
             Date.now() - new Date(at).getTime() < MOXIE_LIVE_THRESHOLD_MS
         );
+        setBillingConfigured(!!billingData?.provider && !!billingData?.hasCredentials);
       })
-      .catch(() => setMoxieLive(false));
+      .catch(() => {
+        setMoxieLive(false);
+        setBillingConfigured(false);
+      });
   }, []);
 
   return (
@@ -117,19 +123,35 @@ export function Sidebar() {
 
       {/* Quick action — amber gradient */}
       <div className="mt-4 px-3">
-        <Link
-          href="/invoices/new"
-          className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1628] outline-none"
-          style={{
-            background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)',
-            boxShadow: '0 4px 14px rgba(232,137,58,0.35)',
-          }}
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-          </svg>
-          {t('newInvoice')}
-        </Link>
+        {moxieLive && billingConfigured ? (
+          <Link
+            href="/invoices/new"
+            className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1628] outline-none"
+            style={{
+              background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)',
+              boxShadow: '0 4px 14px rgba(232,137,58,0.35)',
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('newInvoice')}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white opacity-40 cursor-not-allowed"
+            style={{
+              background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)',
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('newInvoice')}
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -177,10 +199,12 @@ export function Sidebar() {
                   {showConnectionBadge && (
                     <span className="ml-auto shrink-0">
                       <ConnectionStatusBadge
-                        connected={moxieLive}
+                        connected={moxieLive && billingConfigured}
                         connectedLabel={tMoxie('statusConnected')}
                         disconnectedLabel={tMoxie('statusDisconnected')}
                         dotOnly
+                        hasWarning={!moxieLive || !billingConfigured}
+                        warningLabel={tMoxie('statusSetupIncomplete')}
                       />
                     </span>
                   )}

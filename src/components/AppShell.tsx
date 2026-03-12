@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
                   <circle cx="55" cy="28" r="6" fill="#E8893A"/>
                 </svg>
-                <span className="font-extrabold text-base text-text-primary tracking-tight" style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}>Brixa</span>
+                <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
               </span>
             ) : (
               <Link
@@ -66,7 +66,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <line x1="30" y1="75" x2="80" y2="75" stroke="#E8893A" strokeWidth="9" strokeLinecap="round"/>
                   <circle cx="55" cy="28" r="6" fill="#E8893A"/>
                 </svg>
-                <span className="font-extrabold text-base text-text-primary tracking-tight" style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}>Brixa</span>
+                <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
               </Link>
             )}
           </div>

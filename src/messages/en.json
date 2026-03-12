@@ -185,6 +185,7 @@
     "statusLive": "Live",
     "statusConnected": "Connected",
     "statusDisconnected": "Not connected",
+    "statusSetupIncomplete": "Moxie or billing not set up or not working",
     "statusNotTested": "Not tested",
     "statusNotConfigured": "Not configured",
     "webhookUrl": "Webhook URL in Moxie:",

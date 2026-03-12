@@ -110,8 +110,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-4 mb-5">
             <BrixaLogoMark size={52} />
             <span
-              className="font-extrabold text-2xl tracking-tight text-white"
-              style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
+              style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '38px', lineHeight: 1, color: 'white' }}
             >
               Brixa
             </span>
@@ -177,8 +176,7 @@ export default function LoginPage() {
             <div className="flex items-center gap-3 mb-8 md:hidden">
               <BrixaLogoMark size={36} />
               <span
-                className="font-extrabold text-lg text-text-primary tracking-tight"
-                style={{ fontFamily: "var(--font-syne), 'Syne', sans-serif" }}
+                style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '26px', lineHeight: 1, color: 'var(--color-text-primary)' }}
               >
                 Brixa
               </span>

@@ -185,6 +185,7 @@
     "statusLive": "Él",
     "statusConnected": "Csatlakoztatva",
     "statusDisconnected": "Nincs kapcsolat",
+    "statusSetupIncomplete": "A Moxie vagy a számlázó nincs beállítva vagy nem működik",
     "statusNotTested": "Nem tesztelt",
     "statusNotConfigured": "Nincs beállítva",
     "webhookUrl": "A webhook URL a Moxie-ban:",
