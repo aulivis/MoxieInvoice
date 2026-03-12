@@ -133,10 +133,13 @@ export default async function HomePage() {
   const allSetupDone = hasSubscription && moxieConnected && billingConfigured;
 
   function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString(locale, {
+    const d = new Date(dateStr);
+    const datePart = d.toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
     });
+    const timePart = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+    return `${datePart} ${timePart}`;
   }
 
   return (

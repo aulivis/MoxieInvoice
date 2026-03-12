@@ -41,7 +41,7 @@ function buildXml(
       <mennyiseg>${item.quantity}</mennyiseg>
       <mennyisegiEgyseg>${escapeXml(item.unit)}</mennyisegiEgyseg>
       <nettoEgysegar>${item.netUnitPrice}</nettoEgysegar>
-      <afakulcs>${item.vatPercent}</afakulcs>
+      <afakulcs>${String(item.vatPercent)}</afakulcs>
       <nettoErtek>${net}</nettoErtek>
       <afaErtek>${vat}</afaErtek>
       <bruttoErtek>${gross}</bruttoErtek>
@@ -53,8 +53,13 @@ function buildXml(
     ? `<szamlaagentkulcs>${escapeXml(creds.agentKey)}</szamlaagentkulcs>`
     : `<felhasznalo>${escapeXml(creds.username || '')}</felhasznalo><jelszo>${escapeXml(creds.password || '')}</jelszo>`;
 
+  const isHuf = request.currency === 'HUF';
+  const fejlecMegjegyzes = request.comment ? `<megjegyzes>${escapeXml(request.comment)}</megjegyzes>` : '';
+  const fejlecArfolyam = !isHuf ? `<arfolyamBank>MNB</arfolyamBank>
+    <arfolyam>0.0</arfolyam>` : '';
+
   return `<?xml version="1.0" encoding="UTF-8"?>
-<xmlszamla xmlns="http://www.szamlazz.hu/xmlszamla" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.szamlazz.hu/xmlszamla https://www.szamlazz.hu/docs/xsd/agent/xmlszamla.xsd">
+<xmlszamla xmlns="http://www.szamlazz.hu/xmlszamla" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.szamlazz.hu/xmlszamla https://www.szamlazz.hu/szamla/docs/xsds/agent/xmlszamla.xsd">
   <beallitasok>
     ${authXml}
     <eszamla>true</eszamla>
@@ -68,16 +73,20 @@ function buildXml(
     <fizmod>${request.paymentMethod === 'cash' ? 'Készpénz' : 'Átutalás'}</fizmod>
     <penznem>${request.currency}</penznem>
     <szamlaNyelve>hu</szamlaNyelve>
-    <tipus>${isProforma ? 'díjbekérő' : 'számla'}</tipus>
-    ${request.comment ? `<megjegyzes>${escapeXml(request.comment)}</megjegyzes>` : ''}
+    ${fejlecMegjegyzes}
+    ${fejlecArfolyam}
+    <dijbekero>${isProforma}</dijbekero>
   </fejlec>
+  <elado>
+  </elado>
   <vevo>
     <nev>${escapeXml(request.buyer.name)}</nev>
     <orszag>${request.buyer.countryCode || 'HU'}</orszag>
     <irsz>${escapeXml(request.buyer.postCode)}</irsz>
     <telepules>${escapeXml(request.buyer.city)}</telepules>
     <cim>${escapeXml(request.buyer.address)}</cim>
-    ${request.buyer.email ? `<email>${escapeXml(request.buyer.email)}</email>` : ''}
+    ${request.buyer.email ? `<email>${escapeXml(request.buyer.email)}</email>
+    <sendEmail>false</sendEmail>` : ''}
     ${request.buyer.taxNumber ? `<adoszam>${escapeXml(request.buyer.taxNumber)}</adoszam>` : ''}
   </vevo>
   <tetelek>
@@ -179,6 +188,51 @@ export async function getSzamlazzDocument(
  */
 export function isSzamlazzDocumentPaid(info: SzamlazzDocumentPaymentInfo): boolean {
   return info._paid || (info.total > 0 && info.total_paid >= info.total);
+}
+
+/**
+ * Fetch invoice/bizonylat PDF via "Bizonylat lekérése PDF-ben" (action-szamla_agent_pdf).
+ * Returns the PDF as Buffer on success; null on auth error, not found, or other failure.
+ * @see https://www.szamlazz.hu/szamla/docs/xsds/agentpdf/xmlszamlapdf.xsd
+ */
+export async function getSzamlazzPdf(
+  credentials: SzamlazzCredentials,
+  invoiceNumber: string
+): Promise<Buffer | null> {
+  const authXml = credentials.agentKey
+    ? `<szamlaagentkulcs>${escapeXml(credentials.agentKey)}</szamlaagentkulcs>`
+    : `<felhasznalo>${escapeXml(credentials.username || '')}</felhasznalo><jelszo>${escapeXml(credentials.password || '')}</jelszo>`;
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<xmlszamlapdf xmlns="http://www.szamlazz.hu/xmlszamlapdf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.szamlazz.hu/xmlszamlapdf https://www.szamlazz.hu/szamla/docs/xsds/agentpdf/xmlszamlapdf.xsd">
+  ${authXml}
+  <szamlaszam>${escapeXml(invoiceNumber)}</szamlaszam>
+  <valaszVerzio>2</valaszVerzio>
+</xmlszamlapdf>`;
+
+  let text: string;
+  try {
+    const form = new FormData();
+    form.append('action-szamla_agent_pdf', new Blob([xml], { type: 'application/xml' }));
+    const res = await fetch(SZAMLAZZ_ENDPOINT, { method: 'POST', body: form });
+    if (!res.ok) return null;
+    text = await res.text();
+  } catch {
+    return null;
+  }
+
+  const sikeresMatch = text.match(/<sikeres>\s*(?:true|false)\s*<\/sikeres>/i);
+  const sikeres = sikeresMatch && sikeresMatch[0].toLowerCase().includes('>true<');
+  const pdfMatch = text.match(/<pdf>\s*([\s\S]*?)\s*<\/pdf>/i);
+  const base64 = pdfMatch?.[1]?.trim().replace(/\s/g, '');
+
+  if (!sikeres || !base64) return null;
+
+  try {
+    return Buffer.from(base64, 'base64');
+  } catch {
+    return null;
+  }
 }
 
 export async function createSzamlazzInvoice(

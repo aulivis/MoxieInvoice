@@ -61,9 +61,12 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
   }
 
   function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString(locale, {
+    const d = new Date(dateStr);
+    const datePart = d.toLocaleDateString(locale, {
       year: 'numeric', month: 'short', day: 'numeric',
     });
+    const timePart = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+    return `${datePart} ${timePart}`;
   }
 
   function statusLabel(status: string) {

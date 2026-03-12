@@ -12,6 +12,7 @@ import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { decrypt } from '@/lib/crypto';
 import { downloadBillingoPdf } from '@/lib/invoices/billingo';
+import { getSzamlazzPdf, type SzamlazzCredentials } from '@/lib/invoices/szamlazz';
 
 /** Extract keyman access key from a Számlázz.hu printpreview URL. */
 function extractSzamlazzKeyman(pdfUrl: string): string | null {
@@ -108,7 +109,29 @@ export async function GET(
   }
 
   if (invoice.provider === 'szamlazz') {
-    // Option A: try a direct PDF URL with the keyman access key
+    if (!invoice.external_id) {
+      return NextResponse.json({ error: 'No external_id for Számlázz.hu invoice' }, { status: 500 });
+    }
+
+    const szamlazzCreds: SzamlazzCredentials = {
+      agentKey: String(credentials.agentKey ?? credentials.agent_key ?? '').trim() || undefined,
+      username: credentials.username != null ? String(credentials.username) : undefined,
+      password: credentials.password != null ? String(credentials.password) : undefined,
+    };
+
+    const pdfBuffer = await getSzamlazzPdf(szamlazzCreds, invoice.external_id);
+    if (pdfBuffer && pdfBuffer.length > 0) {
+      return new Response(pdfBuffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `inline; filename="invoice-${invoice.external_id}.pdf"`,
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+
+    // Fallback: try direct PDF URL with keyman or printpreview
     const keyman = invoice.pdf_url ? extractSzamlazzKeyman(invoice.pdf_url) : null;
 
     if (keyman) {
