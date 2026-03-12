@@ -340,10 +340,13 @@ function normalizeMoxiePayload(
       getCustomFieldValue(clientInfo, 'rm-inv-type');
     const defaultCurrency = (body.currency as string) || (clientInfo?.currency as string) || 'HUF';
     const targetCurrency = resolveTargetCurrency(defaultCurrency, body, clientInfo);
+    const registrationNo =
+      getCustomFieldValue(clientInfo, 'reg-no') ?? getCustomFieldValue(body, 'reg-no');
     const request: NormalizedInvoiceRequest = {
       buyer: {
         name,
         taxNumber: extractBuyerTaxNumber(clientInfo, body),
+        ...(registrationNo ? { registrationNo } : {}),
         postCode: String(clientInfo.postal ?? clientInfo.postCode ?? ''),
         city: String(clientInfo.city ?? ''),
         address: String(clientInfo.address1 ?? clientInfo.address ?? ''),
@@ -376,6 +379,7 @@ function normalizeMoxiePayload(
     getCustomFieldValue(body, 'rm-inv-type') ?? getCustomFieldValue(client, 'rm-inv-type');
   const defaultCurrency = (body.currency as string) || (client.currency as string) || 'HUF';
   const targetCurrency = resolveTargetCurrency(defaultCurrency, body, client);
+  const regNo = getCustomFieldValue(client, 'reg-no') ?? getCustomFieldValue(body, 'reg-no');
   const request: NormalizedInvoiceRequest = {
     buyer: {
       name,
@@ -384,6 +388,7 @@ function normalizeMoxiePayload(
         getCustomFieldValue(client, 'eori') ||
         getCustomFieldValue(body, 'eori') ||
         undefined,
+      ...(regNo ? { registrationNo: regNo } : {}),
       postCode: String(address.post_code ?? address.postCode ?? ''),
       city: String(address.city ?? ''),
       address: String(address.line1 ?? address.address ?? ''),

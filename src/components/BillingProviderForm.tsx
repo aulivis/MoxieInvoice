@@ -202,9 +202,6 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
 
       {provider === 'szamlazz' && !wizardMode && orgId && (
         <div className="mt-8 pt-6 border-t border-border-light">
-          <Alert variant="warning" className="mb-4">
-            {t('ipnSupportNotice')}
-          </Alert>
           <p className="text-sm text-text-secondary mb-1">{t('ipnUrl')}</p>
           <div className="flex items-start gap-2 flex-wrap">
             <div className="flex-1 min-w-0">

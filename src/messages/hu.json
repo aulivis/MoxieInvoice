@@ -292,8 +292,7 @@
     "paymentMethodCash": "Készpénz",
     "paymentMethodBankcard": "Bankkártya",
     "ipnUrl": "IPN URL (kifizetési értesítés)",
-    "ipnHint": "Ezt az URL-t a Számlázz.hu Fiók beállítások / Számlázás alapadatok oldal alján megadott mezőbe illeszd be. Ha egy számla kifizetett összege megváltozik a Számlázz.hu felületén, a rendszer erre a címre küldi az értesítést, és a fizetési állapot automatikusan frissül. A számlalista „Frissítés” gombja csak kiegészítő (pl. ha az IPN nem érkezett meg).",
-    "ipnSupportNotice": "Az IPN funkciót a Számlázz.hu ügyfélszolgálatánál kell engedélyezni. Amíg ez nem történik meg, a fizetési visszajelzés nem fog beérkezni.",
+    "ipnHint": "Ezt az URL-t a Számlázz.hu Fiók beállítások / Számlázás alapadatok oldal alján megadott mezőbe illeszd be. Ha egy számla kifizetett összege megváltozik a Számlázz.hu felületén, a rendszer erre a címre küldi az értesítést, és a fizetési állapot automatikusan frissül.",
     "copyIpnUrl": "IPN URL másolása",
     "ipnCopied": "Másolva!"
   },

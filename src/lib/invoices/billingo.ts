@@ -289,6 +289,8 @@ export async function createBillingoInvoice(
     'X-API-KEY': credentials.apiKey,
   };
 
+  // Billingo API v3 PartnerUpsert has no cégjegyzékszám (company registration number) field;
+  // supported: name, address, emails, taxcode, iban, swift, account_number, phone, general_ledger_number, tax_type, custom_billing_settings, group_member_tax_number.
   const partnerPayload = {
     name: request.buyer.name,
     address: {

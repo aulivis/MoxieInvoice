@@ -12,6 +12,8 @@ export interface NormalizedInvoiceRequest {
   buyer: {
     name: string;
     taxNumber?: string;
+    /** Cégjegyzékszám (company registration number); from Moxie custom field mappingKey "reg-no". */
+    registrationNo?: string;
     postCode: string;
     city: string;
     address: string;
