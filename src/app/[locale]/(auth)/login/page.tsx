@@ -9,6 +9,7 @@ import { Link } from '@/i18n/navigation';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { TextWithMoxieLogo } from '@/components/MoxieLogoInline';
 
 function EmailIcon() {
   return (
@@ -140,7 +141,7 @@ export default function LoginPage() {
             </span>
           </h2>
           <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {t('heroDescription')}
+            <TextWithMoxieLogo>{t('heroDescription')}</TextWithMoxieLogo>
           </p>
           <ul className="space-y-3">
             {features.map((f) => (
@@ -153,7 +154,7 @@ export default function LoginPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 </span>
-                {f}
+                <TextWithMoxieLogo>{f}</TextWithMoxieLogo>
               </li>
             ))}
           </ul>

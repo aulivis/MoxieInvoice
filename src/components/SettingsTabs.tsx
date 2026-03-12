@@ -6,6 +6,7 @@ import { Link } from '@/i18n/navigation';
 import { Card } from '@/components/ui/Card';
 import { SubscriptionSection } from '@/components/SubscriptionSection';
 import { MoxieConnectionForm } from '@/components/MoxieConnectionForm';
+import { TextWithMoxieLogo } from '@/components/MoxieLogoInline';
 import { BillingProviderForm } from '@/components/BillingProviderForm';
 import { CurrencyForm } from '@/components/CurrencyForm';
 import { ScheduleForm } from '@/components/ScheduleForm';
@@ -139,7 +140,13 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
                 role="tab"
               >
                 <Icon />
-                <span className="hidden sm:inline">{t(labelKey as Parameters<typeof t>[0])}</span>
+                <span className="hidden sm:inline">
+                  {key === 'moxie' ? (
+                    <TextWithMoxieLogo>{t('moxie')}</TextWithMoxieLogo>
+                  ) : (
+                    t(labelKey as Parameters<typeof t>[0])
+                  )}
+                </span>
                 {isConfigured && (
                   <span className="absolute top-1.5 right-1 flex">
                     <ConfiguredDot />

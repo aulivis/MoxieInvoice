@@ -225,21 +225,21 @@ export function SubscriptionSection({ returnTo, hasSubscription = false }: Subsc
         <div className="space-y-4">
           <p className="text-text-secondary text-sm">{t('sectionDescription')}</p>
 
-          <div className="rounded-xl border border-border-light bg-background-card p-5 shadow-card space-y-4">
+          <div className="rounded-xl border border-border-light border-l-4 border-l-primary bg-background-card p-6 shadow-card space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="font-display text-lg font-semibold text-text-primary">
+              <h3 className="text-section-title text-text-primary">
                 {t('currentPlan')}
               </h3>
               <span
-                className={`rounded-full px-2.5 py-1 text-xs font-medium ${getStatusBadgeClass(d.status)}`}
+                className={`rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wider ${getStatusBadgeClass(d.status)}`}
                 aria-label={getStatusLabel(d.status)}
               >
                 {getStatusLabel(d.status)}
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-text-secondary text-sm">{planLabel}</span>
-              <span className="text-2xl font-bold text-text-primary">{d.formatted}</span>
+              <span className="text-sm text-text-secondary">{planLabel}</span>
+              <span className="text-metric-value font-tabular-nums text-text-primary">{d.formatted}</span>
             </div>
             <dl className="space-y-1.5 text-sm">
               {!d.cancelAtPeriodEnd ? (
@@ -255,13 +255,13 @@ export function SubscriptionSection({ returnTo, hasSubscription = false }: Subsc
                   <dd className="text-text-primary font-medium">
                     {t('accessUntil')} {nextBillingDate}
                   </dd>
-                  <p className="text-text-tertiary text-xs mt-1">
+                  <p className="text-caption text-text-tertiary mt-1">
                     {t('manageSubscriptionHint')}
                   </p>
                 </div>
               )}
               {!d.cancelAtPeriodEnd && (
-                <p className="text-text-tertiary text-xs pt-1">
+                <p className="text-caption text-text-tertiary pt-1">
                   {t('manageSubscriptionHint')}
                 </p>
               )}
@@ -361,10 +361,10 @@ export function SubscriptionSection({ returnTo, hasSubscription = false }: Subsc
             aria-pressed={selectedPriceId === monthly.priceId}
             aria-label={`${t('planMonthly')} – ${monthly.formatted}`}
           >
-            <div className="font-display text-lg font-semibold text-text-primary">
+            <div className="text-section-title text-text-primary">
               {t('planMonthly')}
             </div>
-            <div className="mt-1 text-2xl font-bold text-text-primary">
+            <div className="mt-1 text-metric-value font-tabular-nums text-text-primary">
               {monthly.formatted}
             </div>
           </button>
@@ -382,23 +382,23 @@ export function SubscriptionSection({ returnTo, hasSubscription = false }: Subsc
             aria-pressed={selectedPriceId === yearly.priceId}
             aria-label={`${t('planYearly')} – ${yearly.formatted} – ${t('twoMonthsFree')}`}
           >
-            <span className="absolute top-3 right-3 rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+            <span className="absolute top-3 right-3 rounded-md bg-primary/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
               {t('bestValue')}
             </span>
-            <div className="font-display text-lg font-semibold text-text-primary pr-20">
+            <div className="text-section-title text-text-primary pr-20">
               {t('planYearly')}
             </div>
-            <div className="mt-1 text-sm font-medium text-status-success">
+            <div className="mt-1 text-xs font-semibold text-status-success">
               {t('twoMonthsFree')}
             </div>
-            <div className="mt-1 text-2xl font-bold text-text-primary">
+            <div className="mt-1 text-metric-value font-tabular-nums text-text-primary">
               {yearly.formatted}
             </div>
           </button>
         )}
       </div>
 
-      <p className="text-xs text-text-tertiary">
+      <p className="text-caption text-text-tertiary">
         {t('securePayment')}. {t('cancelAnytime')}.
       </p>
 

@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { Alert } from '@/components/ui/Alert';
 
 const CONFIRM_TEXT_EN = 'DELETE';
 const CONFIRM_TEXT_HU = 'TÖRÖL';
@@ -103,16 +104,44 @@ export function DeleteAccountDialog({
 
           {step === 1 && (
             <>
-              <p className="mt-3 text-sm font-medium text-text-secondary">
-                {t('step1Intro')}
-              </p>
-              <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-text-secondary">
-                <li>{t('subscriptionCancelled')}</li>
-                <li>{t('accountSuspended')}</li>
-                <li>{t('restoreWithin14')}</li>
-                <li>{t('deleteAfter14')}</li>
-                <li>{t('dataDeleted')}</li>
-              </ul>
+              <Alert variant="warning" className="mt-3">
+                {t('step1Warning')}
+              </Alert>
+              <div className="mt-5 space-y-5">
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+                    {t('step1SectionImmediate')}
+                  </h3>
+                  <ul className="mt-2 list-outside list-disc space-y-2 pl-4 text-sm text-text-secondary">
+                    <li>{t('subscriptionCancelled')}</li>
+                    <li>{t('accountSuspended')}</li>
+                  </ul>
+                </section>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+                    {t('step1SectionWithin14')}
+                  </h3>
+                  <p className="mt-2 text-sm text-text-secondary">
+                    {t('restoreWithin14')}
+                  </p>
+                </section>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+                    {t('step1SectionAfter14')}
+                  </h3>
+                  <p className="mt-2 text-sm text-text-secondary">
+                    {t('deleteAfter14')}
+                  </p>
+                </section>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+                    {t('step1SectionDataDeleted')}
+                  </h3>
+                  <p className="mt-2 text-sm text-text-secondary">
+                    {t('dataDeleted')}
+                  </p>
+                </section>
+              </div>
               <div className="mt-6 flex gap-3 justify-end">
                 <Button type="button" variant="secondary" onClick={handleClose}>
                   {t('cancel')}
@@ -134,10 +163,14 @@ export function DeleteAccountDialog({
               <p className="mt-3 text-sm text-text-secondary">
                 {t('step2Title')}
               </p>
-              <p className="mt-1 text-sm text-text-secondary">
+              <label
+                htmlFor="delete-account-confirm-input"
+                className="mt-4 block text-sm font-medium text-text-primary"
+              >
                 {t('typeToConfirm')}
-              </p>
+              </label>
               <input
+                id="delete-account-confirm-input"
                 type="text"
                 value={confirmInput}
                 onChange={(e) => {
@@ -145,15 +178,15 @@ export function DeleteAccountDialog({
                   setError(null);
                 }}
                 placeholder={t('confirmPlaceholder')}
-                className="mt-3 w-full rounded-lg border border-border-medium bg-background px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+                className="mt-2 w-full rounded-lg border border-border-medium bg-background px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
                 aria-label={t('confirmPlaceholder')}
                 disabled={loading}
                 autoFocus
               />
               {error && (
-                <p className="mt-2 text-sm text-status-error" role="alert">
+                <Alert variant="error" className="mt-3" role="alert">
                   {error}
-                </p>
+                </Alert>
               )}
               <div className="mt-6 flex gap-3 justify-end">
                 <Button
