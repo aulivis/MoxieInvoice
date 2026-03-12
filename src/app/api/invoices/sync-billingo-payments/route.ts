@@ -26,10 +26,10 @@ export async function POST() {
     return NextResponse.json({ error: 'No organization' }, { status: 400 });
   }
 
-  const { updated, moxieNotified, moxieErrors } = await syncBillingoPaymentsForOrg(
+  const { updated, moxieNotified, moxieErrors, openInvoicesChecked } = await syncBillingoPaymentsForOrg(
     profile.organization_id,
     supabase
   );
 
-  return NextResponse.json({ ok: true, updated, moxieNotified, moxieErrors });
+  return NextResponse.json({ ok: true, updated, moxieNotified, moxieErrors, openInvoicesChecked });
 }

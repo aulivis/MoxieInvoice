@@ -9,13 +9,14 @@ type SyncResult = {
   updated: number;
   moxieNotified: number;
   moxieErrors?: string[];
+  openInvoicesChecked?: number;
 };
 
 type FeedbackState =
   | { kind: 'none' }
   | { kind: 'success'; updated: number; moxieNotified: number }
   | { kind: 'warning'; updated: number; moxieErrors: string[] }
-  | { kind: 'no_update' }
+  | { kind: 'no_update'; openInvoicesChecked: number }
   | { kind: 'error'; message: string };
 
 export function RefreshInvoicesButton() {
@@ -42,7 +43,7 @@ export function RefreshInvoicesButton() {
       if (!res.ok) {
         setFeedback({ kind: 'error', message: t('refreshError') });
       } else if (data.updated === 0) {
-        setFeedback({ kind: 'no_update' });
+        setFeedback({ kind: 'no_update', openInvoicesChecked: data.openInvoicesChecked ?? 0 });
       } else if (data.moxieErrors?.length) {
         setFeedback({ kind: 'warning', updated: data.updated, moxieErrors: data.moxieErrors });
       } else {
@@ -80,7 +81,11 @@ export function RefreshInvoicesButton() {
 
       {/* Inline feedback */}
       {feedback.kind === 'no_update' && (
-        <p className="text-xs text-text-tertiary animate-fade-in">{t('refreshNoUpdate')}</p>
+        <p className="text-xs text-text-tertiary animate-fade-in">
+          {feedback.openInvoicesChecked === 0
+            ? t('refreshNoUpdate')
+            : t('refreshNoUpdateChecked', { count: feedback.openInvoicesChecked })}
+        </p>
       )}
       {feedback.kind === 'success' && (
         <p className="text-xs text-status-success animate-fade-in">

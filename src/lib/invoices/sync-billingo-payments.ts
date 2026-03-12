@@ -126,7 +126,7 @@ export async function markInvoicePaidAndNotifyMoxie(
 export async function syncBillingoPaymentsForOrg(
   orgId: string,
   supabase: SupabaseClient
-): Promise<{ updated: number; moxieNotified: number; moxieErrors: string[] }> {
+): Promise<{ updated: number; moxieNotified: number; moxieErrors: string[]; openInvoicesChecked: number }> {
   const { data: billing } = await supabase
     .from('billing_providers')
     .select('provider, credentials_encrypted')
@@ -135,7 +135,7 @@ export async function syncBillingoPaymentsForOrg(
 
   const provider = billing?.provider;
   if (!billing || (provider !== 'billingo' && provider !== 'szamlazz') || !billing.credentials_encrypted) {
-    return { updated: 0, moxieNotified: 0, moxieErrors: [] };
+    return { updated: 0, moxieNotified: 0, moxieErrors: [], openInvoicesChecked: 0 };
   }
 
   // Decrypt and parse credentials per provider
@@ -156,7 +156,7 @@ export async function syncBillingoPaymentsForOrg(
       };
     }
   } catch {
-    return { updated: 0, moxieNotified: 0, moxieErrors: [] };
+    return { updated: 0, moxieNotified: 0, moxieErrors: [], openInvoicesChecked: 0 };
   }
 
   const { data: invoices } = await supabase
@@ -167,7 +167,7 @@ export async function syncBillingoPaymentsForOrg(
     .eq('payment_status', 'open')
     .limit(SYNC_INVOICES_LIMIT);
 
-  if (!invoices?.length) return { updated: 0, moxieNotified: 0, moxieErrors: [] };
+  if (!invoices?.length) return { updated: 0, moxieNotified: 0, moxieErrors: [], openInvoicesChecked: 0 };
 
   let updated = 0;
   let moxieNotified = 0;
@@ -232,5 +232,5 @@ export async function syncBillingoPaymentsForOrg(
     }
   }
 
-  return { updated, moxieNotified, moxieErrors };
+  return { updated, moxieNotified, moxieErrors, openInvoicesChecked: invoices.length };
 }

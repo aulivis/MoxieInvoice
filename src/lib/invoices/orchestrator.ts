@@ -46,7 +46,7 @@ function needsBillingoDefaults(request: NormalizedInvoiceRequest): boolean {
 }
 
 export async function createInvoice(input: CreateInvoiceInput): Promise<CreateInvoiceOutput> {
-  const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieBaseUrl, moxieApiKey, locale = 'hu' } = input;
+  const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieInvoiceUuid, moxieBaseUrl, moxieApiKey, locale = 'hu' } = input;
   let request = rawRequest;
   let billingoOrgSettings: { billingo_send_invoice_by_email?: boolean } | null = null;
 
@@ -178,7 +178,9 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
         const base = moxieBaseUrl.replace(/\/$/, '').replace(/\/api\/public\/?$/i, '');
         const form = new FormData();
         form.set('type', 'DELIVERABLE');
-        form.set('id', moxieInvoiceId || row.id);
+        // Use deliverable object ID (UUID from webhook) for attachment; fallback to invoice number then row id.
+        const attachmentId = moxieInvoiceUuid ?? moxieInvoiceId ?? row.id;
+        form.set('id', attachmentId);
         form.set('fileUrl', fileUrl);
         form.set('fileName', `invoice-${result.invoiceNumber}.pdf`);
         const moxieRes = await fetch(
@@ -203,6 +205,13 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
             invoiceId: row.id,
             invoiceNumber: result.invoiceNumber,
           });
+          // On 404 (e.g. deliverable not found), clear pdf_token so we don't retry; invoice stays created.
+          if (moxieRes.status === 404) {
+            await supabase
+              .from('invoices')
+              .update({ pdf_token: null })
+              .eq('id', row.id);
+          }
         }
       } catch (err) {
         logError(err instanceof Error ? err : new Error(String(err)), {
