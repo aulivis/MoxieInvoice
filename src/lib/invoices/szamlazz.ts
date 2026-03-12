@@ -133,30 +133,34 @@ export interface SzamlazzDocumentPaymentInfo {
 }
 
 /**
- * Query payment status for an existing invoice via action-xmlszamlainformacio.
+ * Query payment status for an existing invoice via "Számla XML lekérés" (action-szamla_agent_xml).
+ * Uses the documented API whose response includes <osszegek><totalossz><brutto> and <kifizetesek>.
  * The invoice number is used as the identifier (external_id == invoice_number for Számlázz.hu).
  * Returns null on 404, auth error, or unexpected response.
+ * @see https://docs.szamlazz.hu/hu/agent/querying_xml/request
+ * @see https://docs.szamlazz.hu/hu/agent/querying_xml/response
  */
 export async function getSzamlazzDocument(
   credentials: SzamlazzCredentials,
   invoiceNumber: string
 ): Promise<SzamlazzDocumentPaymentInfo | null> {
-  const authXml = credentials.agentKey
-    ? `<szamlaagentkulcs>${escapeXml(credentials.agentKey)}</szamlaagentkulcs>`
-    : `<felhasznalo>${escapeXml(credentials.username || '')}</felhasznalo><jelszo>${escapeXml(credentials.password || '')}</jelszo>`;
+  // Számla XML lekérés only documents agent key auth; username/password may not be supported for this action.
+  const agentKey = credentials.agentKey?.trim();
+  if (!agentKey) return null;
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<xmlszamlainformacio xmlns="http://www.szamlazz.hu/xmlszamlainformacio" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.szamlazz.hu/xmlszamlainformacio https://www.szamlazz.hu/docs/xsd/agent/xmlszamlainformacio.xsd">
-  <beallitasok>
-    ${authXml}
-    <szamlaszam>${escapeXml(invoiceNumber)}</szamlaszam>
-  </beallitasok>
-</xmlszamlainformacio>`;
+<xmlszamlaxml xmlns="http://www.szamlazz.hu/xmlszamlaxml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.szamlazz.hu/xmlszamlaxml https://www.szamlazz.hu/szamla/docs/xsds/agentxml/xmlszamlaxml.xsd">
+  <szamlaagentkulcs>${escapeXml(agentKey)}</szamlaagentkulcs>
+  <szamlaszam>${escapeXml(invoiceNumber)}</szamlaszam>
+  <rendelesSzam></rendelesSzam>
+  <pdf></pdf>
+  <szamlaKulsoAzon></szamlaKulsoAzon>
+</xmlszamlaxml>`;
 
   let text: string;
   try {
     const form = new FormData();
-    form.append('action-xmlszamlainformacio', new Blob([xml], { type: 'application/xml' }));
+    form.append('action-szamla_agent_xml', new Blob([xml], { type: 'application/xml' }));
     const res = await fetch(SZAMLAZZ_ENDPOINT, { method: 'POST', body: form });
     if (!res.ok) return null;
     text = await res.text();
@@ -164,16 +168,25 @@ export async function getSzamlazzDocument(
     return null;
   }
 
-  // Non-zero hibakod means an error (0 = success)
-  const errorCodeMatch = text.match(/<hibakod>\s*([^<]*)\s*<\/hibakod>/i);
-  if (errorCodeMatch && errorCodeMatch[1].trim() !== '0') return null;
+  // Error: Hiba (7) or similar, or non-success response
+  const hibaMatch = text.match(/<hiba[^>]*>([^<]*)<\/hiba>/i) ?? text.match(/Hiba\s*\(\d+\)/);
+  if (hibaMatch) return null;
+  const hibakodMatch = text.match(/<hibakod>\s*([^<]*)\s*<\/hibakod>/i);
+  if (hibakodMatch && hibakodMatch[1].trim() !== '0') return null;
 
-  // Total amount: <brutto> can appear at top level or inside <alap>
-  const bruttoMatch = text.match(/<brutto>\s*([^<]*)\s*<\/brutto>/i);
-  const total = bruttoMatch ? Math.abs(Number(bruttoMatch[1].trim().replace(',', '.'))) : 0;
+  // Total: <osszegek><totalossz><brutto> (documented response structure)
+  const totalosszBlock = text.match(/<totalossz>\s*([\s\S]*?)<\/totalossz>/i);
+  const bruttoMatch = totalosszBlock
+    ? totalosszBlock[1].match(/<brutto>\s*([^<]*)\s*<\/brutto>/i)
+    : text.match(/<brutto>\s*([^<]*)\s*<\/brutto>/i);
+  const total = bruttoMatch
+    ? Math.abs(Number(bruttoMatch[1].trim().replace(',', '.')))
+    : 0;
 
-  // Sum all <osszeg> values inside <kifizetesek> payment records
-  const paymentMatches = [...text.matchAll(/<osszeg>\s*([^<]*)\s*<\/osszeg>/gi)];
+  // Sum only <osszeg> inside <kifizetesek><kifizetes> to avoid matching other numeric elements
+  const kifizetesekBlock = text.match(/<kifizetesek>\s*([\s\S]*?)<\/kifizetesek>/i);
+  const block = kifizetesekBlock ? kifizetesekBlock[1] : '';
+  const paymentMatches = [...block.matchAll(/<osszeg>\s*([^<]*)\s*<\/osszeg>/gi)];
   const totalPaid = paymentMatches.reduce(
     (sum, m) => sum + Math.abs(Number(m[1].trim().replace(',', '.'))),
     0

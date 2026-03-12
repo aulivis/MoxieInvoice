@@ -292,7 +292,8 @@
     "paymentMethodCash": "Cash",
     "paymentMethodBankcard": "Bank card",
     "ipnUrl": "IPN URL (payment notification)",
-    "ipnHint": "Paste this URL in the field at the bottom of Számlázz.hu Account settings / Invoicing basics. When a document's paid amount changes, Számlázz.hu will send the payment notification to this URL.",
+    "ipnHint": "Paste this URL in the field at the bottom of Számlázz.hu Account settings / Invoicing basics. When a document's paid amount changes on Számlázz.hu, the system sends the notification to this URL and payment status updates automatically. The invoice list \"Refresh\" button is only a fallback (e.g. if the IPN was not received).",
+    "ipnSupportNotice": "The IPN feature must be enabled by Számlázz.hu customer support. Until this is done, payment notifications will not be received.",
     "copyIpnUrl": "Copy IPN URL",
     "ipnCopied": "Copied!"
   },
