@@ -121,7 +121,7 @@ export async function GET(
 
     const pdfBuffer = await getSzamlazzPdf(szamlazzCreds, invoice.external_id);
     if (pdfBuffer && pdfBuffer.length > 0) {
-      return new Response(pdfBuffer, {
+      return new Response(new Uint8Array(pdfBuffer), {
         status: 200,
         headers: {
           'Content-Type': 'application/pdf',
