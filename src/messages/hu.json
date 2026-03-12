@@ -55,10 +55,10 @@
     "cookieNoticeSuffix": ".",
     "heroTagline": "A híd a projekted és a számláid között.",
     "noPassword": "Nincs jelszó, nincs regisztráció – add meg az e-mail-címed és máris bent vagy.",
-    "feature1": "Automatikus számlagenerálás Moxie-ból",
+    "feature1": "Automatikus számlagenerálás",
     "feature2": "Billingo & Számlázz.hu integráció",
-    "feature3": "Valós idejű EUR → HUF konverzió",
-    "feature4": "Automatikus fizetés visszaigazolás Moxie-ba"
+    "feature3": "Valós idejű deviza konverzió",
+    "feature4": "Automatikus fizetés visszaigazolás"
   },
   "dashboard": {
     "ariaStepDone": "Kész",
@@ -255,6 +255,7 @@
     "webhookHint": "A Moxie-ban a Webhookoknál add hozzá ezt az URL-t végpontként, és társítsd az „InvoiceSent” eseményt. Amikor egy számlát „Sent”-re állítasz, a Moxie meghívja ezt az URL-t, és kiállítjuk a számlát.",
     "copyWebhook": "Webhook URL másolása",
     "webhookCopied": "Másolva!",
+    "openMoxie": "Moxie megnyitása",
     "errors": {
       "notConfigured": "A Moxie nincs beállítva. Add meg a Base URL-t és az API kulcsot.",
       "baseUrlNotFound": "A megadott Moxie cím nem található. Beillesztheted a Moxie-ból kimásolt teljes URL-t (pl. https://pod01.withmoxie.com/api/public); az alkalmazás a szerver címét használja.",
@@ -274,7 +275,8 @@
     "portalFailed": "Az előfizetés kezelő megnyitása sikertelen. Próbáld újra.",
     "noSubscription": "Még nincs előfizetésed. Először fizess elő.",
     "invalidPriceId": "Érvénytelen csomag. Válaszd újra a csomagot.",
-    "stripeCustomerInvalid": "Az előfizetés rögzítése érvénytelen vagy teszt célból készült. Fizess elő újra lent."
+    "stripeCustomerInvalid": "Az előfizetés rögzítése érvénytelen vagy teszt célból készült. Fizess elő újra lent.",
+    "pricesLoadFailed": "Az árak betöltése sikertelen. Próbáld később újra."
   },
   "billingoValidation": {
     "blocked": "A számla generálását a Billingo követelményei miatt blokkoltuk, mert egy vagy több adat hiányzik vagy érvénytelen.",
@@ -341,8 +343,12 @@
     "saveFailed": "A mentés sikertelen. Próbáld újra.",
     "statusNotConfigured": "Nincs beállítva",
     "statusConnected": "Csatlakoztatva",
+    "statusConnectedBillingo": "Billingo csatlakoztatva",
+    "statusConnectedSzamlazz": "Számlázz.hu csatlakoztatva",
     "statusDisconnected": "Nincs kapcsolat",
     "statusLive": "Él",
+    "openBillingo": "Billingo megnyitása",
+    "openSzamlazz": "Számlázz.hu megnyitása",
     "invoiceDefaultsTitle": "Alapértelmezett számla mezők (Billingo)",
     "invoiceDefaultsHint": "Ha a Moxie számla nem ad meg értéket, ezek kerülnek használatra.",
     "defaultBlockId": "Alapértelmezett számlatömb",
@@ -361,7 +367,13 @@
     "ipnUrl": "IPN URL (kifizetési értesítés)",
     "ipnHint": "Ezt az URL-t a Számlázz.hu Fiók beállítások / Számlázás alapadatok oldal alján megadott mezőbe illeszd be. Ha egy számla kifizetett összege megváltozik a Számlázz.hu felületén, a rendszer erre a címre küldi az értesítést, és a fizetési állapot automatikusan frissül.",
     "copyIpnUrl": "IPN URL másolása",
-    "ipnCopied": "Másolva!"
+    "ipnCopied": "Másolva!",
+    "billingoNotConfigured": "A Billingo nincs konfigurálva.",
+    "billingoApiKeyMissing": "A Billingo API kulcs hiányzik.",
+    "providerBillingo": "Billingo",
+    "providerSzamlazz": "Számlázz.hu",
+    "languageHu": "Magyar",
+    "languageEn": "Angol"
   },
   "orgSettings": {
     "currencyTitle": "Pénznem / árfolyam",

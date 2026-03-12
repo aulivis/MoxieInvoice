@@ -50,7 +50,7 @@ export async function GET() {
 
   if (!billing || billing.provider !== 'billingo' || !billing.credentials_encrypted) {
     return NextResponse.json(
-      { error: 'Billingo not configured', blocks: [], defaultBlockId: null },
+      { errorCode: 'billingoNotConfigured', blocks: [], defaultBlockId: null },
       { status: 200 }
     );
   }
@@ -59,7 +59,7 @@ export async function GET() {
   const apiKey = credentials.apiKey ?? credentials.api_key;
   if (typeof apiKey !== 'string' || !apiKey) {
     return NextResponse.json(
-      { error: 'Billingo API key missing', blocks: [], defaultBlockId: null },
+      { errorCode: 'billingoApiKeyMissing', blocks: [], defaultBlockId: null },
       { status: 200 }
     );
   }

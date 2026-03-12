@@ -67,8 +67,8 @@ export function SubscriptionSection({ returnTo, hasSubscription = false }: Subsc
         const monthlyId = data.monthly?.priceId;
         setSelectedPriceId(yearlyId ?? monthlyId ?? null);
       })
-      .catch((e) => {
-        if (!cancelled) setPricesError(e instanceof Error ? e.message : tCommon('error'));
+      .catch(() => {
+        if (!cancelled) setPricesError(tErrors('pricesLoadFailed'));
       })
       .finally(() => {
         if (!cancelled) setPricesLoading(false);
@@ -328,7 +328,7 @@ export function SubscriptionSection({ returnTo, hasSubscription = false }: Subsc
       <div className="space-y-3">
         <p className="text-text-secondary text-sm">{t('sectionDescription')}</p>
         <p className="text-status-error text-sm" role="alert">
-          {pricesError ?? tErrors('checkoutFailed')}
+          {pricesError ?? tErrors('pricesLoadFailed')}
         </p>
         <Button type="button" onClick={handlePortal} variant="secondary">
           {t('manage')}

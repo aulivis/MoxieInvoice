@@ -96,19 +96,21 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
           </p>
 
           {/* MNB Daily */}
-          <label className="flex items-start gap-3 cursor-pointer group p-3 rounded-lg border border-border-light hover:border-primary/40 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-            <input
-              type="radio"
-              name="conversion_source"
-              value="mnb_daily"
-              checked={conversionSource === 'mnb_daily'}
-              onChange={() => setConversionSource('mnb_daily')}
-              className="mt-0.5 accent-primary"
-              disabled={disabled}
-            />
-            <div className="flex-1 min-w-0">
+          <label className="flex flex-col cursor-pointer group p-3 rounded-lg border border-border-light hover:border-primary/40 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+            <div className="flex items-center gap-3">
+              <input
+                type="radio"
+                name="conversion_source"
+                value="mnb_daily"
+                checked={conversionSource === 'mnb_daily'}
+                onChange={() => setConversionSource('mnb_daily')}
+                className="accent-primary shrink-0"
+                disabled={disabled}
+              />
               <span className="text-sm font-medium text-text-primary">{t('mnbDaily')}</span>
-              <p className="text-xs text-text-tertiary mt-0.5">{t('mnbDailyHint')}</p>
+            </div>
+            <div className="mt-1 ml-7 min-w-0">
+              <p className="text-xs text-text-tertiary">{t('mnbDailyHint')}</p>
               {conversionSource === 'mnb_daily' && (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {rateLoading ? (
@@ -136,19 +138,21 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
           </label>
 
           {/* Manual rates */}
-          <label className="flex items-start gap-3 cursor-pointer group p-3 rounded-lg border border-border-light hover:border-primary/40 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-            <input
-              type="radio"
-              name="conversion_source"
-              value="manual"
-              checked={conversionSource === 'manual'}
-              onChange={() => setConversionSource('manual')}
-              className="mt-0.5 accent-primary"
-              disabled={disabled}
-            />
-            <div className="flex-1 min-w-0">
+          <label className="flex flex-col cursor-pointer group p-3 rounded-lg border border-border-light hover:border-primary/40 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+            <div className="flex items-center gap-3">
+              <input
+                type="radio"
+                name="conversion_source"
+                value="manual"
+                checked={conversionSource === 'manual'}
+                onChange={() => setConversionSource('manual')}
+                className="accent-primary shrink-0"
+                disabled={disabled}
+              />
               <span className="text-sm font-medium text-text-primary">{t('manualRate')}</span>
-              <p className="text-xs text-text-tertiary mt-0.5">{t('manualRateHint')}</p>
+            </div>
+            <div className="mt-1 ml-7 min-w-0">
+              <p className="text-xs text-text-tertiary">{t('manualRateHint')}</p>
               {conversionSource === 'manual' && (
                 <div className="mt-3 space-y-2">
                   <div>

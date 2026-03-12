@@ -137,8 +137,16 @@ export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSu
     (disabled ? disabledInputClass : '');
   const labelClass = 'block text-sm font-medium text-text-label mb-1';
 
-  return (
-    <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>
+  function ExternalLinkIcon({ className }: { className?: string }) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+    );
+  }
+
+  const mainContent = (
+    <>
       {disabled && (
         <p className="text-sm text-text-secondary mb-3" role="status">
           {tSub('guardTitle')}
@@ -245,6 +253,31 @@ export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSu
           </button>
         </div>
       </form>
+    </>
+  );
+
+  const moxieHomeUrl = 'https://create.withmoxie.com';
+  const rightPanel = (
+    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center lg:items-end justify-start pt-6 lg:pt-0 lg:pl-8 border-t lg:border-t-0 lg:border-l border-border-light">
+      <img src="/moxie-logo.png" alt="" className="h-11 w-auto object-contain" width={140} height={44} />
+      <a
+        href={moxieHomeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
+      >
+        {t('openMoxie')}
+        <ExternalLinkIcon className="w-4 h-4 shrink-0" />
+      </a>
+    </div>
+  );
+
+  return (
+    <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch">
+        <div className="flex-1 min-w-0">{mainContent}</div>
+        {rightPanel}
+      </div>
     </div>
   );
 }

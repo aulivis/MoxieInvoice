@@ -103,7 +103,11 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
               if (blocksData.defaultBlockId != null) setBillingoDefaultBlockId(blocksData.defaultBlockId);
               if (!savedBlockId && blocksData.defaultBlockId != null) setDefaultBlockId(String(blocksData.defaultBlockId));
             }
-            if (blocksData.error) setBillingoBlocksError(blocksData.error);
+            if (blocksData.errorCode) {
+              setBillingoBlocksError(t(blocksData.errorCode as 'billingoNotConfigured' | 'billingoApiKeyMissing'));
+            } else if (blocksData.error) {
+              setBillingoBlocksError(blocksData.error);
+            }
             if (optionsData.paymentMethods?.length) setBillingoPaymentMethods(optionsData.paymentMethods);
             if (optionsData.languages?.length) setBillingoLanguages(optionsData.languages);
           })
@@ -121,21 +125,35 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
     (disabled ? disabledInputClass : '');
   const labelClass = 'block text-sm font-medium text-text-label mb-1';
 
+  const connectedLabel =
+    provider === 'billingo' ? t('statusConnectedBillingo') : t('statusConnectedSzamlazz');
   const statusBadge = (
     <ConnectionStatusBadge
       connected={hasCredentials}
-      connectedLabel={t('statusConnected')}
+      connectedLabel={connectedLabel}
       disconnectedLabel={t('statusDisconnected')}
     />
   );
+
+  const providerHomeUrl = provider === 'billingo' ? 'https://www.billingo.hu' : 'https://www.szamlazz.hu';
+  const openLabel = provider === 'billingo' ? t('openBillingo') : t('openSzamlazz');
+  const logoSrc = provider === 'billingo' ? '/logos/billingo.svg' : '/logos/szamlazz.svg';
+
+  function ExternalLinkIcon({ className }: { className?: string }) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+    );
+  }
 
   if (!fetched)
     return (
       <p className="text-text-secondary">{tCommon('loading')}</p>
     );
 
-  return (
-    <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>
+  const mainContent = (
+    <>
       {disabled && (
         <p className="text-sm text-text-secondary mb-3" role="status">
           {tSub('guardTitle')}
@@ -154,8 +172,8 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
             name="provider"
             value={provider}
             options={[
-              { value: 'billingo', label: 'Billingo' },
-              { value: 'szamlazz', label: 'Számlázz.hu' },
+              { value: 'billingo', label: t('providerBillingo') },
+              { value: 'szamlazz', label: t('providerSzamlazz') },
             ]}
             onChange={(v) => setProvider(v as 'billingo' | 'szamlazz')}
             disabled={disabled}
@@ -350,8 +368,8 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
                   id="default-language"
                   value={defaultLanguage}
                   options={[
-                    { value: 'hu', label: 'Magyar' },
-                    { value: 'en', label: 'English' },
+                    { value: 'hu', label: t('languageHu') },
+                    { value: 'en', label: t('languageEn') },
                   ]}
                   onChange={(v) => setDefaultLanguage(v)}
                   disabled={disabled}
@@ -415,6 +433,34 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
             {defaultsSaved && <Alert variant="success">{t('saved')}</Alert>}
             {defaultsError && <Alert variant="error">{defaultsError}</Alert>}
           </form>
+        </div>
+      )}
+    </>
+  );
+
+  const rightPanel = !wizardMode && (
+    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center lg:items-end justify-start pt-6 lg:pt-0 lg:pl-8 border-t lg:border-t-0 lg:border-l border-border-light">
+      <img src={logoSrc} alt="" className="h-11 w-auto object-contain" width={160} height={48} />
+      <a
+        href={providerHomeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
+      >
+        {openLabel}
+        <ExternalLinkIcon className="w-4 h-4 shrink-0" />
+      </a>
+    </div>
+  );
+
+  return (
+    <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>
+      {wizardMode ? (
+        mainContent
+      ) : (
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch">
+          <div className="flex-1 min-w-0">{mainContent}</div>
+          {rightPanel}
         </div>
       )}
     </div>

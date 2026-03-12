@@ -43,7 +43,7 @@ export async function GET() {
   if (!billing || billing.provider !== 'billingo') {
     return NextResponse.json(
       {
-        error: 'Billingo not configured',
+        errorCode: 'billingoNotConfigured',
         paymentMethods: [],
         languages: [],
         vat: [],

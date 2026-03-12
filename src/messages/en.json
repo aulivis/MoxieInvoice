@@ -44,21 +44,21 @@
     "resendAfter": "You can request a new link in 60 seconds.",
     "linkExpired": "The link has expired or was already used. Request a new sign-in link.",
     "heroTitlePrefix": "Automate your",
-    "heroHighlight": "invoicing",
+    "heroHighlight": "invoicing.",
     "emailPlaceholder": "you@example.com",
-    "heroDescription": "Moxie payments automatically generate invoices in your chosen billing system.",
+    "heroDescription": "No more manual copying. Brixa automatically generates invoices in your chosen billing system from data stored in Moxie.",
     "emailHint": "Enter your email and we'll send you a sign-in link.",
     "linkSent": "Link sent!",
     "copyright": "© 2026 Brixa",
     "cookieNoticePrefix": "We only use cookies that are strictly necessary for the operation of the service. See our ",
     "privacyPolicyLinkText": "Privacy Policy",
     "cookieNoticeSuffix": ".",
-    "heroTagline": "The bridge between your project and your invoice.",
+    "heroTagline": "The bridge between your project and your invoices.",
     "noPassword": "No password, no registration – just enter your email and you're in.",
-    "feature1": "Automatic invoice generation from Moxie",
+    "feature1": "Automatic invoice generation",
     "feature2": "Billingo & Számlázz.hu integration",
-    "feature3": "Real-time EUR → HUF conversion",
-    "feature4": "Automatic payment confirmation back to Moxie"
+    "feature3": "Real-time currency conversion",
+    "feature4": "Automatic payment confirmation"
   },
   "dashboard": {
     "ariaStepDone": "Done",
@@ -255,6 +255,7 @@
     "webhookHint": "In Moxie go to Webhooks, add this URL as an endpoint, and map the \"InvoiceSent\" event. When you set an invoice to Sent, Moxie will call this URL and we will issue the invoice.",
     "copyWebhook": "Copy webhook URL",
     "webhookCopied": "Copied!",
+    "openMoxie": "Open Moxie",
     "errors": {
       "notConfigured": "Moxie is not configured. Set Base URL and API key first.",
       "baseUrlNotFound": "The Moxie URL was not found. You can paste the full URL from Moxie (e.g. https://pod01.withmoxie.com/api/public); the app uses the server address.",
@@ -274,7 +275,8 @@
     "portalFailed": "Failed to open subscription management. Please try again.",
     "noSubscription": "No subscription found. Please subscribe first.",
     "invalidPriceId": "Invalid plan selected. Please choose a plan again.",
-    "stripeCustomerInvalid": "Subscription record is invalid or was created for testing. Please subscribe again below."
+    "stripeCustomerInvalid": "Subscription record is invalid or was created for testing. Please subscribe again below.",
+    "pricesLoadFailed": "Failed to load prices. Please try again later."
   },
   "billingoValidation": {
     "blocked": "Invoice generation was blocked because of Billingo requirements: one or more fields are missing or invalid.",
@@ -341,8 +343,12 @@
     "saveFailed": "Save failed. Please try again.",
     "statusNotConfigured": "Not configured",
     "statusConnected": "Connected",
+    "statusConnectedBillingo": "Billingo connected",
+    "statusConnectedSzamlazz": "Számlázz.hu connected",
     "statusDisconnected": "Not connected",
     "statusLive": "Live",
+    "openBillingo": "Open Billingo",
+    "openSzamlazz": "Open Számlázz.hu",
     "invoiceDefaultsTitle": "Default invoice fields (Billingo)",
     "invoiceDefaultsHint": "Used when the Moxie invoice does not provide these values.",
     "defaultBlockId": "Default invoice block",
@@ -361,7 +367,13 @@
     "ipnUrl": "IPN URL (payment notification)",
     "ipnHint": "Paste this URL in the field at the bottom of Számlázz.hu Account settings / Invoicing basics. When a document's paid amount changes on Számlázz.hu, the system sends the notification to this URL and payment status updates automatically.",
     "copyIpnUrl": "Copy IPN URL",
-    "ipnCopied": "Copied!"
+    "ipnCopied": "Copied!",
+    "billingoNotConfigured": "Billingo is not configured.",
+    "billingoApiKeyMissing": "Billingo API key is missing.",
+    "providerBillingo": "Billingo",
+    "providerSzamlazz": "Számlázz.hu",
+    "languageHu": "Hungarian",
+    "languageEn": "English"
   },
   "orgSettings": {
     "currencyTitle": "Currency / exchange rate",
