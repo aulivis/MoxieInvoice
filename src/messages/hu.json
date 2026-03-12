@@ -92,7 +92,7 @@
     "invoiceValue": "Számla értéke",
     "moxieInvoiceNumber": "Moxie számla száma",
     "invoiceNumber": "Számla száma",
-    "paymentStatus": "Fizetettség",
+    "paymentStatus": "Fizetés",
     "paymentPaid": "Fizetve",
     "paymentOpen": "Nyitott",
     "openInBillingo": "Megnyitás a Billingo-ban",
@@ -123,10 +123,7 @@
     "filterCreated": "Létrehozva",
     "filterSynced": "Szinkronizált",
     "filterFailed": "Sikertelen",
-    "emptyFiltered": "Nincs ilyen számla.",
-    "paymentStatus": "Fizetés",
-    "paymentOpen": "Nyitott",
-    "paymentPaid": "Fizetve"
+    "emptyFiltered": "Nincs ilyen számla."
   },
   "invoicesNew": {
     "title": "Új számla",
@@ -217,7 +214,7 @@
     "missingFields": "A következő kötelező mező hiányzik: {fields}.",
     "invalidValue": "A(z) „{field}” mező értéke nem megfelelő.",
     "invalidValueWithDetail": "A(z) „{field}” mező értéke nem megfelelő (tétel {value}).",
-    "fixAndRetry": "Ha kijavítod az adatokat, a számla újra beküldhető (pl. a Moxie-ban a számlát Sent-re állítva, vagy az Új számla űrlapról).",
+    "fixAndRetry": "Ha kijavítod az adatokat, a számla újra beküldhető (pl. a Moxie-ban a számlát Sent-re állítva).",
     "fields": {
       "buyerName": "vevő neve",
       "postCode": "irányítószám",
@@ -235,7 +232,8 @@
       "quantity": "mennyiség",
       "netUnitPrice": "nettó egységár",
       "unitPriceType": "egységár típusa",
-      "vatPercent": "ÁFA százalék"
+      "vatPercent": "ÁFA százalék",
+      "taxNumber": "adószám"
     }
   },
   "szamlazzValidation": {
@@ -244,7 +242,7 @@
     "missingFields": "A következő kötelező mező hiányzik: {fields}.",
     "invalidValue": "A(z) „{field}” mező értéke nem megfelelő.",
     "invalidValueWithDetail": "A(z) „{field}” mező értéke nem megfelelő (tétel {value}).",
-    "fixAndRetry": "Ha kijavítod az adatokat, a számla újra beküldhető (pl. a Moxie-ban a számlát Sent-re állítva, vagy az Új számla űrlapról).",
+    "fixAndRetry": "Ha kijavítod az adatokat, a számla újra beküldhető (pl. a Moxie-ban a számlát Sent-re állítva).",
     "fields": {
       "buyerName": "vevő neve",
       "postCode": "irányítószám",
@@ -259,7 +257,8 @@
       "itemName": "tétel megnevezése",
       "quantity": "mennyiség",
       "netUnitPrice": "nettó egységár",
-      "vatPercent": "ÁFA százalék"
+      "vatPercent": "ÁFA százalék",
+      "taxNumber": "adószám"
     }
   },
   "billing": {

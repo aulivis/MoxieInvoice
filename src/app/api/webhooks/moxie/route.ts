@@ -172,6 +172,43 @@ type MoxieLineItem = {
   taxable?: boolean;
 };
 
+/**
+ * Extract a custom field value by its Moxie mappingKey.
+ * Handles the standard `customFields: [{ mappingKey, value }]` array shape.
+ */
+function getCustomFieldValue(
+  container: Record<string, unknown> | undefined,
+  mappingKey: string
+): string | undefined {
+  if (!container) return undefined;
+  const fields = container.customFields as Array<Record<string, unknown>> | undefined;
+  if (!Array.isArray(fields)) return undefined;
+  const match = fields.find(
+    (f) => f !== null && typeof f === 'object' && f.mappingKey === mappingKey
+  );
+  if (!match) return undefined;
+  const val = String(match.value ?? '').trim();
+  return val || undefined;
+}
+
+/**
+ * Extract buyer tax number using the following priority:
+ *   1. Native Moxie clientInfo fields: taxId / tax_id
+ *   2. Custom field with mappingKey "eori" (clientInfo.customFields, then body.customFields)
+ * Returns undefined when neither is present — triggers validation block.
+ */
+function extractBuyerTaxNumber(
+  clientInfo: Record<string, unknown>,
+  body: Record<string, unknown>
+): string | undefined {
+  const native = String(clientInfo.taxId ?? clientInfo.tax_id ?? '').trim();
+  if (native) return native;
+  return (
+    getCustomFieldValue(clientInfo, 'eori') ??
+    getCustomFieldValue(body, 'eori')
+  );
+}
+
 function normalizeMoxiePayload(
   body: Record<string, unknown>,
   _eventType: string
@@ -222,7 +259,7 @@ function normalizeMoxiePayload(
     const request: NormalizedInvoiceRequest = {
       buyer: {
         name,
-        taxNumber: (clientInfo.taxId ?? clientInfo.tax_id) as string | undefined,
+        taxNumber: extractBuyerTaxNumber(clientInfo, body),
         postCode: String(clientInfo.postal ?? clientInfo.postCode ?? ''),
         city: String(clientInfo.city ?? ''),
         address: String(clientInfo.address1 ?? clientInfo.address ?? ''),
@@ -252,7 +289,11 @@ function normalizeMoxiePayload(
   const request: NormalizedInvoiceRequest = {
     buyer: {
       name,
-      taxNumber: client.tax_number as string | undefined,
+      taxNumber:
+        String(client.tax_number ?? '').trim() ||
+        getCustomFieldValue(client, 'eori') ||
+        getCustomFieldValue(body, 'eori') ||
+        undefined,
       postCode: String(address.post_code ?? address.postCode ?? ''),
       city: String(address.city ?? ''),
       address: String(address.line1 ?? address.address ?? ''),

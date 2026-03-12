@@ -48,8 +48,6 @@ export default async function InvoicesListPage() {
 
   // Moxie web app is always at create.withmoxie.com regardless of which API pod is in use.
   const moxieWebBaseUrl = moxieConn?.base_url ? 'https://create.withmoxie.com' : undefined;
-  const allSetupDone = (ctx?.hasSubscription ?? false) && !!moxieConn?.base_url && !!billingProvider?.provider;
-
   const count = invoices?.length ?? 0;
 
   return (
@@ -64,65 +62,15 @@ export default async function InvoicesListPage() {
         </div>
         <div className="flex items-center gap-2">
           <RefreshInvoicesButton />
-          {allSetupDone ? (
-            <Link
-              href="/invoices/new"
-              className="hidden sm:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none shadow-sm shrink-0"
-              style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)', boxShadow: '0 4px 14px rgba(232,137,58,0.3)' }}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-              </svg>
-              {t('newInvoice')}
-            </Link>
-          ) : (
-            <button
-              type="button"
-              disabled
-              className="hidden sm:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white opacity-50 cursor-not-allowed shrink-0"
-              style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)', boxShadow: '0 4px 14px rgba(232,137,58,0.3)' }}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-              </svg>
-              {t('newInvoice')}
-            </button>
-          )}
         </div>
       </div>
 
       {/* Invoices list */}
       <Card contentClassName="p-0">
-        <InvoicesClientList invoices={invoices ?? []} locale={locale} moxieWebBaseUrl={moxieWebBaseUrl} setupDone={allSetupDone} />
+        <InvoicesClientList invoices={invoices ?? []} locale={locale} moxieWebBaseUrl={moxieWebBaseUrl} />
       </Card>
 
-      {/* Mobile FAB – above bottom nav */}
-      <div className="fixed bottom-[80px] right-4 z-30 md:hidden">
-        {allSetupDone ? (
-          <Link
-            href="/invoices/new"
-            aria-label={t('newInvoice')}
-            className="flex items-center justify-center w-14 h-14 rounded-full text-white shadow-fab hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none"
-            style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)' }}
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-          </Link>
-        ) : (
-          <button
-            type="button"
-            disabled
-            aria-label={t('newInvoice')}
-            className="flex items-center justify-center w-14 h-14 rounded-full text-white opacity-50 cursor-not-allowed"
-            style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)' }}
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-        )}
-      </div>
+
     </div>
   );
 }

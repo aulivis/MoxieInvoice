@@ -46,7 +46,20 @@
       "Bash(mkdir -p \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(wizard\\)/onboarding\")",
       "Bash(mv \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(app\\)/onboarding/page.tsx\" \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(wizard\\)/onboarding/page.tsx\")",
       "Bash(rmdir \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(app\\)/onboarding\")",
-      "Bash(ls \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(wizard\\)/\")"
+      "Bash(ls \"D:/Apps/MoxieInvoice/src/app/[locale]/\\(wizard\\)/\")",
+      "Bash(python -c \":*)",
+      "Bash(grep -rn \"invoices/new\\\\|CreateInvoiceForm\\\\|invoicesNew\" D:AppsMoxieInvoicesrc --include=*.tsx --include=*.ts)",
+      "Bash(grep -l \"moxie_connections\" /d/Apps/MoxieInvoice/supabase/migrations/*.sql)",
+      "WebFetch(domain:developers.withmoxie.com)",
+      "WebFetch(domain:docs.withmoxie.com)",
+      "WebFetch(domain:www.withmoxie.com)",
+      "WebSearch",
+      "Bash(firecrawl scrape:*)",
+      "Bash(npx firecrawl-cli:*)",
+      "Bash(find /d/Apps/MoxieInvoice -type f -name *.sql)",
+      "Bash(find /d/Apps/MoxieInvoice -name *schema* -type f)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -r \"local.*invoice\\\\|generate.*local\" /d/Apps/MoxieInvoice/src --include=*.ts --include=*.tsx)"
     ]
   }
 }

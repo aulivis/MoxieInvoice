@@ -6,7 +6,6 @@ import { Link, usePathname } from '@/i18n/navigation';
 const tabs = [
   { href: '/', key: 'dashboard' as const },
   { href: '/invoices', key: 'invoices' as const },
-  { href: '/invoices/new', key: 'newInvoice' as const, isAction: true },
   { href: '/settings', key: 'settings' as const },
 ] as const;
 
@@ -24,14 +23,6 @@ function InvoicesIcon({ active }: { active: boolean }) {
     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2 : 1.5}
         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
     </svg>
   );
 }
@@ -66,25 +57,7 @@ export function MobileBottomNav() {
       <ul className="flex items-stretch h-16">
         {tabs.map((tab) => {
           const { href, key } = tab;
-          const isAction = 'isAction' in tab && tab.isAction;
-          const isActive =
-            !isAction &&
-            (pathname === href || (href !== '/' && !href.includes('/new') && pathname.startsWith(href)));
-
-          if (isAction) {
-            return (
-              <li key={href} className="flex-1 flex items-center justify-center">
-                <Link
-                  href={href}
-                  aria-label={t(key)}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-[#C96E22] to-[#F4A85C] text-white shadow-fab hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none"
-                >
-                  <PlusIcon />
-                </Link>
-              </li>
-            );
-          }
-
+          const isActive = pathname === href || (href !== '/' && pathname.startsWith(href));
           const Icon = tabIcons[key];
 
           return (

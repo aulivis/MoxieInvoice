@@ -48,6 +48,9 @@ export function validateSzamlazzRequest(
   if (empty(request.buyer.name)) {
     errors.push({ code: 'MISSING_FIELD', field: 'buyerName' });
   }
+  if (empty(request.buyer.taxNumber)) {
+    errors.push({ code: 'MISSING_FIELD', field: 'taxNumber' });
+  }
   if (empty(request.buyer.postCode)) {
     errors.push({ code: 'MISSING_FIELD', field: 'postCode' });
   }

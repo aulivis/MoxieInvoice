@@ -38,7 +38,6 @@ interface Props {
   invoices: Invoice[];
   locale: string;
   moxieWebBaseUrl?: string;
-  setupDone?: boolean;
 }
 
 const FILTERS: { value: FilterValue; labelKey: string }[] = [
@@ -48,7 +47,7 @@ const FILTERS: { value: FilterValue; labelKey: string }[] = [
   { value: 'failed', labelKey: 'filterFailed' },
 ];
 
-export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl, setupDone }: Props) {
+export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props) {
   const t = useTranslations('invoices');
   const [filter, setFilter] = useState<FilterValue>('all');
   const [expandedErrors, setExpandedErrors] = useState<Set<string>>(new Set());
@@ -161,8 +160,6 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl, setupDon
         {filtered.length === 0 ? (
           <EmptyState
             title={filter === 'all' ? t('empty') : t('emptyFiltered')}
-            ctaLabel={filter === 'all' ? t('newInvoice') : undefined}
-            ctaHref={filter === 'all' && setupDone !== false ? '/invoices/new' : undefined}
           />
         ) : (
           filtered.map((inv, i) => {
@@ -279,8 +276,6 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl, setupDon
         {filtered.length === 0 ? (
           <EmptyState
             title={filter === 'all' ? t('empty') : t('emptyFiltered')}
-            ctaLabel={filter === 'all' ? t('newInvoice') : undefined}
-            ctaHref={filter === 'all' && setupDone !== false ? '/invoices/new' : undefined}
           />
         ) : (
           <Table>

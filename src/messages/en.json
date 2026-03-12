@@ -94,7 +94,7 @@
     "invoiceNumber": "Invoice number",
     "paymentStatus": "Payment",
     "paymentPaid": "Paid",
-    "paymentOpen": "Outstanding",
+    "paymentOpen": "Open",
     "openInBillingo": "Open in Billingo",
     "openInSzamlazz": "Open in Számlázz.hu",
     "openInBillingApp": "Open in billing app",
@@ -123,10 +123,7 @@
     "filterCreated": "Created",
     "filterSynced": "Synced",
     "filterFailed": "Failed",
-    "emptyFiltered": "No invoices match this filter.",
-    "paymentStatus": "Payment",
-    "paymentOpen": "Open",
-    "paymentPaid": "Paid"
+    "emptyFiltered": "No invoices match this filter."
   },
   "invoicesNew": {
     "title": "New invoice",
@@ -217,7 +214,7 @@
     "missingFields": "The following required fields are missing: {fields}.",
     "invalidValue": "The \"{field}\" field has an invalid value.",
     "invalidValueWithDetail": "The \"{field}\" field has an invalid value (item {value}).",
-    "fixAndRetry": "If you fix the data, you can try again (e.g. set the invoice to Sent in Moxie, or use the New invoice form).",
+    "fixAndRetry": "If you fix the data, you can try again (e.g. set the invoice to Sent in Moxie).",
     "fields": {
       "buyerName": "buyer name",
       "postCode": "postal code",
@@ -235,7 +232,8 @@
       "quantity": "quantity",
       "netUnitPrice": "net unit price",
       "unitPriceType": "unit price type",
-      "vatPercent": "VAT percent"
+      "vatPercent": "VAT percent",
+      "taxNumber": "tax number"
     }
   },
   "szamlazzValidation": {
@@ -244,7 +242,7 @@
     "missingFields": "The following required fields are missing: {fields}.",
     "invalidValue": "The \"{field}\" field has an invalid value.",
     "invalidValueWithDetail": "The \"{field}\" field has an invalid value (item {value}).",
-    "fixAndRetry": "If you fix the data, you can try again (e.g. set the invoice to Sent in Moxie, or use the New invoice form).",
+    "fixAndRetry": "If you fix the data, you can try again (e.g. set the invoice to Sent in Moxie).",
     "fields": {
       "buyerName": "buyer name",
       "postCode": "postal code",
@@ -259,7 +257,8 @@
       "itemName": "item description",
       "quantity": "quantity",
       "netUnitPrice": "net unit price",
-      "vatPercent": "VAT percent"
+      "vatPercent": "VAT percent",
+      "taxNumber": "tax number"
     }
   },
   "billing": {

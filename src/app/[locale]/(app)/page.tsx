@@ -144,30 +144,6 @@ export default async function HomePage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <h1 className="text-page-title">{t('title')}</h1>
-        {allSetupDone ? (
-          <Link
-            href="/invoices/new"
-            className="hidden sm:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none shadow-sm"
-            style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)', boxShadow: '0 4px 14px rgba(232,137,58,0.3)' }}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-            {t('newInvoice')}
-          </Link>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="hidden sm:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white opacity-50 cursor-not-allowed"
-            style={{ background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)', boxShadow: '0 4px 14px rgba(232,137,58,0.3)' }}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-            {t('newInvoice')}
-          </button>
-        )}
       </div>
 
       {/* Setup wizard CTA — shown until all steps are done */}
@@ -264,8 +240,6 @@ export default async function HomePage() {
             <EmptyState
               title={t('noInvoices')}
               description={t('noInvoicesDesc')}
-              ctaLabel={t('newInvoice')}
-              ctaHref={allSetupDone ? '/invoices/new' : undefined}
             />
           ) : (
             <ul className="divide-y divide-border-light">

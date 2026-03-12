@@ -64,7 +64,7 @@ function buildXml(
   <fejlec>
     <keltDatum>${fulfillment}</keltDatum>
     <teljesitesDatum>${fulfillment}</teljesitesDatum>
-    <fizetesiHatarido>${due}</fizetesiHatarido>
+    <fizetesiHataridoDatum>${due}</fizetesiHataridoDatum>
     <fizetesiMod>${request.paymentMethod === 'cash' ? 'Készpénz' : 'Átutalás'}</fizetesiMod>
     <penznem>${request.currency}</penznem>
     <szamlaNyelve>hu</szamlaNyelve>

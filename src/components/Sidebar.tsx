@@ -13,7 +13,6 @@ const navLinks = [
   { href: '/settings', key: 'settings' as const },
 ] as const;
 
-const MOXIE_LIVE_THRESHOLD_MS = 24 * 60 * 60 * 1000;
 
 function DashboardIcon({ active }: { active: boolean }) {
   return (
@@ -87,13 +86,7 @@ export function Sidebar() {
       fetch('/api/billing', { cache: 'no-store' }).then((r) => r.json()),
     ])
       .then(([moxieData, billingData]) => {
-        const at = moxieData?.lastTestedAt;
-        setMoxieLive(
-          !!moxieData?.connected &&
-            !!moxieData?.hasApiKey &&
-            !!at &&
-            Date.now() - new Date(at).getTime() < MOXIE_LIVE_THRESHOLD_MS
-        );
+        setMoxieLive(!!moxieData?.connected && !!moxieData?.hasApiKey);
         setBillingConfigured(!!billingData?.provider && !!billingData?.hasCredentials);
       })
       .catch(() => {
@@ -119,39 +112,6 @@ export function Sidebar() {
         >
           <BrixaLogoMark />
         </Link>
-      </div>
-
-      {/* Quick action — amber gradient */}
-      <div className="mt-4 px-3">
-        {moxieLive && billingConfigured ? (
-          <Link
-            href="/invoices/new"
-            className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1628] outline-none"
-            style={{
-              background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)',
-              boxShadow: '0 4px 14px rgba(232,137,58,0.35)',
-            }}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-            {t('newInvoice')}
-          </Link>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white opacity-40 cursor-not-allowed"
-            style={{
-              background: 'linear-gradient(135deg, #C96E22 0%, #F4A85C 100%)',
-            }}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-            {t('newInvoice')}
-          </button>
-        )}
       </div>
 
       {/* Navigation */}
