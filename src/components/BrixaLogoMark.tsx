@@ -39,7 +39,7 @@ export function BrixaLogoMark({ size = 48 }: { size?: number }) {
         rx="26"
         stroke={`url(#${brixaGrad})`}
         strokeWidth="4"
-        fill="none"
+        fill="#FAF8F4"
       />
       {/* Antenna */}
       <line x1="110" y1="60" x2="110" y2="42" stroke="#E8893A" strokeWidth="4" />

@@ -9,7 +9,7 @@
       <stop offset="100%" stop-color="#F4A85C"/>
     </linearGradient>
   </defs>
-  <rect x="50" y="60" width="120" height="90" rx="26" stroke="url(#iconBrixa)" stroke-width="4" fill="none"/>
+  <rect x="50" y="60" width="120" height="90" rx="26" stroke="url(#iconBrixa)" stroke-width="4" fill="#FAF8F4"/>
   <line x1="110" y1="60" x2="110" y2="42" stroke="#E8893A" stroke-width="4"/>
   <circle cx="110" cy="34" r="6" fill="#E8893A"/>
   <path d="M75 95 Q110 70 145 95" stroke="url(#iconAccent)" stroke-width="4" fill="none"/>
