@@ -2,9 +2,10 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
-import { locales, localeNames, localeFlags } from '@/i18n';
+import { locales, localeNames } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { Select } from '@/components/ui/Select';
+import { CircleFlag } from '@/components/CircleFlag';
 
 interface LanguageSwitcherProps {
   dark?: boolean;
@@ -13,7 +14,7 @@ interface LanguageSwitcherProps {
 const languageOptions = locales.map((loc) => ({
   value: loc,
   label: localeNames[loc],
-  leading: localeFlags[loc],
+  leading: <CircleFlag locale={loc} />,
 }));
 
 export function LanguageSwitcher({ dark = false }: LanguageSwitcherProps) {

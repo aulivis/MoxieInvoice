@@ -3,11 +3,10 @@ import {
   locales,
   defaultLocale,
   localeNames,
-  localeFlags,
   type Locale,
 } from './i18n/constants';
 
-export { locales, defaultLocale, localeNames, localeFlags, type Locale };
+export { locales, defaultLocale, localeNames, type Locale };
 
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;

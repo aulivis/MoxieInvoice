@@ -11,9 +11,3 @@ export const localeNames: Record<Locale, string> = {
   hu: 'Magyar',
   en: 'English',
 };
-
-/** Flag emoji or character for each locale (for language selector UX) */
-export const localeFlags: Record<Locale, string> = {
-  hu: '🇭🇺',
-  en: '🇬🇧',
-};

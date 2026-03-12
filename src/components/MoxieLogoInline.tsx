@@ -11,21 +11,29 @@ interface MoxieLogoInlineProps {
   variant?: MoxieLogoVariant;
 }
 
-/** Inline Moxie logo, height 1.4em to align with text (logo art doesn't fill full height). */
+/** Inline Moxie logo, height 1.4em to align with text (logo art doesn't fill full height). Vertically centered. */
 export function MoxieLogoInline({ className, variant = 'default' }: MoxieLogoInlineProps) {
   const src = variant === 'white' ? MOXIE_LOGO_WHITE_SRC : MOXIE_LOGO_SRC;
   return (
-    <img
-      src={src}
-      alt="Moxie"
+    <span
       className={className}
       style={{
-        height: '1.4em',
-        width: 'auto',
-        display: 'inline-block',
+        display: 'inline-flex',
+        alignItems: 'center',
         verticalAlign: 'middle',
       }}
-    />
+    >
+      <img
+        src={src}
+        alt="Moxie"
+        style={{
+          height: '1.4em',
+          width: 'auto',
+          display: 'block',
+          verticalAlign: 'middle',
+        }}
+      />
+    </span>
   );
 }
 
