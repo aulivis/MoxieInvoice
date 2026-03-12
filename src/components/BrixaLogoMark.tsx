@@ -7,7 +7,7 @@ export function BrixaLogoMark({ size = 48 }: { size?: number }) {
   const id = useId().replace(/:/g, '');
   const brixaGrad = `brixaGradient-${id}`;
   const accentGrad = `accentGradient-${id}`;
-  const viewBoxHeight = 145;
+  const viewBoxHeight = 160;
   const viewBoxWidth = 220;
   const width = (size * viewBoxWidth) / viewBoxHeight;
   return (

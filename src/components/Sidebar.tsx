@@ -50,8 +50,8 @@ function SettingsIcon({ active }: { active: boolean }) {
 
 function SidebarLogo() {
   return (
-    <div className="flex items-end gap-1.5">
-      <BrixaLogoMark size={48} />
+    <div className="flex items-end gap-[1ch]">
+      <BrixaLogoMark size={26} />
       <span
         style={{ color: 'var(--sidebar-text)', fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '23px', lineHeight: 1 }}
       >
