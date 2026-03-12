@@ -65,7 +65,7 @@ function buildXml(
     <keltDatum>${fulfillment}</keltDatum>
     <teljesitesDatum>${fulfillment}</teljesitesDatum>
     <fizetesiHataridoDatum>${due}</fizetesiHataridoDatum>
-    <fizetesiMod>${request.paymentMethod === 'cash' ? 'Készpénz' : 'Átutalás'}</fizetesiMod>
+    <fizmod>${request.paymentMethod === 'cash' ? 'Készpénz' : 'Átutalás'}</fizmod>
     <penznem>${request.currency}</penznem>
     <szamlaNyelve>hu</szamlaNyelve>
     <tipus>${isProforma ? 'díjbekérő' : 'számla'}</tipus>
