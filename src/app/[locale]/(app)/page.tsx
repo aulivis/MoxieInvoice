@@ -172,7 +172,8 @@ export default async function HomePage() {
 
       {/* Setup wizard CTA — shown until all steps are done */}
       {!allSetupDone && (
-        <div className="opacity-0 animate-fade-up bg-background-card border rounded-xl p-5 animate-setup-glow"
+        <div className="opacity-0 animate-fade-up">
+        <div className="bg-background-card border rounded-xl p-5 animate-setup-glow"
           style={{ borderColor: 'rgba(232,137,58,0.35)', background: 'linear-gradient(135deg, rgba(232,137,58,0.04) 0%, rgba(255,255,255,1) 60%)' }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -205,6 +206,7 @@ export default async function HomePage() {
               {t('wizardCta')}
             </Link>
           </div>
+        </div>
         </div>
       )}
 

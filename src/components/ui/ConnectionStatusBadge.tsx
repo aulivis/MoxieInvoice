@@ -60,7 +60,7 @@ export function ConnectionStatusBadge({
       {connected ? (
         <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
       ) : showWarningIcon ? (
-        <WarningTriangleIcon className="shrink-0 w-[14px] h-[14px] text-status-error" />
+        <WarningTriangleIcon className="shrink-0 w-5 h-5 text-status-error" />
       ) : (
         <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-text-disabled" />
       )}
