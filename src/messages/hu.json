@@ -120,7 +120,7 @@
     "refreshSuccess": "{updated} számla frissítve, Moxie értesítve: {moxieNotified}",
     "refreshMoxieWarning": "{updated} számla fizetve, de Moxie értesítés sikertelen:",
     "refreshError": "Hiba a frissítés során.",
-    "delete": "Törlés",
+    "delete": "Törlés (csak Brixából)",
     "deleteConfirm": "Törlés",
     "deleteFailed": "Hibás sor törlése",
     "deleting": "Törlés...",

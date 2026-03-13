@@ -210,56 +210,59 @@ export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSu
         {testMessage && (
           <Alert variant={testMessage.type === 'error' ? 'error' : 'success'}>{testMessage.text}</Alert>
         )}
-        <div className="flex items-start gap-2 flex-wrap">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm text-text-secondary mb-1">
-              {t('webhookUrl')}
-            </p>
-            <code className="block bg-background-hover px-1.5 py-1 rounded text-xs font-mono text-text-primary break-all">
-              {webhookUrl}
-            </code>
-            <p className="text-xs text-text-secondary mt-1.5">{t('webhookHint')}</p>
-            {!webhookSecret && connected && (
-              <p className="text-xs text-text-secondary mt-1">{t('saved')}</p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={async () => {
-              if (webhookUrl && navigator.clipboard?.writeText) {
-                await navigator.clipboard.writeText(webhookUrl);
-                setWebhookCopied(true);
-                setTimeout(() => setWebhookCopied(false), 2000);
-              }
-            }}
-            className="mt-6 inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-md border border-border-medium bg-background-card text-text-secondary hover:bg-background-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            title={webhookCopied ? t('webhookCopied') : t('copyWebhook')}
-            aria-label={webhookCopied ? t('webhookCopied') : t('copyWebhook')}
-          >
-            {webhookCopied ? (
-              <svg className="w-4 h-4 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-            )}
-          </button>
-        </div>
       </form>
     </>
   );
 
+  const webhookBlock = (
+    <div className="mt-8 pt-6 border-t border-border-light">
+      <p className="text-sm text-text-secondary mb-1">{t('webhookUrl')}</p>
+      <div className="flex items-start gap-2 flex-wrap">
+        <div className="flex-1 min-w-0">
+          <code className="block bg-background-hover px-1.5 py-1 rounded text-xs font-mono text-text-primary break-all">
+            {webhookUrl}
+          </code>
+          <p className="text-xs text-text-secondary mt-1.5">{t('webhookHint')}</p>
+          {!webhookSecret && connected && (
+            <p className="text-xs text-text-secondary mt-1">{t('saved')}</p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={async () => {
+            if (webhookUrl && navigator.clipboard?.writeText) {
+              await navigator.clipboard.writeText(webhookUrl);
+              setWebhookCopied(true);
+              setTimeout(() => setWebhookCopied(false), 2000);
+            }
+          }}
+          className="mt-6 inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-md border border-border-medium bg-background-card text-text-secondary hover:bg-background-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          title={webhookCopied ? t('webhookCopied') : t('copyWebhook')}
+          aria-label={webhookCopied ? t('webhookCopied') : t('copyWebhook')}
+        >
+          {webhookCopied ? (
+            <svg className="w-4 h-4 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
   const moxieHomeUrl = 'https://create.withmoxie.com';
   const rightPanel = (
-    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center lg:items-end justify-start pt-6 lg:pt-0 lg:pl-8 border-t lg:border-t-0 lg:border-l border-border-light">
-      <img src="/moxie-logo.png" alt="" className="h-11 w-auto object-contain" width={140} height={44} />
+    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center lg:items-end justify-start pt-6 lg:pt-0 lg:pl-8">
+      <img src="/moxie-logo.png" alt="" className="h-[5.5rem] w-auto object-contain" width={220} height={88} />
       <a
         href={moxieHomeUrl}
         target="_blank"
@@ -278,6 +281,7 @@ export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSu
         <div className="flex-1 min-w-0">{mainContent}</div>
         {rightPanel}
       </div>
+      {webhookBlock}
     </div>
   );
 }

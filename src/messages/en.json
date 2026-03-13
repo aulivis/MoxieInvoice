@@ -120,7 +120,7 @@
     "refreshSuccess": "{updated} invoice(s) updated, Moxie notified: {moxieNotified}",
     "refreshMoxieWarning": "{updated} invoice(s) paid but Moxie notification failed:",
     "refreshError": "Error during refresh.",
-    "delete": "Delete",
+    "delete": "Delete (only from Brixa)",
     "deleteConfirm": "Delete",
     "deleteFailed": "Delete failed row",
     "deleting": "Deleting...",
