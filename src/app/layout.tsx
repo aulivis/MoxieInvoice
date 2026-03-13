@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react';
+import type { Metadata } from 'next';
 import { Syne, Inter, JetBrains_Mono, Encode_Sans_Expanded } from 'next/font/google';
 import './globals.css';
+
+export const metadata: Metadata = {
+  icons: { icon: '/icon.svg' },
+};
 
 const syne = Syne({
   subsets: ['latin'],
