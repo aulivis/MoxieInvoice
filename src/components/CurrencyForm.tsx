@@ -157,11 +157,11 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
   }, [conversionSource]);
 
   const segmentBase =
-    'inline-flex flex-1 min-w-0 items-center justify-center px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ';
-  const segmentActive = 'bg-primary text-white border-primary';
+    'inline-flex flex-1 min-w-0 items-center justify-center px-2.5 py-1.5 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ';
+  const segmentActive = 'bg-primary text-white';
   const segmentInactive =
-    'bg-background-card text-text-secondary border-border-medium hover:border-border-strong hover:text-text-primary';
-  const toggleContainerClass = 'flex flex-1 min-w-0 rounded-lg border border-border-medium p-0.5 bg-background-muted [&>button]:flex-1';
+    'bg-background-card text-text-secondary hover:bg-background-hover hover:text-text-primary';
+  const toggleContainerClass = 'flex flex-1 min-w-0 rounded-lg border border-border-medium bg-background-muted [&>button]:flex-1';
 
   return (
     <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>

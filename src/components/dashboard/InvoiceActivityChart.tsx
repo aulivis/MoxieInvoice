@@ -115,10 +115,12 @@ function aggregateByMonth(
     const d = new Date();
     d.setMonth(d.getMonth() - i);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const monthName = new Intl.DateTimeFormat(locale, { month: 'short' }).format(d);
+    const yearShort = new Intl.DateTimeFormat(locale, { year: '2-digit' }).format(d);
     result.push({
       period: key,
       count: map.get(key) ?? 0,
-      label: d.toLocaleDateString(locale, { month: 'short', year: '2-digit' }),
+      label: `${monthName} ’${yearShort}`,
     });
   }
   return result;
