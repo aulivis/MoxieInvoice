@@ -1,7 +1,21 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { sendEmail } from '@/lib/resend';
+import en from '@/messages/en.json';
+import hu from '@/messages/hu.json';
 
 const GRACE_DAYS = 14;
+
+const DELETED_EMAIL_MESSAGES = {
+  en: {
+    subject: (en as { deleteAccount: { deletedEmailSubject: string } }).deleteAccount.deletedEmailSubject,
+    body: (en as { deleteAccount: { deletedEmailBody: string } }).deleteAccount.deletedEmailBody,
+  },
+  hu: {
+    subject: (hu as { deleteAccount: { deletedEmailSubject: string } }).deleteAccount.deletedEmailSubject,
+    body: (hu as { deleteAccount: { deletedEmailBody: string } }).deleteAccount.deletedEmailBody,
+  },
+} as const;
 
 function getSupabaseAdmin(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -11,13 +25,17 @@ function getSupabaseAdmin(): SupabaseClient {
 }
 
 /**
- * Send "account permanently deleted" email.
- * Placeholder: implement with Resend/SendGrid when available.
- * Set env RESEND_API_KEY (or similar) to enable sending.
+ * Send "account permanently deleted" email via Resend.
+ * No-op if RESEND_API_KEY is not set (replace re_xxxxxxxxx with your real API key).
  */
-async function sendAccountDeletedEmail(_email: string, _locale: 'hu' | 'en'): Promise<void> {
-  // TODO: integrate Resend/SendGrid, e.g.:
-  // await resend.emails.send({ from: '...', to: email, subject: t('deletedEmailSubject'), html: '...' });
+async function sendAccountDeletedEmail(email: string, locale: 'hu' | 'en'): Promise<void> {
+  const msg = DELETED_EMAIL_MESSAGES[locale];
+  await sendEmail({
+    from: process.env.RESEND_FROM ?? 'onboarding@resend.dev',
+    to: email,
+    subject: msg.subject,
+    html: `<p>${msg.body}</p>`,
+  });
 }
 
 export const dynamic = 'force-dynamic';

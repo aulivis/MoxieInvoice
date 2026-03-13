@@ -110,6 +110,12 @@ export async function saveCurrencySettingsAction(
     conversion_source: formData.get('conversion_source') || undefined,
     manual_eur_huf: formData.get('manual_eur_huf') ? Number(formData.get('manual_eur_huf')) : undefined,
     manual_usd_huf: formData.get('manual_usd_huf') ? Number(formData.get('manual_usd_huf')) : undefined,
+    manual_usd_eur: (() => {
+      const v = formData.get('manual_usd_eur');
+      if (v === null || v === '') return null;
+      const n = Number(v);
+      return Number.isNaN(n) ? null : n;
+    })(),
   };
   const parsed = validate(currencySettingsSchema, raw);
   if (!parsed.success) return { error: parsed.error };
@@ -121,6 +127,7 @@ export async function saveCurrencySettingsAction(
       conversion_source: b.conversion_source,
       manual_eur_huf: b.manual_eur_huf ?? undefined,
       manual_usd_huf: b.manual_usd_huf ?? undefined,
+      manual_usd_eur: b.manual_usd_eur !== undefined ? b.manual_usd_eur : null,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'org_id' }
@@ -168,6 +175,7 @@ export async function saveOrgSettingsAction(
     conversion_source: formData.get('conversion_source') || undefined,
     manual_eur_huf: formData.get('manual_eur_huf') ? Number(formData.get('manual_eur_huf')) : undefined,
     manual_usd_huf: formData.get('manual_usd_huf') ? Number(formData.get('manual_usd_huf')) : undefined,
+    manual_usd_eur: formData.get('manual_usd_eur') ? Number(formData.get('manual_usd_eur')) : undefined,
     schedule_type: formData.get('schedule_type') || undefined,
     timezone: formData.get('timezone') || undefined,
     start_time: formData.get('start_time') || undefined,
@@ -183,6 +191,7 @@ export async function saveOrgSettingsAction(
       conversion_source: b.conversion_source,
       manual_eur_huf: b.manual_eur_huf ?? undefined,
       manual_usd_huf: b.manual_usd_huf ?? undefined,
+      manual_usd_eur: b.manual_usd_eur ?? undefined,
       schedule_type: b.schedule_type,
       timezone: b.timezone,
       start_time: b.start_time,

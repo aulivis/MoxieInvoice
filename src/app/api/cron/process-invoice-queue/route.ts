@@ -64,7 +64,7 @@ export async function GET(request: Request) {
       .maybeSingle();
     const { data: orgSettings } = await supabase
       .from('org_settings')
-      .select('conversion_source, manual_eur_huf, manual_usd_huf, fixed_eur_huf_rate')
+      .select('conversion_source, manual_eur_huf, manual_usd_huf, manual_usd_eur, fixed_eur_huf_rate')
       .eq('org_id', job.org_id)
       .maybeSingle();
 

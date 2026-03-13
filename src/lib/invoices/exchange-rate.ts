@@ -9,6 +9,7 @@ export interface CurrencyOrgSettings {
   conversion_source: 'mnb_daily' | 'manual' | null;
   manual_eur_huf: number | null;
   manual_usd_huf: number | null;
+  manual_usd_eur?: number | null;
   /** @deprecated use manual_eur_huf */
   fixed_eur_huf_rate?: number | null;
 }
@@ -41,7 +42,8 @@ export async function getExchangeRate(
   if (source === 'manual') {
     const eurHuf = orgSettings?.manual_eur_huf ?? orgSettings?.fixed_eur_huf_rate;
     const usdHuf = orgSettings?.manual_usd_huf;
-    // 1 EUR = eurHuf HUF, 1 USD = usdHuf HUF
+    const usdEur = orgSettings?.manual_usd_eur;
+    // 1 EUR = eurHuf HUF, 1 USD = usdHuf HUF; optional 1 USD = usdEur EUR
     if (fromNorm === 'HUF' && toNorm === 'EUR') {
       if (eurHuf == null || eurHuf <= 0) throw new Error('Manual EUR-HUF rate not set');
       return 1 / eurHuf;
@@ -58,15 +60,17 @@ export async function getExchangeRate(
       if (usdHuf == null || usdHuf <= 0) throw new Error('Manual USD-HUF rate not set');
       return usdHuf;
     }
-    if (fromNorm === 'EUR' && toNorm === 'USD') {
-      if (eurHuf == null || usdHuf == null || eurHuf <= 0 || usdHuf <= 0)
-        throw new Error('Manual EUR-HUF and USD-HUF rates required for EUR->USD');
-      return eurHuf / usdHuf;
-    }
     if (fromNorm === 'USD' && toNorm === 'EUR') {
+      if (usdEur != null && usdEur > 0) return usdEur;
       if (eurHuf == null || usdHuf == null || eurHuf <= 0 || usdHuf <= 0)
-        throw new Error('Manual EUR-HUF and USD-HUF rates required for USD->EUR');
+        throw new Error('Manual USD-EUR or EUR-HUF and USD-HUF rates required for USD->EUR');
       return usdHuf / eurHuf;
+    }
+    if (fromNorm === 'EUR' && toNorm === 'USD') {
+      if (usdEur != null && usdEur > 0) return 1 / usdEur;
+      if (eurHuf == null || usdHuf == null || eurHuf <= 0 || usdHuf <= 0)
+        throw new Error('Manual USD-EUR or EUR-HUF and USD-HUF rates required for EUR->USD');
+      return eurHuf / usdHuf;
     }
   }
 

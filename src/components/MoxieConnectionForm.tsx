@@ -261,7 +261,7 @@ export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSu
 
   const moxieHomeUrl = 'https://create.withmoxie.com';
   const rightPanel = (
-    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center lg:items-end justify-start pt-6 lg:pt-0 lg:pl-8">
+    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center justify-center pt-6 lg:pt-0 lg:pl-8">
       <img src="/moxie-logo.png" alt="" className="h-[5.5rem] w-auto object-contain" width={220} height={88} />
       <a
         href={moxieHomeUrl}

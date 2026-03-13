@@ -85,7 +85,12 @@
     "setupStep2": "Moxie kapcsolat beállítása",
     "setupStep3": "Számlázó beállítása",
     "wizardCta": "Beállítás indítása",
-    "wizardCtaContinue": "Beállítás folytatása"
+    "wizardCtaContinue": "Beállítás folytatása",
+    "chartTitle": "Számlák generálása",
+    "chartViewDaily": "Napi",
+    "chartViewWeekly": "Heti",
+    "chartViewMonthly": "Havi",
+    "chartEmpty": "Még nincs generált számla"
   },
   "invoices": {
     "title": "Számlák",
@@ -194,6 +199,7 @@
     "suspendedToast": "A fiókod felfüggesztve. 14 napod van visszaállításra belépéssel.",
     "restoredToast": "A fiókod visszaállítva.",
     "deletedEmailSubject": "A fiókod véglegesen törölve lett",
+    "deletedEmailBody": "A fiókod és az összes hozzá tartozó adat véglegesen törölve lett, ahogy kérted.",
     "pendingTitle": "A fiókod törlésre van kérve",
     "pendingDescription": "Fióktörlést kértél. Ha nem teszel semmit, a fiókod és az adatok 14 nap után véglegesen törlődnek, és e-mailben értesítünk.",
     "restoreAccount": "Fiók visszaállítása",
@@ -397,6 +403,17 @@
     "liveRateEur": "1 EUR = {rate} HUF",
     "liveRateUsd": "1 USD = {rate} HUF",
     "rateUnavailable": "Árfolyam nem elérhető",
+    "mnbLastUpdate": "Utolsó MNB frissítés: {date}",
+    "mnbWeekendNote": "Az MNB árfolyamok munkanapokon frissülnek; hétvégén az utolsó munkanap árfolyama érvényes.",
+    "manualUsdEur": "1 USD = … EUR",
+    "manualUsdEurHint": "Opcionális. Ha üres, az EUR–USD árfolyam az EUR–HUF és USD–HUF alapján számolódik.",
+    "manualRateDirectionEurHuf": "Megadom",
+    "manualRateDir_eurToHuf": "1 EUR = … HUF",
+    "manualRateDir_hufToEur": "1 HUF = … EUR",
+    "manualRateDir_usdToHuf": "1 USD = … HUF",
+    "manualRateDir_hufToUsd": "1 HUF = … USD",
+    "manualRateDir_usdToEur": "1 USD = … EUR",
+    "manualRateDir_eurToUsd": "1 EUR = … USD",
     "saved": "Mentve."
   },
   "scheduleSettings": {

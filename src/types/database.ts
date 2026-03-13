@@ -83,6 +83,7 @@ export interface OrgSettings {
   conversion_source: 'mnb_daily' | 'manual' | null;
   manual_eur_huf: number | null;
   manual_usd_huf: number | null;
+  manual_usd_eur: number | null;
   fixed_eur_huf_rate: number | null; // deprecated, use manual_eur_huf
   schedule_type: ScheduleType;
   timezone: string;

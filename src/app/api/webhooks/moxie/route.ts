@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
   const { data: orgSettings } = await supabase
     .from('org_settings')
-    .select('default_invoice_block_id, default_invoice_language, default_payment_method, default_moxie_project_name, conversion_source, manual_eur_huf, manual_usd_huf, fixed_eur_huf_rate')
+    .select('default_invoice_block_id, default_invoice_language, default_payment_method, default_moxie_project_name, conversion_source, manual_eur_huf, manual_usd_huf, manual_usd_eur, fixed_eur_huf_rate')
     .eq('org_id', orgId)
     .maybeSingle();
 

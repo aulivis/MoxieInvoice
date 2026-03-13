@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PaymentStatusCell } from '@/components/ui/PaymentStatusCell';
 import { RestoredToast } from '@/components/RestoredToast';
+import { InvoiceActivityChart } from '@/components/dashboard/InvoiceActivityChart';
 
 // ── Icons for stat cards ────────────────────────────────────────────────────
 
@@ -30,11 +31,11 @@ function TrendUpIcon() {
   );
 }
 
-function XIcon() {
+function SuccessRateIcon() {
   return (
-    <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+    <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   );
 }
@@ -122,6 +123,12 @@ export default async function HomePage() {
   const billingConfigured = !!billingResult.data?.provider;
 
   const failed = all.filter((i) => i.status === 'failed').length;
+  const attempted = all.length - failed;
+  const successCount = all.filter(
+    (i) => i.status === 'created' || i.status === 'synced_to_moxie'
+  ).length;
+  const successRatePct =
+    attempted > 0 ? Math.round((successCount / attempted) * 100) : null;
 
   const outstandingAmount = all
     .filter((i) => i.payment_status === 'open' && i.status !== 'failed')
@@ -221,14 +228,23 @@ export default async function HomePage() {
         </div>
         <div className="opacity-0 animate-fade-up delay-120">
           <StatCard
-            label={t('statFailed')}
-            value={failed}
-            trend={failed === 0 ? 'neutral' : 'down'}
-            accent={failed > 0 ? 'error' : 'success'}
-            icon={<XIcon />}
-            iconBg={failed > 0 ? 'bg-red-50' : 'bg-emerald-50'}
+            label={t('statSuccessRate')}
+            value={successRatePct != null ? `${successRatePct}%` : '–'}
+            accent="success"
+            icon={<SuccessRateIcon />}
+            iconBg="bg-emerald-50"
           />
         </div>
+      </div>
+
+      {/* Activity chart: invoices generated with Brixa */}
+      <div className="opacity-0 animate-fade-up delay-180">
+        <Card contentClassName="p-5">
+          <InvoiceActivityChart
+            invoiceDates={all.map((i) => i.created_at)}
+            locale={locale}
+          />
+        </Card>
       </div>
 
       {/* Recent invoices */}

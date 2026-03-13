@@ -11,6 +11,8 @@ const serverSchema = z.object({
   // ENCRYPTION_KEY: 64-char hex (32 bytes). Required for encrypting credentials.
   // Generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
   ENCRYPTION_KEY: z.string().length(64).optional(),
+  // Resend: optional. Replace re_xxxxxxxxx with your real API key from https://resend.com
+  RESEND_API_KEY: z.string().min(1).optional(),
 });
 
 const clientSchema = serverSchema.pick({
@@ -36,6 +38,7 @@ export function getEnv(): Env {
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     CRON_SECRET: process.env.CRON_SECRET,
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
   });
   if (!result.success) {
     const first = result.error.issues[0];

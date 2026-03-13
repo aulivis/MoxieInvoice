@@ -2,10 +2,8 @@ import { NextResponse } from 'next/server';
 import http from 'node:http';
 
 // The MNB SOAP endpoint runs on HTTP (not HTTPS).
-// The response contains HTML-encoded XML inside the SOAP body:
-//   curr="EUR"&gt;384,86000&lt;/Rate&gt;
-// We parse the EUR rate from that encoded string.
-function fetchMnbCurrentRate(currency: string): Promise<number | null> {
+// Response contains HTML-encoded XML; we parse rates and the rate date (Day element).
+function fetchMnbRates(): Promise<{ eur: number | null; usd: number | null; rateDate: string | null }> {
   return new Promise((resolve) => {
     const soapBody = Buffer.from(
       `<?xml version="1.0" encoding="utf-8"?>` +
@@ -35,19 +33,42 @@ function fetchMnbCurrentRate(currency: string): Promise<number | null> {
         res.on('data', (chunk: Buffer) => chunks.push(chunk));
         res.on('end', () => {
           const text = Buffer.concat(chunks).toString('utf-8');
-          // Response contains HTML-encoded XML: curr="EUR"&gt;384,86000&lt;/Rate&gt;
-          const escaped = `curr="${currency}"&gt;([^&]+)&lt;/Rate&gt;`;
-          const match = text.match(new RegExp(escaped));
-          if (!match) { resolve(null); return; }
-          const rate = parseFloat(match[1].replace(',', '.'));
-          resolve(isNaN(rate) ? null : rate);
+          let rateDate: string | null = null;
+          // Day element: <Day date="2024-01-15"> or &lt;Day&gt;2024.01.15&lt;/Day&gt;
+          const dayDateAttr = text.match(/&lt;Day\s+date="([^"]+)"|Day\s+date="([^"]+)"/);
+          if (dayDateAttr) {
+            const d = dayDateAttr[1] ?? dayDateAttr[2];
+            if (d) rateDate = d.replace(/\./g, '-');
+          }
+          if (!rateDate) {
+            const dayContent = text.match(/&lt;Day&gt;([^&]+)&lt;\/Day&gt;/);
+            if (dayContent) {
+              const d = dayContent[1].trim().replace(/\./g, '-');
+              if (/^\d{4}-\d{2}-\d{2}$/.test(d)) rateDate = d;
+            }
+          }
+          const parseRate = (currency: string): number | null => {
+            const re = new RegExp(`curr="${currency}"&gt;([^&]+)&lt;/Rate&gt;`);
+            const m = text.match(re);
+            if (!m) return null;
+            const rate = parseFloat(m[1].replace(',', '.'));
+            return Number.isNaN(rate) ? null : rate;
+          };
+          resolve({
+            eur: parseRate('EUR'),
+            usd: parseRate('USD'),
+            rateDate,
+          });
         });
-        res.on('error', () => resolve(null));
+        res.on('error', () => resolve({ eur: null, usd: null, rateDate: null }));
       }
     );
 
-    req.on('error', () => resolve(null));
-    req.on('timeout', () => { req.destroy(); resolve(null); });
+    req.on('error', () => resolve({ eur: null, usd: null, rateDate: null }));
+    req.on('timeout', () => {
+      req.destroy();
+      resolve({ eur: null, usd: null, rateDate: null });
+    });
     req.write(soapBody);
     req.end();
   });
@@ -56,9 +77,6 @@ function fetchMnbCurrentRate(currency: string): Promise<number | null> {
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const [eur, usd] = await Promise.all([
-    fetchMnbCurrentRate('EUR'),
-    fetchMnbCurrentRate('USD'),
-  ]);
-  return NextResponse.json({ rate: eur, eur, usd });
+  const { eur, usd, rateDate } = await fetchMnbRates();
+  return NextResponse.json({ rate: eur, eur, usd, rateDate });
 }

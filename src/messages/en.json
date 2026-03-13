@@ -85,7 +85,12 @@
     "setupStep2": "Set up Moxie connection",
     "setupStep3": "Configure billing provider",
     "wizardCta": "Start setup",
-    "wizardCtaContinue": "Continue setup"
+    "wizardCtaContinue": "Continue setup",
+    "chartTitle": "Invoices generated",
+    "chartViewDaily": "Daily",
+    "chartViewWeekly": "Weekly",
+    "chartViewMonthly": "Monthly",
+    "chartEmpty": "No invoices generated yet"
   },
   "invoices": {
     "title": "Invoices",
@@ -194,6 +199,7 @@
     "suspendedToast": "Your account has been suspended. You have 14 days to restore it by logging in.",
     "restoredToast": "Your account has been restored.",
     "deletedEmailSubject": "Your account has been permanently deleted",
+    "deletedEmailBody": "Your account and all associated data have been permanently deleted as requested.",
     "pendingTitle": "Your account is scheduled for deletion",
     "pendingDescription": "You requested account deletion. If you do nothing, your account and data will be permanently deleted after 14 days and we will email you.",
     "restoreAccount": "Restore account",
@@ -397,6 +403,17 @@
     "liveRateEur": "1 EUR = {rate} HUF",
     "liveRateUsd": "1 USD = {rate} HUF",
     "rateUnavailable": "Rate unavailable",
+    "mnbLastUpdate": "Last MNB update: {date}",
+    "mnbWeekendNote": "MNB rates are updated on business days; on weekends the last business day rate applies.",
+    "manualUsdEur": "1 USD = … EUR",
+    "manualUsdEurHint": "Optional. If empty, EUR–USD is derived from EUR–HUF and USD–HUF.",
+    "manualRateDirectionEurHuf": "I enter",
+    "manualRateDir_eurToHuf": "1 EUR = … HUF",
+    "manualRateDir_hufToEur": "1 HUF = … EUR",
+    "manualRateDir_usdToHuf": "1 USD = … HUF",
+    "manualRateDir_hufToUsd": "1 HUF = … USD",
+    "manualRateDir_usdToEur": "1 USD = … EUR",
+    "manualRateDir_eurToUsd": "1 EUR = … USD",
     "saved": "Saved."
   },
   "scheduleSettings": {

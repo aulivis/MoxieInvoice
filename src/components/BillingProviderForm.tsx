@@ -13,6 +13,8 @@ const disabledInputClass =
 
 export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMode = false }: { hasSubscription?: boolean; onSaved?: () => void; wizardMode?: boolean }) {
   const [provider, setProvider] = useState<'billingo' | 'szamlazz'>('billingo');
+  /** Provider the user is actually connected to (from API). Used for status message and right panel, not the dropdown. */
+  const [connectedProvider, setConnectedProvider] = useState<'billingo' | 'szamlazz' | null>(null);
   const [hasCredentials, setHasCredentials] = useState(false);
   const [fetched, setFetched] = useState(false);
   const [state, formAction] = useActionState<SettingsState | null, FormData>(saveBillingAction, null);
@@ -53,7 +55,10 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
       .then((r) => r.json())
       .then((data) => {
         setFetched(true);
-        if (data.provider) setProvider(data.provider);
+        if (data.provider) {
+          setProvider(data.provider);
+          setConnectedProvider(data.provider);
+        }
         setHasCredentials(!!data.hasCredentials);
         setOrgId(data.orgId ?? null);
       })
@@ -125,8 +130,9 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
     (disabled ? disabledInputClass : '');
   const labelClass = 'block text-sm font-medium text-text-label mb-1';
 
+  /** Status message shows the provider the user is connected to (from API); logo and link follow the dropdown. */
   const connectedLabel =
-    provider === 'billingo' ? t('statusConnectedBillingo') : t('statusConnectedSzamlazz');
+    (connectedProvider ?? provider) === 'billingo' ? t('statusConnectedBillingo') : t('statusConnectedSzamlazz');
   const statusBadge = (
     <ConnectionStatusBadge
       connected={hasCredentials}
@@ -391,7 +397,7 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
   );
 
   const rightPanel = !wizardMode && (
-    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center lg:items-end justify-start pt-6 lg:pt-0 lg:pl-8">
+    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center justify-center pt-6 lg:pt-0 lg:pl-8">
       <img src={logoSrc} alt="" className="h-[5.5rem] w-auto object-contain" width={220} height={88} />
       <a
         href={providerHomeUrl}

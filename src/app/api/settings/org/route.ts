@@ -65,6 +65,7 @@ export async function POST(request: Request) {
   if (body.conversion_source !== undefined) payload.conversion_source = body.conversion_source;
   if (body.manual_eur_huf !== undefined) payload.manual_eur_huf = body.manual_eur_huf;
   if (body.manual_usd_huf !== undefined) payload.manual_usd_huf = body.manual_usd_huf;
+  if (body.manual_usd_eur !== undefined) payload.manual_usd_eur = body.manual_usd_eur;
   if (body.schedule_type !== undefined) payload.schedule_type = body.schedule_type;
   if (body.timezone !== undefined) payload.timezone = body.timezone;
   if (body.start_time !== undefined) payload.start_time = body.start_time;
