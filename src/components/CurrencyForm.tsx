@@ -157,10 +157,11 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
   }, [conversionSource]);
 
   const segmentBase =
-    'inline-flex items-center justify-center px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ';
+    'inline-flex flex-1 min-w-0 items-center justify-center px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ';
   const segmentActive = 'bg-primary text-white border-primary';
   const segmentInactive =
     'bg-background-card text-text-secondary border-border-medium hover:border-border-strong hover:text-text-primary';
+  const toggleContainerClass = 'flex flex-1 min-w-0 rounded-lg border border-border-medium p-0.5 bg-background-muted [&>button]:flex-1';
 
   return (
     <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>
@@ -248,9 +249,24 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                 <div className="mt-3 max-w-md space-y-4">
                   {/* EUR–HUF */}
                   <div className="flex flex-col gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs text-text-tertiary">{t('manualRateDirectionEurHuf')}:</span>
-                      <div className="flex rounded-lg border border-border-medium p-0.5 bg-background-muted" role="group" aria-label={t('manualRateDir_eurToHuf')}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="relative flex-1 min-w-0 max-w-[10rem]">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-tertiary font-medium pointer-events-none">
+                          {dirEurHuf === 'eur_huf' ? 'HUF' : 'EUR'}
+                        </span>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          step={0.01}
+                          placeholder={dirEurHuf === 'eur_huf' ? '395' : '0,00253'}
+                          value={displayEurHuf}
+                          onChange={(e) => setDisplayEurHuf(e.target.value)}
+                          className={`${inputClass} pl-11 w-full`}
+                          disabled={disabled}
+                          aria-label={dirEurHuf === 'eur_huf' ? t('manualRateDir_eurToHuf') : t('manualRateDir_hufToEur')}
+                        />
+                      </div>
+                      <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_eurToHuf')}>
                         <button
                           type="button"
                           onClick={switchDirEurHuf}
@@ -269,32 +285,28 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                         </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex-1 min-w-0 max-w-[10rem]">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-tertiary font-medium pointer-events-none">
-                          {dirEurHuf === 'eur_huf' ? 'HUF' : 'EUR'}
-                        </span>
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          step={0.01}
-                          placeholder={dirEurHuf === 'eur_huf' ? '395' : '0,00253'}
-                          value={displayEurHuf}
-                          onChange={(e) => setDisplayEurHuf(e.target.value)}
-                          className={`${inputClass} pl-11 w-full`}
-                          disabled={disabled}
-                          aria-label={dirEurHuf === 'eur_huf' ? t('manualRateDir_eurToHuf') : t('manualRateDir_hufToEur')}
-                        />
-                      </div>
-                    </div>
                     <input type="hidden" name="manual_eur_huf" value={canonicalEurHuf != null ? String(canonicalEurHuf) : ''} />
                   </div>
 
                   {/* USD–HUF */}
                   <div className="flex flex-col gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs text-text-tertiary">{t('manualRateDirectionEurHuf')}:</span>
-                      <div className="flex rounded-lg border border-border-medium p-0.5 bg-background-muted" role="group" aria-label={t('manualRateDir_usdToHuf')}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="relative flex-1 min-w-0 max-w-[10rem]">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-tertiary font-medium pointer-events-none">
+                          {dirUsdHuf === 'usd_huf' ? 'HUF' : 'USD'}
+                        </span>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder={dirUsdHuf === 'usd_huf' ? '360' : '0,00278'}
+                          value={displayUsdHuf}
+                          onChange={(e) => setDisplayUsdHuf(e.target.value)}
+                          className={`${inputClass} pl-11 w-full`}
+                          disabled={disabled}
+                          aria-label={dirUsdHuf === 'usd_huf' ? t('manualRateDir_usdToHuf') : t('manualRateDir_hufToUsd')}
+                        />
+                      </div>
+                      <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_usdToHuf')}>
                         <button
                           type="button"
                           onClick={switchDirUsdHuf}
@@ -313,31 +325,28 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                         </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex-1 min-w-0 max-w-[10rem]">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-tertiary font-medium pointer-events-none">
-                          {dirUsdHuf === 'usd_huf' ? 'HUF' : 'USD'}
-                        </span>
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          placeholder={dirUsdHuf === 'usd_huf' ? '360' : '0,00278'}
-                          value={displayUsdHuf}
-                          onChange={(e) => setDisplayUsdHuf(e.target.value)}
-                          className={`${inputClass} pl-11 w-full`}
-                          disabled={disabled}
-                          aria-label={dirUsdHuf === 'usd_huf' ? t('manualRateDir_usdToHuf') : t('manualRateDir_hufToUsd')}
-                        />
-                      </div>
-                    </div>
                     <input type="hidden" name="manual_usd_huf" value={canonicalUsdHuf != null ? String(canonicalUsdHuf) : ''} />
                   </div>
 
                   {/* USD–EUR (optional) */}
                   <div className="flex flex-col gap-2 pt-1 border-t border-border-light">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs text-text-tertiary">{t('manualRateDirectionEurHuf')}:</span>
-                      <div className="flex rounded-lg border border-border-medium p-0.5 bg-background-muted" role="group" aria-label={t('manualRateDir_usdToEur')}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="relative flex-1 min-w-0 max-w-[10rem]">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-tertiary font-medium pointer-events-none">
+                          {dirUsdEur === 'usd_eur' ? 'EUR' : 'USD'}
+                        </span>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder={dirUsdEur === 'usd_eur' ? '0,92' : '1,09'}
+                          value={displayUsdEur}
+                          onChange={(e) => setDisplayUsdEur(e.target.value)}
+                          className={`${inputClass} pl-11 w-full`}
+                          disabled={disabled}
+                          aria-label={dirUsdEur === 'usd_eur' ? t('manualRateDir_usdToEur') : t('manualRateDir_eurToUsd')}
+                        />
+                      </div>
+                      <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_usdToEur')}>
                         <button
                           type="button"
                           onClick={switchDirUsdEur}
@@ -354,23 +363,6 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                         >
                           {t('manualRateDir_eurToUsd')}
                         </button>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex-1 min-w-0 max-w-[10rem]">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-tertiary font-medium pointer-events-none">
-                          {dirUsdEur === 'usd_eur' ? 'EUR' : 'USD'}
-                        </span>
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          placeholder={dirUsdEur === 'usd_eur' ? '0,92' : '1,09'}
-                          value={displayUsdEur}
-                          onChange={(e) => setDisplayUsdEur(e.target.value)}
-                          className={`${inputClass} pl-11 w-full`}
-                          disabled={disabled}
-                          aria-label={dirUsdEur === 'usd_eur' ? t('manualRateDir_usdToEur') : t('manualRateDir_eurToUsd')}
-                        />
                       </div>
                     </div>
                     <input type="hidden" name="manual_usd_eur" value={canonicalUsdEur != null ? String(canonicalUsdEur) : ''} />

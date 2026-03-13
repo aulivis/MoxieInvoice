@@ -76,15 +76,29 @@ function SetupStep({
   );
 }
 
-// ── Currency formatter ───────────────────────────────────────────────────────
+// ── Currency formatter (always use invoice currency, not locale) ───────────────
 
-function formatCurrency(amount: number, locale: string): string {
-  const isHu = locale === 'hu';
-  return new Intl.NumberFormat(isHu ? 'hu-HU' : 'en-US', {
+const CURRENCY_ORDER = ['HUF', 'EUR', 'USD'] as const;
+
+function formatCurrency(amount: number, locale: string, currency: string = 'HUF'): string {
+  const norm = currency?.toUpperCase() || 'HUF';
+  const isHuf = norm === 'HUF';
+  return new Intl.NumberFormat(locale === 'hu' ? 'hu-HU' : 'en-US', {
     style: 'currency',
-    currency: isHu ? 'HUF' : 'EUR',
-    maximumFractionDigits: isHu ? 0 : 2,
+    currency: norm,
+    maximumFractionDigits: isHuf ? 0 : 2,
   }).format(amount);
+}
+
+function formatAmountsByCurrency(
+  byCurrency: Record<string, number>,
+  locale: string
+): string {
+  const entries = CURRENCY_ORDER.filter((c) => byCurrency[c] != null && byCurrency[c] !== 0);
+  const rest = Object.entries(byCurrency).filter(
+    ([c]) => !CURRENCY_ORDER.includes(c as (typeof CURRENCY_ORDER)[number])
+  );
+  return [...entries.map((c) => formatCurrency(byCurrency[c], locale, c)), ...rest.map(([c, a]) => formatCurrency(a, locale, c))].join(' · ');
 }
 
 export default async function HomePage() {
@@ -101,11 +115,11 @@ export default async function HomePage() {
   const supabase = await createClient();
   const hasSubscription = ctx?.hasSubscription ?? false;
 
-  // Fetch stats, recent invoices, and setup status in parallel
+  // Fetch stats, recent invoices, and setup status in parallel (payload_snapshot for invoice currency)
   const [allResult, recentResult, moxieResult, billingResult] = await Promise.all([
     supabase
       .from('invoices')
-      .select('id, status, total_amount, payment_status, created_at')
+      .select('id, status, total_amount, payment_status, created_at, payload_snapshot')
       .eq('org_id', orgId),
     supabase
       .from('invoices')
@@ -130,14 +144,25 @@ export default async function HomePage() {
   const successRatePct =
     attempted > 0 ? Math.round((successCount / attempted) * 100) : null;
 
-  const outstandingAmount = all
-    .filter((i) => i.payment_status === 'open' && i.status !== 'failed')
-    .reduce((sum, i) => sum + (i.total_amount ?? 0), 0);
+  function getInvoiceCurrency(inv: { payload_snapshot?: unknown }): string {
+    const c = (inv.payload_snapshot as { currency?: string } | null)?.currency;
+    return (c && ['HUF', 'EUR', 'USD'].includes(c.toUpperCase())) ? c.toUpperCase() : 'HUF';
+  }
+
+  const outstandingByCurrency: Record<string, number> = {};
+  for (const i of all) {
+    if (i.payment_status !== 'open' || i.status === 'failed') continue;
+    const cur = getInvoiceCurrency(i);
+    outstandingByCurrency[cur] = (outstandingByCurrency[cur] ?? 0) + (i.total_amount ?? 0);
+  }
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const paidLast30Days = all
-    .filter((i) => i.payment_status === 'paid' && i.created_at >= thirtyDaysAgo)
-    .reduce((sum, i) => sum + (i.total_amount ?? 0), 0);
+  const paidByCurrency: Record<string, number> = {};
+  for (const i of all) {
+    if (i.payment_status !== 'paid' || i.created_at < thirtyDaysAgo) continue;
+    const cur = getInvoiceCurrency(i);
+    paidByCurrency[cur] = (paidByCurrency[cur] ?? 0) + (i.total_amount ?? 0);
+  }
 
   const allSetupDone = hasSubscription && moxieConnected && billingConfigured;
   const anyStepDone = hasSubscription || moxieConnected || billingConfigured;
@@ -210,7 +235,9 @@ export default async function HomePage() {
         <div className="opacity-0 animate-fade-up">
           <StatCard
             label={t('statOutstanding')}
-            value={formatCurrency(outstandingAmount, locale)}
+            value={Object.keys(outstandingByCurrency).length
+              ? formatAmountsByCurrency(outstandingByCurrency, locale)
+              : formatCurrency(0, locale, 'HUF')}
             accent="primary"
             icon={<CashIcon />}
             iconBg="bg-amber-50"
@@ -219,7 +246,9 @@ export default async function HomePage() {
         <div className="opacity-0 animate-fade-up delay-60">
           <StatCard
             label={t('statPaidMonth')}
-            value={formatCurrency(paidLast30Days, locale)}
+            value={Object.keys(paidByCurrency).length
+              ? formatAmountsByCurrency(paidByCurrency, locale)
+              : formatCurrency(0, locale, 'HUF')}
             trend="up"
             accent="success"
             icon={<TrendUpIcon />}
@@ -306,10 +335,10 @@ export default async function HomePage() {
                       className="shrink-0 text-xs"
                     />
 
-                    {/* Right: amount */}
+                    {/* Right: amount (in invoice currency) */}
                     {inv.total_amount != null && (
                       <span className="shrink-0 text-sm font-semibold font-tabular-nums text-text-primary">
-                        {formatCurrency(inv.total_amount, locale)}
+                        {formatCurrency(inv.total_amount, locale, snapshot?.currency)}
                       </span>
                     )}
                   </li>

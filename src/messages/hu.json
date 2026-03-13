@@ -90,7 +90,8 @@
     "chartViewDaily": "Napi",
     "chartViewWeekly": "Heti",
     "chartViewMonthly": "Havi",
-    "chartEmpty": "Még nincs generált számla"
+    "chartEmpty": "Még nincs generált számla",
+    "chartWeekNumber": "{number}. hét"
   },
   "invoices": {
     "title": "Számlák",

@@ -90,7 +90,8 @@
     "chartViewDaily": "Daily",
     "chartViewWeekly": "Weekly",
     "chartViewMonthly": "Monthly",
-    "chartEmpty": "No invoices generated yet"
+    "chartEmpty": "No invoices generated yet",
+    "chartWeekNumber": "Week {number}"
   },
   "invoices": {
     "title": "Invoices",

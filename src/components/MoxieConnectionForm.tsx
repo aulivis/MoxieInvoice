@@ -261,7 +261,7 @@ export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSu
 
   const moxieHomeUrl = 'https://create.withmoxie.com';
   const rightPanel = (
-    <div className="shrink-0 w-full lg:w-52 flex flex-col items-center justify-center pt-6 lg:pt-0 lg:pl-8">
+    <div className="w-full min-w-0 flex flex-col items-start pt-6 lg:pt-8 lg:pl-8">
       <img src="/moxie-logo.png" alt="" className="h-[5.5rem] w-auto object-contain" width={220} height={88} />
       <a
         href={moxieHomeUrl}
@@ -277,8 +277,8 @@ export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSu
 
   return (
     <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch">
-        <div className="flex-1 min-w-0">{mainContent}</div>
+      <div className="flex flex-col lg:grid lg:grid-cols-[3fr_2fr] gap-8 lg:gap-10 items-stretch">
+        <div className="min-w-0">{mainContent}</div>
         {rightPanel}
       </div>
       {webhookBlock}

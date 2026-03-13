@@ -27,6 +27,15 @@ function getWeekStart(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate() - offset);
 }
 
+/** ISO 8601 week number (1–53) for the given date */
+function getISOWeekNumber(d: Date): number {
+  const t = new Date(d);
+  t.setHours(0, 0, 0, 0);
+  t.setDate(t.getDate() + 4 - (t.getDay() || 7));
+  const yearStart = new Date(t.getFullYear(), 0, 1);
+  return Math.ceil((((t.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+}
+
 function aggregateByDay(
   dates: string[],
   lastDays: number,
@@ -59,9 +68,8 @@ function aggregateByDay(
 
 function aggregateByWeek(
   dates: string[],
-  lastWeeks: number,
-  locale: string
-): { period: string; count: number; label: string }[] {
+  lastWeeks: number
+): { period: string; count: number; weekNumber: number; year: number }[] {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - lastWeeks * 7);
   const map = new Map<string, number>();
@@ -72,7 +80,7 @@ function aggregateByWeek(
     const key = weekStart.toISOString().slice(0, 10);
     map.set(key, (map.get(key) ?? 0) + 1);
   }
-  const result: { period: string; count: number; label: string }[] = [];
+  const result: { period: string; count: number; weekNumber: number; year: number }[] = [];
   for (let i = lastWeeks - 1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i * 7);
@@ -81,7 +89,8 @@ function aggregateByWeek(
     result.push({
       period: key,
       count: map.get(key) ?? 0,
-      label: weekStart.toLocaleDateString(locale, { day: 'numeric', month: 'short' }),
+      weekNumber: getISOWeekNumber(weekStart),
+      year: weekStart.getFullYear(),
     });
   }
   return result;
@@ -121,9 +130,15 @@ export function InvoiceActivityChart({ invoiceDates, locale }: InvoiceActivityCh
 
   const chartData = useMemo(() => {
     if (viewMode === 'daily') return aggregateByDay(invoiceDates, 14, locale);
-    if (viewMode === 'weekly') return aggregateByWeek(invoiceDates, 12, locale);
+    if (viewMode === 'weekly') {
+      const rows = aggregateByWeek(invoiceDates, 12);
+      return rows.map((row) => ({
+        ...row,
+        label: t('chartWeekNumber', { number: row.weekNumber }),
+      }));
+    }
     return aggregateByMonth(invoiceDates, 12, locale);
-  }, [invoiceDates, viewMode, locale]);
+  }, [invoiceDates, viewMode, locale, t]);
 
   const hasAnyInvoices = invoiceDates.length > 0;
 
