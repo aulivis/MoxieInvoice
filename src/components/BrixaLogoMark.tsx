@@ -1,17 +1,36 @@
 'use client';
 
-const LOGO_SRC = '/icon.svg';
+import { useId } from 'react';
 
-/** Brixa brand logo. Uses the single source of truth: public/icon.svg (favicon + all in-app uses). */
+/** Brixa brand logo (inline SVG – megbízható megjelenés login/sidebar/AppShell/onboarding). */
 export function BrixaLogoMark({ size = 48 }: { size?: number }) {
+  const id = useId().replace(/:/g, '');
   return (
-    <img
-      src={LOGO_SRC}
-      alt=""
+    <svg
       width={size}
       height={size}
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
       className="shrink-0"
       aria-hidden
-    />
+    >
+      <defs>
+        <linearGradient id={`brixa-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#E8831F" />
+          <stop offset="100%" stopColor="#E8831F" />
+        </linearGradient>
+      </defs>
+      <rect x="47" y="6" width="6" height="10" rx="1" fill="#E8831F" />
+      <circle cx="50" cy="3" r="3.5" fill="#E8831F" />
+      <rect x="3" y="16" width="94" height="81" rx="20" fill="#1F2C3D" stroke="#E8831F" strokeWidth="6" />
+      <rect x="29" y="24" width="42" height="3.5" rx="1.75" fill="#6C7A89" />
+      <rect x="36.5" y="30" width="27" height="3.5" rx="1.75" fill="#6C7A89" />
+      <circle cx="35" cy="53" r="4.5" fill="#E8831F" />
+      <rect x="33.5" y="48" width="3" height="10" fill="#E8831F" />
+      <circle cx="65" cy="53" r="4.5" fill="#E8831F" />
+      <rect x="63.5" y="48" width="3" height="10" fill="#E8831F" />
+      <path d="M 30 76 Q 50 90 70 76" stroke="#E8831F" strokeWidth="5" strokeLinecap="round" fill="none" />
+    </svg>
   );
 }
