@@ -48,12 +48,13 @@ function SettingsIcon({ active }: { active: boolean }) {
   );
 }
 
+const SIDEBAR_ICON_SIZE = 31;
 function SidebarLogo() {
   return (
     <div className="flex items-end gap-[1ch]">
-      <BrixaLogoMark size={31} />
+      <BrixaLogoMark size={SIDEBAR_ICON_SIZE} />
       <span
-        style={{ color: 'var(--sidebar-text)', fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '23px', lineHeight: 1 }}
+        style={{ color: 'var(--sidebar-text)', fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: `${SIDEBAR_ICON_SIZE * 0.9}px`, lineHeight: 1 }}
       >
         Brixa
       </span>

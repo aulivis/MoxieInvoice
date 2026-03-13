@@ -161,7 +161,8 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
   const segmentActive = 'bg-primary text-white';
   const segmentInactive =
     'bg-background-card text-text-secondary hover:bg-background-hover hover:text-text-primary';
-  const toggleContainerClass = 'flex flex-1 min-w-0 rounded-lg border border-border-medium bg-background-muted [&>button]:flex-1';
+  const outerRowClass = 'flex flex-1 min-w-0 rounded-lg border border-border-medium overflow-hidden';
+  const toggleContainerClass = 'flex flex-1 min-w-0 bg-background-muted [&>button]:flex-1';
 
   return (
     <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>
@@ -266,7 +267,8 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                           aria-label={dirEurHuf === 'eur_huf' ? t('manualRateDir_eurToHuf') : t('manualRateDir_hufToEur')}
                         />
                       </div>
-                      <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_eurToHuf')}>
+                      <div className={outerRowClass}>
+                        <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_eurToHuf')}>
                         <button
                           type="button"
                           onClick={switchDirEurHuf}
@@ -283,6 +285,7 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                         >
                           {t('manualRateDir_hufToEur')}
                         </button>
+                        </div>
                       </div>
                     </div>
                     <input type="hidden" name="manual_eur_huf" value={canonicalEurHuf != null ? String(canonicalEurHuf) : ''} />
@@ -306,7 +309,8 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                           aria-label={dirUsdHuf === 'usd_huf' ? t('manualRateDir_usdToHuf') : t('manualRateDir_hufToUsd')}
                         />
                       </div>
-                      <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_usdToHuf')}>
+                      <div className={outerRowClass}>
+                        <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_usdToHuf')}>
                         <button
                           type="button"
                           onClick={switchDirUsdHuf}
@@ -323,6 +327,7 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                         >
                           {t('manualRateDir_hufToUsd')}
                         </button>
+                        </div>
                       </div>
                     </div>
                     <input type="hidden" name="manual_usd_huf" value={canonicalUsdHuf != null ? String(canonicalUsdHuf) : ''} />
@@ -346,7 +351,8 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                           aria-label={dirUsdEur === 'usd_eur' ? t('manualRateDir_usdToEur') : t('manualRateDir_eurToUsd')}
                         />
                       </div>
-                      <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_usdToEur')}>
+                      <div className={outerRowClass}>
+                        <div className={toggleContainerClass} role="group" aria-label={t('manualRateDir_usdToEur')}>
                         <button
                           type="button"
                           onClick={switchDirUsdEur}
@@ -363,6 +369,7 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
                         >
                           {t('manualRateDir_eurToUsd')}
                         </button>
+                        </div>
                       </div>
                     </div>
                     <input type="hidden" name="manual_usd_eur" value={canonicalUsdEur != null ? String(canonicalUsdEur) : ''} />

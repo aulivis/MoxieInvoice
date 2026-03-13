@@ -98,16 +98,22 @@ export default function LoginPage() {
         className="hidden md:flex md:w-1/2 shrink-0 flex-col justify-between p-12 xl:p-16"
         style={{ background: 'linear-gradient(160deg, #0E1628 0%, #1A2744 60%, #2A3A5C 100%)' }}
       >
-        {/* Logo + tagline */}
+        {/* Logo + tagline. Wordmark = icon height −10%. */}
         <div>
-          <div className="flex items-end gap-[1ch] mb-5">
-            <BrixaLogoMark size={52} />
-            <span
-              style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '38px', lineHeight: 1, color: 'white' }}
-            >
-              Brixa
-            </span>
-          </div>
+          {(() => {
+            const heroIconSize = 52;
+            const heroWordmarkSize = heroIconSize * 0.9;
+            return (
+              <div className="flex items-end gap-[1ch] mb-5">
+                <BrixaLogoMark size={heroIconSize} />
+                <span
+                  style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: `${heroWordmarkSize}px`, lineHeight: 1, color: 'white' }}
+                >
+                  Brixa
+                </span>
+              </div>
+            );
+          })()}
           <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
             {t('heroTagline')}
           </p>
@@ -185,15 +191,21 @@ export default function LoginPage() {
         {/* Centered form */}
         <div className="flex-1 flex items-center justify-center px-6 pb-12">
           <div className="w-full max-w-sm">
-            {/* Mobile logo */}
-            <div className="flex items-end gap-[1ch] mb-8 md:hidden">
-              <BrixaLogoMark size={35} />
-              <span
-                style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '26px', lineHeight: 1, color: 'var(--color-text-primary)' }}
-              >
-                Brixa
-              </span>
-            </div>
+            {/* Mobile logo. Wordmark = icon height −10%. */}
+            {(() => {
+              const mobileIconSize = 35;
+              const mobileWordmarkSize = mobileIconSize * 0.9;
+              return (
+                <div className="flex items-end gap-[1ch] mb-8 md:hidden">
+                  <BrixaLogoMark size={mobileIconSize} />
+                  <span
+                    style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: `${mobileWordmarkSize}px`, lineHeight: 1, color: 'var(--color-text-primary)' }}
+                  >
+                    Brixa
+                  </span>
+                </div>
+              );
+            })()}
 
             {messageSuspended && (
               <div className="mb-6 rounded-lg border border-border-medium bg-background-card p-4 text-sm text-text-primary" role="status">

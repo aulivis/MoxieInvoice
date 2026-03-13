@@ -43,21 +43,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Header */}
         <header className={`sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-light bg-background-card/95 backdrop-blur-sm px-4 md:px-6${signedIn ? ' md:hidden' : ''}`}>
           <div className="flex items-center gap-3">
-            {/* Logo – visible on mobile when signed in (sidebar is hidden), always when signed out */}
-            {signedIn ? (
-              <span className="flex items-end gap-[1ch] md:hidden">
-                <BrixaLogoMark size={24} />
-                <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
-              </span>
-            ) : (
-              <Link
-                href="/"
-                className="flex items-end gap-[1ch] hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md outline-none transition-opacity"
-              >
-                <BrixaLogoMark size={24} />
-                <span style={{ fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: '17px', lineHeight: 1, color: 'var(--color-text-primary)' }}>Brixa</span>
-              </Link>
-            )}
+            {/* Logo – visible on mobile when signed in (sidebar is hidden), always when signed out. Wordmark = icon height −10%. */}
+            {(() => {
+              const headerIconSize = 24;
+              const wordmarkSize = headerIconSize * 0.9;
+              const wordmarkStyle = { fontFamily: "var(--font-encode-sans-expanded), 'Encode Sans Expanded', sans-serif", fontWeight: 400, fontSize: `${wordmarkSize}px`, lineHeight: 1, color: 'var(--color-text-primary)' } as const;
+              return signedIn ? (
+                <span className="flex items-end gap-[1ch] md:hidden">
+                  <BrixaLogoMark size={headerIconSize} />
+                  <span style={wordmarkStyle}>Brixa</span>
+                </span>
+              ) : (
+                <Link
+                  href="/"
+                  className="flex items-end gap-[1ch] hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md outline-none transition-opacity"
+                >
+                  <BrixaLogoMark size={headerIconSize} />
+                  <span style={wordmarkStyle}>Brixa</span>
+                </Link>
+              );
+            })()}
           </div>
 
           <div className="flex items-center gap-2">
