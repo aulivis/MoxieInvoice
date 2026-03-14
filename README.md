@@ -172,7 +172,7 @@ A `vercel.json`-ban konfigurált cron job-ok:
 | Endpoint | Ütemezés | Leírás |
 |----------|----------|--------|
 | `GET /api/cron/process-invoice-queue` | 5 percenként | Pending számlasor feldolgozása |
-| `POST /api/cron/sync-billingo-payments` | Óránként | Fizetési állapot szinkron |
+| `POST /api/cron/sync-billingo-payments` | Naponta 07:00 (Budapest, 06:00 UTC) | Fizetési állapot szinkron |
 
 Állítsd be a `CRON_SECRET` env-et; a Vercel automatikusan küldi az `Authorization: Bearer <CRON_SECRET>` headert.
 

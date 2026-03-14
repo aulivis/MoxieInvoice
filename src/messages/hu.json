@@ -55,6 +55,8 @@
     "cookieNoticeSuffix": ".",
     "heroTagline": "A híd a projekted és a számláid között.",
     "noPassword": "Nincs jelszó, nincs regisztráció – add meg az e-mail-címed és máris bent vagy.",
+    "orContinueWith": "Vagy folytatás",
+    "signInWithGoogle": "Bejelentkezés Google-lel",
     "feature1": "Automatikus számlagenerálás",
     "feature2": "Billingo & Számlázz.hu integráció",
     "feature3": "Valós idejű deviza konverzió",
@@ -176,7 +178,11 @@
     "dataHandling": "Adatkezelés",
     "dataHandlingParagraph1": "Csak a szolgáltatás működéséhez elengedhetetlenül szükséges sütiket használunk: munkamenet és hitelesítés, biztonság, valamint (ha számlázót használsz) a fizetéssel kapcsolatos sütik. Nem használunk analitikai vagy marketing sütiket, és nem követünk nyomon más oldalakon. Ezért nem jelenítünk meg süti hozzájárulási ablakot.",
     "dataHandlingParagraph2": "Az adataid kezelésének teljes leírásáért, jogaidról és az adatmegőrzési időkről lásd az adatkezelési tájékoztatónkat.",
-    "dataHandlingLinkText": "Adatkezelési tájékoztató"
+    "dataHandlingLinkText": "Adatkezelési tájékoztató",
+    "signInMethods": "Bejelentkezési módok",
+    "emailMagicLink": "Email (Magic Link)",
+    "googleProvider": "Google",
+    "connected": "Csatolva"
   },
   "deleteAccount": {
     "title": "Fiók végleges törlése?",

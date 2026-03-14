@@ -10,6 +10,7 @@ import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { decrypt } from '@/lib/crypto';
 import { logError } from '@/lib/logger';
 import { createMoxieClient } from '@/lib/moxie/client';
+import { getOrgOwnerEmail } from '@/lib/moxie/get-org-owner-email';
 
 const WEBHOOK_LIMIT_PER_MIN = 60;
 
@@ -133,6 +134,7 @@ export async function POST(request: NextRequest) {
     request: finalRequest,
     moxieInvoiceId: normalized.moxieInvoiceId,
     moxieInvoiceUuid: normalized.moxieInvoiceUuid,
+    moxieClientId: normalized.moxieClientId,
     moxieBaseUrl: moxie.base_url,
     moxieApiKey,
     locale,
@@ -157,12 +159,16 @@ export async function POST(request: NextRequest) {
     const projectName = extractProjectName(body, orgSettings ?? null);
     if (clientName && projectName && result.errorMessage) {
       try {
+        const ownerEmail = await getOrgOwnerEmail(supabase, orgId);
         const moxieClient = createMoxieClient(moxie.base_url, moxieApiKey);
         await moxieClient.createTask({
           name: 'Számla létrehozás sikertelen',
           clientName,
           projectName,
           description: result.errorMessage,
+          dueDate: new Date().toISOString().slice(0, 10),
+          priority: 1,
+          ...(ownerEmail ? { assignedTo: [ownerEmail] } : {}),
         });
       } catch (taskErr) {
         logError(taskErr instanceof Error ? taskErr : new Error(String(taskErr)), {
@@ -259,6 +265,8 @@ function extractBuyerTaxNumber(
 }
 
 const INV_CURRENCY_KEY = 'inv-currency';
+/** Moxie custom field mappingKey for legal form. "cég" => tax required; empty or "magánszemély" => tax not required. */
+const LEGAL_FORM_KEY = 'legal-form';
 const ALLOWED_CURRENCIES = ['EUR', 'HUF', 'USD'] as const;
 
 /** Resolve target currency from inv-currency custom field. Empty or "Alapértelmezett" => use default (no conversion). */
@@ -288,10 +296,23 @@ function mapRmInvTypeToInvoiceType(
   return 'invoice';
 }
 
+/** Extract Moxie client id for CLIENT attachment (createFromUrl). Prefer clientInfo.id / _id, then body.clientId. */
+function extractMoxieClientId(
+  body: Record<string, unknown>,
+  clientInfoOrClient?: Record<string, unknown>
+): string | undefined {
+  const fromClient = clientInfoOrClient
+    ? String(clientInfoOrClient.id ?? clientInfoOrClient._id ?? '').trim()
+    : '';
+  if (fromClient) return fromClient;
+  const fromBody = String(body.clientId ?? body.client_id ?? '').trim();
+  return fromBody || undefined;
+}
+
 function normalizeMoxiePayload(
   body: Record<string, unknown>,
   _eventType: string
-): { request: NormalizedInvoiceRequest; moxieInvoiceId?: string; moxieInvoiceUuid?: string } | null {
+): { request: NormalizedInvoiceRequest; moxieInvoiceId?: string; moxieInvoiceUuid?: string; moxieClientId?: string } | null {
   // 1) Moxie InvoiceSent: clientInfo + lineItems or items, or totals as fallback
   const clientInfo = body.clientInfo as Record<string, unknown> | undefined;
   if (clientInfo) {
@@ -342,11 +363,14 @@ function normalizeMoxiePayload(
     const targetCurrency = resolveTargetCurrency(defaultCurrency, body, clientInfo);
     const registrationNo =
       getCustomFieldValue(clientInfo, 'reg-no') ?? getCustomFieldValue(body, 'reg-no');
+    const legalForm =
+      getCustomFieldValue(clientInfo, LEGAL_FORM_KEY) ?? getCustomFieldValue(body, LEGAL_FORM_KEY);
     const request: NormalizedInvoiceRequest = {
       buyer: {
         name,
         taxNumber: extractBuyerTaxNumber(clientInfo, body),
         ...(registrationNo ? { registrationNo } : {}),
+        ...(legalForm !== undefined ? { legalForm } : {}),
         postCode: String(clientInfo.postal ?? clientInfo.postCode ?? ''),
         city: String(clientInfo.city ?? ''),
         address: String(clientInfo.address1 ?? clientInfo.address ?? ''),
@@ -365,6 +389,7 @@ function normalizeMoxiePayload(
       request,
       moxieInvoiceId: (String(body.invoiceNumberFormatted ?? body.invoiceNumber ?? body.id ?? body.invoice_id ?? '').trim()) || undefined,
       moxieInvoiceUuid: extractMoxieInvoiceUuid(body),
+      moxieClientId: extractMoxieClientId(body, clientInfo),
     };
   }
 
@@ -380,6 +405,8 @@ function normalizeMoxiePayload(
   const defaultCurrency = (body.currency as string) || (client.currency as string) || 'HUF';
   const targetCurrency = resolveTargetCurrency(defaultCurrency, body, client);
   const regNo = getCustomFieldValue(client, 'reg-no') ?? getCustomFieldValue(body, 'reg-no');
+  const legalForm =
+    getCustomFieldValue(client, LEGAL_FORM_KEY) ?? getCustomFieldValue(body, LEGAL_FORM_KEY);
   const request: NormalizedInvoiceRequest = {
     buyer: {
       name,
@@ -389,6 +416,7 @@ function normalizeMoxiePayload(
         getCustomFieldValue(body, 'eori') ||
         undefined,
       ...(regNo ? { registrationNo: regNo } : {}),
+      ...(legalForm !== undefined ? { legalForm } : {}),
       postCode: String(address.post_code ?? address.postCode ?? ''),
       city: String(address.city ?? ''),
       address: String(address.line1 ?? address.address ?? ''),
@@ -414,5 +442,6 @@ function normalizeMoxiePayload(
     request,
     moxieInvoiceId: (body.invoiceNumberFormatted ?? (body.invoiceNumber != null ? String(body.invoiceNumber) : undefined) ?? body.invoice_id) as string | undefined,
     moxieInvoiceUuid: extractMoxieInvoiceUuid(body),
+    moxieClientId: extractMoxieClientId(body, client),
   };
 }

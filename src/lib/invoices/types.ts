@@ -14,6 +14,8 @@ export interface NormalizedInvoiceRequest {
     taxNumber?: string;
     /** Cégjegyzékszám (company registration number); from Moxie custom field mappingKey "reg-no". */
     registrationNo?: string;
+    /** From Moxie custom field mappingKey "legal-form". "cég" => tax number required; empty or "magánszemély" => not required. */
+    legalForm?: string;
     postCode: string;
     city: string;
     address: string;

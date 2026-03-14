@@ -48,7 +48,9 @@ export function validateSzamlazzRequest(
   if (empty(request.buyer.name)) {
     errors.push({ code: 'MISSING_FIELD', field: 'buyerName' });
   }
-  if (empty(request.buyer.taxNumber)) {
+  // Tax number required only when legal form is "cég" (company). Empty or "magánszemély" => not required.
+  const isCompany = request.buyer.legalForm?.trim().toLowerCase() === 'cég';
+  if (isCompany && empty(request.buyer.taxNumber)) {
     errors.push({ code: 'MISSING_FIELD', field: 'taxNumber' });
   }
   if (empty(request.buyer.postCode)) {

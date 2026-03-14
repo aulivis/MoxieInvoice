@@ -26,6 +26,8 @@ export interface CreateInvoiceInput {
   request: NormalizedInvoiceRequest;
   moxieInvoiceId?: string;
   moxieInvoiceUuid?: string;
+  /** Moxie client id for attaching PDF to CLIENT via createFromUrl. When present, PDF is attached to client instead of deliverable. */
+  moxieClientId?: string;
   moxieBaseUrl?: string;
   moxieApiKey?: string;
   /** Locale for validation error messages (Billingo / Számlázz.hu) (default 'hu'). */
@@ -46,7 +48,7 @@ function needsBillingoDefaults(request: NormalizedInvoiceRequest): boolean {
 }
 
 export async function createInvoice(input: CreateInvoiceInput): Promise<CreateInvoiceOutput> {
-  const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieInvoiceUuid, moxieBaseUrl, moxieApiKey, locale = 'hu' } = input;
+  const { orgId, provider, credentials, request: rawRequest, moxieInvoiceId, moxieInvoiceUuid, moxieClientId, moxieBaseUrl, moxieApiKey, locale = 'hu' } = input;
   let request = rawRequest;
   let billingoOrgSettings: { billingo_send_invoice_by_email?: boolean } | null = null;
 
@@ -162,25 +164,20 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
     }
   }
 
-  if (moxieBaseUrl && moxieApiKey) {
-    // Build the PDF proxy URL. Moxie will download the actual PDF binary from this endpoint.
-    // NEXT_PUBLIC_APP_URL must be set to the public app URL (e.g. https://app.example.com).
+  if (moxieBaseUrl && moxieApiKey && moxieClientId) {
+    // Attach PDF to Moxie CLIENT (not deliverable). Moxie downloads from fileUrl and attaches to the client.
     const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '');
     const proxyUrl = appUrl
       ? `${appUrl}/api/invoices/${row.id}/pdf?token=${pdfToken}`
       : null;
-
-    // Fall back to viewer URL if app URL is not configured (Moxie may or may not handle HTML)
     const fileUrl = proxyUrl ?? result.pdfUrl;
 
     if (fileUrl) {
       try {
         const base = moxieBaseUrl.replace(/\/$/, '').replace(/\/api\/public\/?$/i, '');
         const form = new FormData();
-        form.set('type', 'DELIVERABLE');
-        // Use deliverable object ID (UUID from webhook) for attachment; fallback to invoice number then row id.
-        const attachmentId = moxieInvoiceUuid ?? moxieInvoiceId ?? row.id;
-        form.set('id', attachmentId);
+        form.set('type', 'CLIENT');
+        form.set('id', moxieClientId);
         form.set('fileUrl', fileUrl);
         form.set('fileName', `invoice-${result.invoiceNumber}.pdf`);
         const moxieRes = await fetch(
@@ -192,7 +189,6 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
           }
         );
         if (moxieRes.ok) {
-          // Clear the pdf_token after successful sync (one-time use)
           await supabase
             .from('invoices')
             .update({ status: 'synced_to_moxie', pdf_token: null })
@@ -205,7 +201,6 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
             invoiceId: row.id,
             invoiceNumber: result.invoiceNumber,
           });
-          // On 404 (e.g. deliverable not found), clear pdf_token so we don't retry; invoice stays created.
           if (moxieRes.status === 404) {
             await supabase
               .from('invoices')
@@ -221,6 +216,12 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<CreateIn
         });
       }
     }
+  } else if (moxieBaseUrl && moxieApiKey && !moxieClientId) {
+    logError(new Error('Moxie PDF attachment skipped: no moxieClientId in webhook payload'), {
+      step: 'moxie_attach_pdf_skip',
+      orgId,
+      invoiceId: row.id,
+    });
   }
 
   return {

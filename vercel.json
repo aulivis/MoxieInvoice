@@ -7,7 +7,7 @@
     },
     {
       "path": "/api/cron/sync-billingo-payments",
-      "schedule": "0 * * * *"
+      "schedule": "0 6 * * *"
     }
   ]
 }

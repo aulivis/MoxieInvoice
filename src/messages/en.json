@@ -55,6 +55,8 @@
     "cookieNoticeSuffix": ".",
     "heroTagline": "The bridge between your project and your invoices.",
     "noPassword": "No password, no registration – just enter your email and you're in.",
+    "orContinueWith": "Or continue with",
+    "signInWithGoogle": "Sign in with Google",
     "feature1": "Automatic invoice generation",
     "feature2": "Billingo & Számlázz.hu integration",
     "feature3": "Real-time currency conversion",
@@ -176,7 +178,11 @@
     "dataHandling": "Data & privacy",
     "dataHandlingParagraph1": "We only use cookies that are strictly necessary for the operation of the service: session and authentication, security, and (when you use billing) payment-related cookies. We do not use analytics or marketing cookies, and we do not track you across sites. For this reason we do not show a cookie consent banner.",
     "dataHandlingParagraph2": "For a full description of how we process your data, your rights, and how long we keep data, see our data protection notice.",
-    "dataHandlingLinkText": "Full data protection notice"
+    "dataHandlingLinkText": "Full data protection notice",
+    "signInMethods": "Sign-in methods",
+    "emailMagicLink": "Email (Magic Link)",
+    "googleProvider": "Google",
+    "connected": "Connected"
   },
   "deleteAccount": {
     "title": "Permanently delete account?",

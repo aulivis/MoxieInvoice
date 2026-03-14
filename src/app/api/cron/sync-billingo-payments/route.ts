@@ -4,7 +4,7 @@ import { syncBillingoPaymentsForOrg } from '@/lib/invoices/sync-billingo-payment
 
 /**
  * Vercel Cron: sync payment status from Billingo or Számlázz.hu for all orgs.
- * Runs hourly. Secured with CRON_SECRET.
+ * Runs daily at 06:00 UTC (= 07:00 Budapest CET / 08:00 Budapest CEST). Secured with CRON_SECRET.
  */
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;

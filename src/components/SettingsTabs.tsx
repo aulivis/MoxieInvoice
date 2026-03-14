@@ -12,6 +12,7 @@ import { CurrencyForm } from '@/components/CurrencyForm';
 import { ScheduleForm } from '@/components/ScheduleForm';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { HeaderAuth } from '@/components/HeaderAuth';
+import { SignInMethods } from '@/components/SignInMethods';
 import { DeleteAccountDialog } from '@/components/DeleteAccountDialog';
 
 type TabKey = 'subscription' | 'moxie' | 'billing' | 'currency' | 'schedule' | 'dataHandling';
@@ -228,10 +229,11 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
         )}
       </div>
 
-      {/* Mobile-only: language + logout (desktop has these in sidebar) */}
+      {/* Mobile-only: sign-in methods, language + logout (desktop has these in sidebar) */}
       <div className="mt-8 pt-6 border-t border-border-light md:hidden">
         <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{t('accountSection')}</p>
         <div className="space-y-2">
+          <SignInMethods />
           <LanguageSwitcher />
           <HeaderAuth />
         </div>

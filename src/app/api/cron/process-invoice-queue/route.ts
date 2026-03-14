@@ -6,6 +6,7 @@ import { applyCurrencyConversion } from '@/lib/invoices/apply-currency-conversio
 import { logError } from '@/lib/logger';
 import { decrypt } from '@/lib/crypto';
 import { createMoxieClient } from '@/lib/moxie/client';
+import { getOrgOwnerEmail } from '@/lib/moxie/get-org-owner-email';
 import type { NormalizedInvoiceRequest } from '@/lib/invoices/types';
 
 function getSupabase(): SupabaseClient {
@@ -160,12 +161,16 @@ export async function GET(request: Request) {
         const projectName = orgSettingsForTask?.default_moxie_project_name?.trim();
         if (clientName && projectName && result.errorMessage && moxie?.base_url && moxieApiKey) {
           try {
+            const ownerEmail = await getOrgOwnerEmail(supabase, job.org_id);
             const moxieClient = createMoxieClient(moxie.base_url, moxieApiKey);
             await moxieClient.createTask({
               name: 'Számla létrehozás sikertelen',
               clientName,
               projectName,
               description: result.errorMessage,
+              dueDate: new Date().toISOString().slice(0, 10),
+              priority: 1,
+              ...(ownerEmail ? { assignedTo: [ownerEmail] } : {}),
             });
           } catch (taskErr) {
             logError(taskErr instanceof Error ? taskErr : new Error(String(taskErr)), {
