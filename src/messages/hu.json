@@ -72,6 +72,7 @@
     "connectionStatus": "Kapcsolat állapota",
     "noInvoices": "Még nincs számla.",
     "noInvoicesDesc": "Hozd létre az első számlát kézzel, vagy konfiguráld a Moxie integrációt.",
+    "emptyStateCta": "Folytasd a beállítást",
     "viewInvoices": "Számlák",
     "viewAll": "Összes",
     "newInvoice": "Új számla",
@@ -115,8 +116,12 @@
     "numberOrId": "Szám / Külső ID",
     "errorColumn": "Hiba",
     "errorSummary": "Hibás adatok",
+    "errorPrescriptive": "Ellenőrizd a Beállításokban a Billingo és Moxie kapcsolatot. Ha a hiba továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
     "action": "Művelet",
     "empty": "Még nincs számla.",
+    "emptyDesc": "Kapcsold be a Moxie és Billingo integrációt a Beállításokban, majd a számlák itt fognak megjelenni.",
+    "emptyCta": "Beállítások",
+    "emptyFilteredDesc": "Válassz másik szűrőt a listához.",
     "count": "{count, plural, =0 {Nincs számla} other {# számla}}",
     "statusFailed": "Sikertelen",
     "statusCreated": "Létrehozva",
@@ -124,6 +129,7 @@
     "pdf": "PDF",
     "details": "Részletek",
     "refresh": "Frissítés",
+    "refreshSyncing": "Szinkronizáljuk a Billingót…",
     "refreshNoUpdate": "Nincs nyitott számla az alkalmazásban.",
     "refreshNoUpdateChecked": "{count} nyitott számla ellenőrizve, nincs új fizetés.",
     "refreshSuccess": "{updated} számla frissítve, Moxie értesítve: {moxieNotified}",
@@ -435,7 +441,9 @@
     "saved": "Mentve."
   },
   "loading": {
-    "default": "Betöltés..."
+    "default": "Betöltés...",
+    "invoices": "Szóinkronizáljuk a számlákat...",
+    "syncing": "Szinkronizáljuk a Billingót..."
   },
   "onboarding": {
     "title": "Beállítás varázsló",

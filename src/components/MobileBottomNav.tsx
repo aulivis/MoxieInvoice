@@ -66,7 +66,7 @@ export function MobileBottomNav() {
                 href={href}
                 aria-current={isActive ? 'page' : undefined}
                 className={[
-                  'flex flex-col items-center justify-center h-full gap-1 text-xs font-semibold transition-colors outline-none',
+                  'relative flex flex-col items-center justify-center h-full gap-1 text-xs font-semibold transition-colors outline-none',
                   'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                   isActive ? 'text-primary' : 'text-text-tertiary',
                 ].join(' ')}

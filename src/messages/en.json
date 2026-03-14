@@ -72,6 +72,7 @@
     "connectionStatus": "Connection status",
     "noInvoices": "No invoices yet.",
     "noInvoicesDesc": "Create your first invoice manually or configure the Moxie integration.",
+    "emptyStateCta": "Continue setup",
     "viewInvoices": "Invoices",
     "viewAll": "View all",
     "newInvoice": "New invoice",
@@ -115,8 +116,12 @@
     "numberOrId": "Number / External ID",
     "errorColumn": "Error",
     "errorSummary": "Incorrect data",
+    "errorPrescriptive": "Check your Billingo and Moxie connection in Settings. If the problem persists, contact support.",
     "action": "Action",
     "empty": "No invoices yet.",
+    "emptyDesc": "Enable Moxie and Billingo in Settings; invoices will appear here once synced.",
+    "emptyCta": "Settings",
+    "emptyFilteredDesc": "Try a different filter to see more results.",
     "count": "{count, plural, =0 {No invoices} one {# invoice} other {# invoices}}",
     "statusFailed": "Failed",
     "statusCreated": "Created",
@@ -124,6 +129,7 @@
     "pdf": "PDF",
     "details": "Details",
     "refresh": "Refresh",
+    "refreshSyncing": "Syncing with Billingo…",
     "refreshNoUpdate": "No open invoices in the app.",
     "refreshNoUpdateChecked": "{count} open invoice(s) checked, no new payments.",
     "refreshSuccess": "{updated} invoice(s) updated, Moxie notified: {moxieNotified}",
@@ -435,7 +441,9 @@
     "saved": "Saved."
   },
   "loading": {
-    "default": "Loading..."
+    "default": "Loading...",
+    "invoices": "Syncing invoices...",
+    "syncing": "Syncing with Billingo..."
   },
   "onboarding": {
     "title": "Setup wizard",

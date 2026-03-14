@@ -5,7 +5,6 @@ import { hasActiveSubscription } from '@/lib/subscription';
 import {
   moxieConnectionBodySchema,
   billingProviderBodySchema,
-  orgSettingsBodySchema,
   currencySettingsSchema,
   scheduleSettingsSchema,
   validate,
@@ -154,44 +153,6 @@ export async function saveScheduleSettingsAction(
   await supabase.from('org_settings').upsert(
     {
       org_id: org.orgId,
-      schedule_type: b.schedule_type,
-      timezone: b.timezone,
-      start_time: b.start_time,
-      end_time: b.end_time,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'org_id' }
-  );
-  return { success: true };
-}
-
-export async function saveOrgSettingsAction(
-  _prev: SettingsState | null,
-  formData: FormData
-): Promise<SettingsState> {
-  const org = await getOrgId();
-  if ('error' in org) return { error: org.error };
-  const raw = {
-    conversion_source: formData.get('conversion_source') || undefined,
-    manual_eur_huf: formData.get('manual_eur_huf') ? Number(formData.get('manual_eur_huf')) : undefined,
-    manual_usd_huf: formData.get('manual_usd_huf') ? Number(formData.get('manual_usd_huf')) : undefined,
-    manual_usd_eur: formData.get('manual_usd_eur') ? Number(formData.get('manual_usd_eur')) : undefined,
-    schedule_type: formData.get('schedule_type') || undefined,
-    timezone: formData.get('timezone') || undefined,
-    start_time: formData.get('start_time') || undefined,
-    end_time: formData.get('end_time') || undefined,
-  };
-  const parsed = validate(orgSettingsBodySchema, raw);
-  if (!parsed.success) return { error: parsed.error };
-  const supabase = await createClient();
-  const b = parsed.data;
-  await supabase.from('org_settings').upsert(
-    {
-      org_id: org.orgId,
-      conversion_source: b.conversion_source,
-      manual_eur_huf: b.manual_eur_huf ?? undefined,
-      manual_usd_huf: b.manual_usd_huf ?? undefined,
-      manual_usd_eur: b.manual_usd_eur ?? undefined,
       schedule_type: b.schedule_type,
       timezone: b.timezone,
       start_time: b.start_time,

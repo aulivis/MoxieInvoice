@@ -115,26 +115,31 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
     { key: 'dataHandling', labelKey: 'dataHandling', Icon: DataHandlingIcon },
   ];
 
+  const tabPanelId = 'settings-tabpanel';
+
   return (
     <div>
       {/* Tab bar */}
       <div className="border-b border-border-light mb-6 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
-        <div className="flex gap-0 min-w-max sm:min-w-0">
+        <div className="flex gap-0 min-w-max sm:min-w-0" role="tablist">
           {tabs.map(({ key, labelKey, Icon }) => {
             const isActive = activeTab === key;
             const isConfigured = configuredMap[key];
+            const tabId = `settings-tab-${key}`;
             return (
               <button
                 key={key}
+                id={tabId}
                 type="button"
                 onClick={() => setActiveTab(key)}
                 className={[
-                  'relative flex items-center gap-2 px-3 sm:px-4 py-3 text-sm font-medium border-b-2 transition-colors duration-150 whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-t-lg',
+                  'relative flex items-center gap-2 px-3 sm:px-4 py-3 min-h-[44px] sm:min-h-0 text-sm font-medium border-b-2 transition-colors duration-150 whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-t-lg',
                   isActive
                     ? 'border-primary text-primary'
                     : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border-medium',
                 ].join(' ')}
                 aria-selected={isActive}
+                aria-controls={tabPanelId}
                 role="tab"
               >
                 <Icon />
@@ -157,7 +162,7 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
       </div>
 
       {/* Tab panels — Card title removed to avoid duplication with tab label; same width as app pages (max-w-7xl) */}
-      <div role="tabpanel" className="animate-fade-in">
+      <div id={tabPanelId} role="tabpanel" aria-labelledby={`settings-tab-${activeTab}`} className="animate-fade-in">
         {activeTab === 'subscription' && (
           <Card>
             <SubscriptionSection hasSubscription={hasSubscription} />

@@ -231,7 +231,7 @@ export default async function HomePage() {
       <div className={['space-y-6', !allSetupDone ? 'blur-sm pointer-events-none select-none' : ''].filter(Boolean).join(' ')}>
 
       {/* Bento: Stats row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="opacity-0 animate-fade-up">
           <StatCard
             label={t('statOutstanding')}
@@ -294,6 +294,8 @@ export default async function HomePage() {
             <EmptyState
               title={t('noInvoices')}
               description={t('noInvoicesDesc')}
+              ctaLabel={t('emptyStateCta')}
+              ctaHref="/onboarding"
             />
           ) : (
             <ul className="divide-y divide-border-light">

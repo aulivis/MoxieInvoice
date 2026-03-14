@@ -15,11 +15,6 @@ const serverSchema = z.object({
   RESEND_API_KEY: z.string().min(1).optional(),
 });
 
-const clientSchema = serverSchema.pick({
-  NEXT_PUBLIC_SUPABASE_URL: true,
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: true,
-});
-
 export type Env = z.infer<typeof serverSchema>;
 
 let cached: Env | null = null;
@@ -48,14 +43,4 @@ export function getEnv(): Env {
   }
   cached = result.data;
   return result.data;
-}
-
-/**
- * Client-safe env (only NEXT_PUBLIC_*). Use in client components if needed.
- */
-export function getClientEnv() {
-  return clientSchema.parse({
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-  });
 }

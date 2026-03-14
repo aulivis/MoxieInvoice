@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { useAuthSession } from '@/hooks/useAuthSession';
 import { Sidebar } from '@/components/Sidebar';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -11,21 +10,8 @@ import { useTranslations } from 'next-intl';
 import { BrixaLogoMark } from '@/components/BrixaLogoMark';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const [signedIn, setSignedIn] = useState(false);
+  const signedIn = useAuthSession();
   const t = useTranslations('common');
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSignedIn(!!session);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) =>
-      setSignedIn(!!session)
-    );
-    return () => subscription.unsubscribe();
-  }, []);
 
   return (
     <>

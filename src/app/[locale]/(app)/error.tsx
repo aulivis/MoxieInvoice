@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export default function AppError({
   error,
   reset,
@@ -14,8 +16,12 @@ export default function AppError({
   const t = useTranslations('common');
 
   useEffect(() => {
-    console.error('App error boundary:', error);
+    console.error('App error boundary:', error.message, error.digest ? `[digest: ${error.digest}]` : '');
   }, [error]);
+
+  const message = isProduction
+    ? t('errorFallback')
+    : (error.message || t('errorFallback'));
 
   return (
     <div className="min-h-[40vh] flex flex-col items-center justify-center p-6">
@@ -23,7 +29,7 @@ export default function AppError({
         {t('errorTitle')}
       </h2>
       <p className="text-text-secondary mb-4 text-center max-w-md">
-        {error.message || t('errorFallback')}
+        {message}
       </p>
       <Button onClick={reset}>{t('tryAgain')}</Button>
     </div>

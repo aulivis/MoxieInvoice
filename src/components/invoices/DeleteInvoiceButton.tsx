@@ -84,7 +84,7 @@ export function DeleteInvoiceButton({ invoiceId, iconOnly = false }: DeleteInvoi
         type="button"
         onClick={() => setConfirming(true)}
         disabled={pending}
-        className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] text-text-tertiary hover:text-status-error hover:bg-error-muted/20 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none transition-colors"
+        className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] md:min-h-[36px] md:min-w-[36px] text-text-tertiary hover:text-status-error hover:bg-error-muted/20 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none transition-colors"
         aria-label={t('delete')}
         title={t('delete')}
       >

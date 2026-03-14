@@ -183,6 +183,24 @@ body {
   background-clip: text;
 }
 
+/* ── Sidebar nav link (default + hover in CSS for reduced-motion) ────────── */
+.sidebar-nav-link {
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+}
+.sidebar-nav-link:hover {
+  background: var(--sidebar-hover);
+  color: rgba(255, 255, 255, 0.85);
+}
+.sidebar-nav-active.sidebar-nav-link {
+  color: var(--sidebar-active-text);
+  background: var(--sidebar-active-bg);
+}
+.sidebar-nav-active.sidebar-nav-link:hover {
+  color: var(--sidebar-active-text);
+  background: var(--sidebar-active-bg);
+}
+
 /* ── Sidebar nav active indicator ───────────────────────────────────────── */
 .sidebar-nav-active { position: relative; }
 
@@ -203,3 +221,12 @@ body {
 *::-webkit-scrollbar       { width: 6px; height: 6px; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb { background-color: #E0DDD8; border-radius: 3px; }
+
+/* ── Reduced motion (WCAG 2.2) ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

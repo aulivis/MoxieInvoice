@@ -3,6 +3,8 @@
 import { useState, useEffect, useActionState } from 'react';
 import { useTranslations } from 'next-intl';
 import { saveCurrencySettingsAction, type SettingsState } from '@/app/actions/settings';
+import { getSettingsErrorKey } from '@/lib/settings-errors';
+import { useSettingsFetch } from '@/hooks/useSettingsFetch';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 
@@ -60,7 +62,22 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
   const [liveRateUsd, setLiveRateUsd] = useState<number | null>(null);
   const [rateDate, setRateDate] = useState<string | null>(null);
   const [rateLoading, setRateLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
+
+  const { data: orgData, fetched } = useSettingsFetch<Record<string, unknown>>('/api/settings/org');
+  useEffect(() => {
+    if (!orgData) return;
+    const src = orgData.conversion_source === 'manual' ? 'manual' : 'mnb_daily';
+    setConversionSource(src);
+    const eurHuf = orgData.manual_eur_huf ?? orgData.fixed_eur_huf_rate;
+    const usdHuf = orgData.manual_usd_huf;
+    const usdEur = orgData.manual_usd_eur;
+    setDisplayEurHuf(eurHuf != null ? String(eurHuf) : '');
+    setDisplayUsdHuf(usdHuf != null ? String(usdHuf) : '');
+    setDisplayUsdEur(usdEur != null ? String(usdEur) : '');
+    setDirEurHuf('eur_huf');
+    setDirUsdHuf('usd_huf');
+    setDirUsdEur('usd_eur');
+  }, [orgData]);
 
   const [state, formAction] = useActionState<SettingsState | null, FormData>(
     saveCurrencySettingsAction,
@@ -74,14 +91,9 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
 
   const disabled = !hasSubscription;
 
-  const actionErrorKey: Record<string, string> = {
-    Unauthorized: 'unauthorized',
-    'No organization': 'noOrganization',
-    'Subscription required': 'subscriptionRequired',
-  };
   const displayActionError = state?.error
-    ? (actionErrorKey[state.error]
-        ? tErrors(actionErrorKey[state.error] as 'unauthorized')
+    ? (getSettingsErrorKey(state.error)
+        ? tErrors(getSettingsErrorKey(state.error) as 'unauthorized')
         : state.error)
     : null;
 
@@ -110,27 +122,6 @@ export function CurrencyForm({ hasSubscription = true }: { hasSubscription?: boo
     setDirUsdEur((prev) => (prev === 'usd_eur' ? 'eur_usd' : 'usd_eur'));
     if (can != null) setDisplayUsdEur(fromCanonicalToDisplay(can, true));
   };
-
-  // Load saved settings (canonical from API)
-  useEffect(() => {
-    fetch('/api/settings/org')
-      .then((r) => r.json())
-      .then((d) => {
-        const src = d.conversion_source === 'manual' ? 'manual' : 'mnb_daily';
-        setConversionSource(src);
-        const eurHuf = d.manual_eur_huf ?? d.fixed_eur_huf_rate;
-        const usdHuf = d.manual_usd_huf;
-        const usdEur = d.manual_usd_eur;
-        setDisplayEurHuf(eurHuf != null ? String(eurHuf) : '');
-        setDisplayUsdHuf(usdHuf != null ? String(usdHuf) : '');
-        setDisplayUsdEur(usdEur != null ? String(usdEur) : '');
-        setDirEurHuf('eur_huf');
-        setDirUsdHuf('usd_huf');
-        setDirUsdEur('usd_eur');
-        setFetched(true);
-      })
-      .catch(() => setFetched(true));
-  }, []);
 
   // Fetch live MNB rates when MNB daily is selected (for preview + rate date)
   useEffect(() => {

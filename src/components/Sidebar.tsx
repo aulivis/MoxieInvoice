@@ -127,27 +127,11 @@ export function Sidebar() {
                   href={href}
                   aria-current={isActive ? 'page' : undefined}
                   className={[
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[40px] text-sm font-medium outline-none',
+                    'sidebar-nav-link flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[40px] text-sm font-medium outline-none',
                     'transition-colors duration-150',
                     'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1628]',
                     isActive ? 'sidebar-nav-active' : '',
                   ].join(' ')}
-                  style={{
-                    color: isActive ? '#E8893A' : 'rgba(255,255,255,0.5)',
-                    background: isActive ? 'rgba(232,137,58,0.12)' : undefined,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = '#1A2744';
-                      (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.85)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = '';
-                      (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)';
-                    }
-                  }}
                 >
                   {Icon && <Icon active={isActive} />}
                   <span>{t(key)}</span>

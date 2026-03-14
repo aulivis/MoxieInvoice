@@ -24,3 +24,5 @@ export { Select } from './Select';
 export type { SelectOption, SelectProps } from './Select';
 export { EmptyState } from './EmptyState';
 export { StatCard } from './StatCard';
+export { TimezoneCombobox } from './TimezoneCombobox';
+export type { TimezoneComboboxProps } from './TimezoneCombobox';

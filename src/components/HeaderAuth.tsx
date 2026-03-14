@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { useAuthSession } from '@/hooks/useAuthSession';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
@@ -12,22 +12,9 @@ interface HeaderAuthProps {
 }
 
 export function HeaderAuth({ dark = false }: HeaderAuthProps) {
-  const [signedIn, setSignedIn] = useState(false);
+  const signedIn = useAuthSession();
   const router = useRouter();
   const t = useTranslations('nav');
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSignedIn(!!session);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) =>
-      setSignedIn(!!session)
-    );
-    return () => subscription.unsubscribe();
-  }, []);
 
   async function signOut() {
     const supabase = createClient();

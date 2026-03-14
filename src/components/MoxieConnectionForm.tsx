@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import { getSettingsErrorKey } from '@/lib/settings-errors';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { ConnectionStatusBadge } from '@/components/ui/ConnectionStatusBadge';
@@ -31,13 +32,8 @@ export function MoxieConnectionForm({ hasSubscription = true, onSaved }: { hasSu
   const tErrors = useTranslations('errors');
   const disabled = !hasSubscription;
 
-  const actionErrorKey: Record<string, string> = {
-    'Unauthorized': 'unauthorized',
-    'No organization': 'noOrganization',
-    'Subscription required': 'subscriptionRequired',
-  };
   const displaySaveError = saveError
-    ? (actionErrorKey[saveError] ? tErrors(actionErrorKey[saveError] as 'unauthorized') : saveError)
+    ? (getSettingsErrorKey(saveError) ? tErrors(getSettingsErrorKey(saveError) as 'unauthorized') : saveError)
     : null;
 
   const fetchConnection = useCallback(() => {

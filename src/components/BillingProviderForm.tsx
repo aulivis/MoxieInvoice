@@ -3,6 +3,7 @@
 import { useState, useEffect, useActionState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { saveBillingAction, type SettingsState } from '@/app/actions/settings';
+import { getSettingsErrorKey } from '@/lib/settings-errors';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { ConnectionStatusBadge } from '@/components/ui/ConnectionStatusBadge';
@@ -41,13 +42,8 @@ export function BillingProviderForm({ hasSubscription = true, onSaved, wizardMod
   const tErrors = useTranslations('errors');
   const disabled = !hasSubscription;
 
-  const actionErrorKey: Record<string, string> = {
-    'Unauthorized': 'unauthorized',
-    'No organization': 'noOrganization',
-    'Subscription required': 'subscriptionRequired',
-  };
   const displayActionError = state?.error
-    ? (actionErrorKey[state.error] ? tErrors(actionErrorKey[state.error] as 'unauthorized') : state.error)
+    ? (getSettingsErrorKey(state.error) ? tErrors(getSettingsErrorKey(state.error) as 'unauthorized') : state.error)
     : null;
 
   const fetchBilling = useCallback(() => {

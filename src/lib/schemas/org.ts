@@ -29,7 +29,7 @@ export const invoiceDefaultsSchema = z.object({
   billingo_send_invoice_by_email: z.boolean().optional(),
 });
 
-// Merged schema (used by the legacy saveOrgSettingsAction and API POST)
+// Merged schema for org_settings (GET response typing, optional validation)
 export const orgSettingsBodySchema = currencySettingsSchema
   .merge(scheduleSettingsSchema)
   .merge(invoiceDefaultsSchema);

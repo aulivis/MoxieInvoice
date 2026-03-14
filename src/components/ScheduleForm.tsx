@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect, useActionState, useMemo, useRef } from 'react';
+import { useState, useEffect, useActionState } from 'react';
 import { useTranslations } from 'next-intl';
 import { saveScheduleSettingsAction, type SettingsState } from '@/app/actions/settings';
 import type { ScheduleType } from '@/lib/schemas';
+import { getSettingsErrorKey } from '@/lib/settings-errors';
+import { useSettingsFetch } from '@/hooks/useSettingsFetch';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
+import { TimezoneCombobox } from '@/components/ui/TimezoneCombobox';
 
 // Derive schedule_type from the two dimensions
 function toScheduleType(allDays: boolean, hasWindow: boolean): ScheduleType {
@@ -50,173 +53,25 @@ function ClockIcon() {
   );
 }
 
-function ChevronDownIcon() {
-  return (
-    <svg className="w-4 h-4 text-text-tertiary pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-    </svg>
-  );
-}
-
-/** All IANA timezone names via Intl API (with fallback for older environments). */
-function getTimezoneList(): string[] {
-  try {
-    return (Intl as unknown as { supportedValuesOf(k: string): string[] }).supportedValuesOf('timeZone');
-  } catch {
-    return [
-      'Africa/Abidjan', 'America/New_York', 'America/Chicago', 'America/Denver',
-      'America/Los_Angeles', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Kolkata',
-      'Australia/Sydney', 'Europe/Berlin', 'Europe/Budapest', 'Europe/London',
-      'Europe/Paris', 'Europe/Prague', 'Pacific/Auckland', 'UTC',
-    ];
-  }
-}
-
-interface TimezoneComboboxProps {
-  value: string;
-  onChange: (tz: string) => void;
-  placeholder: string;
-  disabled?: boolean;
-  inputClass: string;
-}
-
-function TimezoneCombobox({ value, onChange, placeholder, disabled, inputClass }: TimezoneComboboxProps) {
-  const [query, setQuery] = useState('');
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
-  const [highlightedIndex, setHighlightedIndex] = useState(0);
-
-  const tzList = useMemo(getTimezoneList, []);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return tzList.slice(0, 80);
-    return tzList.filter((tz) => tz.toLowerCase().includes(q)).slice(0, 100);
-  }, [tzList, query]);
-
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return;
-    function onMousedown(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setQuery('');
-      }
-    }
-    document.addEventListener('mousedown', onMousedown);
-    return () => document.removeEventListener('mousedown', onMousedown);
-  }, [open]);
-
-  // Reset highlight when filtered list changes
-  useEffect(() => {
-    setHighlightedIndex(0);
-  }, [filtered]);
-
-  function handleSelect(tz: string) {
-    onChange(tz);
-    setQuery('');
-    setOpen(false);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!open) {
-      if (e.key === 'ArrowDown' || e.key === 'Enter') { setOpen(true); e.preventDefault(); }
-      return;
-    }
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setHighlightedIndex((i) => Math.min(i + 1, filtered.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setHighlightedIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (filtered[highlightedIndex]) handleSelect(filtered[highlightedIndex]);
-    } else if (e.key === 'Escape') {
-      setOpen(false);
-      setQuery('');
-    }
-  }
-
-  // Scroll highlighted item into view
-  useEffect(() => {
-    if (!open || !listRef.current) return;
-    const item = listRef.current.children[highlightedIndex] as HTMLElement | undefined;
-    item?.scrollIntoView({ block: 'nearest' });
-  }, [highlightedIndex, open]);
-
-  return (
-    <div ref={containerRef} className="relative">
-      {/* Hidden input for form submission */}
-      <input type="hidden" name="timezone" value={value} />
-
-      {/* Search input */}
-      <div className="relative">
-        <input
-          type="text"
-          role="combobox"
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          aria-autocomplete="list"
-          value={open ? query : value}
-          placeholder={open ? placeholder : value || placeholder}
-          onChange={(e) => { setQuery(e.target.value); setHighlightedIndex(0); }}
-          onFocus={() => { setQuery(''); setOpen(true); }}
-          onKeyDown={handleKeyDown}
-          className={`${inputClass} pr-8`}
-          disabled={disabled}
-          autoComplete="off"
-          spellCheck={false}
-        />
-        <span className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none">
-          <ChevronDownIcon />
-        </span>
-      </div>
-
-      {/* Dropdown */}
-      {open && (
-        <ul
-          ref={listRef}
-          role="listbox"
-          className="absolute z-50 w-full mt-1 max-h-52 overflow-y-auto rounded-lg border border-border-medium bg-background-card shadow-lg py-1"
-        >
-          {filtered.length === 0 ? (
-            <li className="px-3 py-2 text-sm text-text-tertiary select-none">—</li>
-          ) : (
-            filtered.map((tz, idx) => (
-              <li
-                key={tz}
-                role="option"
-                aria-selected={tz === value}
-                onMouseDown={(e) => { e.preventDefault(); handleSelect(tz); }}
-                onMouseEnter={() => setHighlightedIndex(idx)}
-                className={[
-                  'px-3 py-2 text-sm cursor-pointer select-none',
-                  idx === highlightedIndex
-                    ? 'bg-primary/10 text-primary'
-                    : tz === value
-                      ? 'text-primary font-medium'
-                      : 'text-text-primary hover:bg-surface-50',
-                ].join(' ')}
-              >
-                {tz}
-              </li>
-            ))
-          )}
-        </ul>
-      )}
-    </div>
-  );
-}
-
 export function ScheduleForm({ hasSubscription = true }: { hasSubscription?: boolean }) {
   const [allDays, setAllDays] = useState(true);
   const [hasWindow, setHasWindow] = useState(false);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
   const [timezone, setTimezone] = useState('Europe/Budapest');
-  const [fetched, setFetched] = useState(false);
+
+  const { data: orgData, fetched } = useSettingsFetch<Record<string, unknown>>('/api/settings/org');
+  useEffect(() => {
+    if (!orgData) return;
+    if (orgData.schedule_type) {
+      const { allDays: a, hasWindow: h } = fromScheduleType(orgData.schedule_type as ScheduleType);
+      setAllDays(a);
+      setHasWindow(h);
+    }
+    if (orgData.start_time) setStartTime(String(orgData.start_time).slice(0, 5));
+    if (orgData.end_time) setEndTime(String(orgData.end_time).slice(0, 5));
+    if (orgData.timezone) setTimezone(String(orgData.timezone));
+  }, [orgData]);
 
   const [state, formAction] = useActionState<SettingsState | null, FormData>(
     saveScheduleSettingsAction,
@@ -231,14 +86,9 @@ export function ScheduleForm({ hasSubscription = true }: { hasSubscription?: boo
   const disabled = !hasSubscription;
   const scheduleType = toScheduleType(allDays, hasWindow);
 
-  const actionErrorKey: Record<string, string> = {
-    Unauthorized: 'unauthorized',
-    'No organization': 'noOrganization',
-    'Subscription required': 'subscriptionRequired',
-  };
   const displayActionError = state?.error
-    ? (actionErrorKey[state.error]
-        ? tErrors(actionErrorKey[state.error] as 'unauthorized')
+    ? (getSettingsErrorKey(state.error)
+        ? tErrors(getSettingsErrorKey(state.error) as 'unauthorized')
         : state.error)
     : null;
 
@@ -247,24 +97,6 @@ export function ScheduleForm({ hasSubscription = true }: { hasSubscription?: boo
     'text-text-primary placeholder:text-text-disabled focus-visible:outline-none ' +
     'focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-primary/10 ' +
     (disabled ? 'disabled:opacity-60 disabled:cursor-not-allowed' : '');
-
-  // Load saved settings
-  useEffect(() => {
-    fetch('/api/settings/org')
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.schedule_type) {
-          const { allDays: a, hasWindow: h } = fromScheduleType(d.schedule_type as ScheduleType);
-          setAllDays(a);
-          setHasWindow(h);
-        }
-        if (d.start_time) setStartTime(d.start_time.slice(0, 5));
-        if (d.end_time) setEndTime(d.end_time.slice(0, 5));
-        if (d.timezone) setTimezone(d.timezone);
-        setFetched(true);
-      })
-      .catch(() => setFetched(true));
-  }, []);
 
   return (
     <div className={disabled ? 'opacity-70 pointer-events-none' : ''}>

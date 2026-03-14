@@ -49,7 +49,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         </div>
         <Link
           href={allSetupDone ? '/onboarding?step=welcome' : '/onboarding'}
-          className="shrink-0 hidden sm:inline-flex items-center gap-2 rounded-lg border border-border-medium bg-background-card px-3 py-2 text-sm font-medium text-text-secondary hover:text-text-primary hover:border-border-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none"
+          className="shrink-0 inline-flex items-center gap-2 rounded-lg border border-border-medium bg-background-card px-3 py-2 min-h-[44px] sm:min-h-0 text-sm font-medium text-text-secondary hover:text-text-primary hover:border-border-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

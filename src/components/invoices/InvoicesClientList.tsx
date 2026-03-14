@@ -140,7 +140,7 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
               type="button"
               onClick={() => setFilter(value)}
               className={[
-                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                'inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] rounded-full text-sm font-medium border transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                 isActive
                   ? 'bg-primary/10 text-primary border-primary/30'
                   : 'bg-surface-50 text-text-secondary border-border-light hover:text-text-primary hover:border-border-medium',
@@ -163,6 +163,9 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
         {filtered.length === 0 ? (
           <EmptyState
             title={filter === 'all' ? t('empty') : t('emptyFiltered')}
+            description={filter === 'all' ? t('emptyDesc') : t('emptyFilteredDesc')}
+            ctaLabel={filter === 'all' ? t('emptyCta') : undefined}
+            ctaHref={filter === 'all' ? '/settings' : undefined}
           />
         ) : (
           filtered.map((inv, i) => {
@@ -207,7 +210,7 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
                         href={getMoxieUrl(inv)!}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-[#7C3AED] hover:bg-[#7C3AED]/10 rounded focus-visible:ring-2 focus-visible:ring-[#7C3AED] focus-visible:ring-offset-2"
+                        className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] text-[#7C3AED] hover:bg-[#7C3AED]/10 rounded focus-visible:ring-2 focus-visible:ring-[#7C3AED] focus-visible:ring-offset-2"
                         aria-label={t('openInMoxie')}
                         title={t('openInMoxie')}
                       >
@@ -221,7 +224,7 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
                         href={publicUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-primary hover:bg-primary/10 rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] text-primary hover:bg-primary/10 rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                         aria-label={openInvoiceLabel(inv)}
                         title={openInvoiceLabel(inv)}
                       >
@@ -231,7 +234,7 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
                       </a>
                     ) : (
                       <span
-                        className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-text-tertiary"
+                        className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] text-text-tertiary"
                         aria-hidden
                       >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -262,9 +265,14 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
                       </svg>
                     </button>
                     {expandedErrors.has(inv.id) && (
-                      <p className="mt-1.5 text-xs text-status-error break-words bg-error-muted/30 rounded p-2">
-                        {inv.error_message}
-                      </p>
+                      <div className="mt-1.5 space-y-1.5">
+                        <p className="text-xs text-text-secondary">
+                          {t('errorPrescriptive')}
+                        </p>
+                        <p className="text-xs text-status-error break-words bg-error-muted/30 rounded p-2">
+                          {inv.error_message}
+                        </p>
+                      </div>
                     )}
                   </div>
                 )}
@@ -279,6 +287,9 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
         {filtered.length === 0 ? (
           <EmptyState
             title={filter === 'all' ? t('empty') : t('emptyFiltered')}
+            description={filter === 'all' ? t('emptyDesc') : t('emptyFilteredDesc')}
+            ctaLabel={filter === 'all' ? t('emptyCta') : undefined}
+            ctaHref={filter === 'all' ? '/settings' : undefined}
           />
         ) : (
           <Table>
@@ -328,9 +339,14 @@ export function InvoicesClientList({ invoices, locale, moxieWebBaseUrl }: Props)
                               </svg>
                             </button>
                             {isExpanded && (
-                              <p className="mt-1 break-words text-xs bg-error-muted/20 rounded p-2 text-status-error">
-                                {inv.error_message}
-                              </p>
+                              <div className="mt-1 space-y-1">
+                                <p className="text-xs text-text-secondary">
+                                  {t('errorPrescriptive')}
+                                </p>
+                                <p className="break-words text-xs bg-error-muted/20 rounded p-2 text-status-error">
+                                  {inv.error_message}
+                                </p>
+                              </div>
                             )}
                           </div>
                         )}
