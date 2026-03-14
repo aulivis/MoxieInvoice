@@ -24,8 +24,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
   const resolvedParams = await Promise.resolve(searchParams);
   const tabParam = resolvedParams?.tab;
-  const initialTab =
-    tabParam === 'dataHandling' ? 'dataHandling' : tabParam === 'account' ? 'account' : undefined;
+  const initialTab = tabParam === 'dataHandling' ? 'dataHandling' : undefined;
 
   let allSetupDone = false;
   if (orgId) {

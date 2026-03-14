@@ -10,12 +10,9 @@ import { TextWithMoxieLogo } from '@/components/MoxieLogoInline';
 import { BillingProviderForm } from '@/components/BillingProviderForm';
 import { CurrencyForm } from '@/components/CurrencyForm';
 import { ScheduleForm } from '@/components/ScheduleForm';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { HeaderAuth } from '@/components/HeaderAuth';
-import { SignInMethods } from '@/components/SignInMethods';
 import { DeleteAccountDialog } from '@/components/DeleteAccountDialog';
 
-type TabKey = 'subscription' | 'moxie' | 'billing' | 'currency' | 'schedule' | 'account' | 'dataHandling';
+type TabKey = 'subscription' | 'moxie' | 'billing' | 'currency' | 'schedule' | 'dataHandling';
 
 interface SettingsTabsProps {
   hasSubscription: boolean;
@@ -67,15 +64,6 @@ function ScheduleIcon() {
   );
 }
 
-function AccountIcon() {
-  return (
-    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-    </svg>
-  );
-}
-
 function DataHandlingIcon() {
   return (
     <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -115,7 +103,6 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
     billing: billingConfigured,
     currency: false,
     schedule: false,
-    account: false,
     dataHandling: false,
   };
 
@@ -125,7 +112,6 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
     { key: 'billing', labelKey: 'billing', Icon: BillingIcon },
     { key: 'currency', labelKey: 'currency', Icon: CurrencyIcon },
     { key: 'schedule', labelKey: 'schedule', Icon: ScheduleIcon },
-    { key: 'account', labelKey: 'accountSection', Icon: AccountIcon },
     { key: 'dataHandling', labelKey: 'dataHandling', Icon: DataHandlingIcon },
   ];
 
@@ -195,19 +181,6 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
         {activeTab === 'schedule' && (
           <Card>
             <ScheduleForm hasSubscription={hasSubscription} />
-          </Card>
-        )}
-        {activeTab === 'account' && (
-          <Card>
-            <div className="space-y-4">
-              <SignInMethods />
-              <div className="pt-4 border-t border-border-light">
-                <LanguageSwitcher />
-              </div>
-              <div className="pt-2">
-                <HeaderAuth />
-              </div>
-            </div>
           </Card>
         )}
         {activeTab === 'dataHandling' && (

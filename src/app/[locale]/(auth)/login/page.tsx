@@ -98,6 +98,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const locale = useLocale();
   const errorAuth = searchParams.get('error') === 'auth';
+  const errorGoogleAlreadyLinked = searchParams.get('error') === 'google_already_used';
   const messageSuspended = searchParams.get('message') === 'account_suspended';
   const t = useTranslations('auth');
   const tDelete = useTranslations('deleteAccount');
@@ -141,6 +142,7 @@ export default function LoginPage() {
   const rawError = state?.error;
   const errorMessage =
     (rawError && getTranslatedAuthError(rawError, t)) ||
+    (errorGoogleAlreadyLinked ? t('errors.googleAlreadyLinked') : null) ||
     (hashError || errorAuth ? t('linkExpired') : null);
 
   const features = [t('feature1'), t('feature2'), t('feature3'), t('feature4')];

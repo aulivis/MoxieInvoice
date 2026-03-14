@@ -29,7 +29,8 @@
     "errors": {
       "emailRequired": "Az e-mail cím megadása kötelező.",
       "emailRateLimit": "Túl sok bejelentkezési e-mailt kértél rövid idő alatt. Várj egy kicsit, majd próbáld újra.",
-      "retryAfterSeconds": "Biztonsági okokból csak {seconds} másodperc múlva kérhetsz új linket. Várj egy kicsit, majd próbáld újra."
+      "retryAfterSeconds": "Biztonsági okokból csak {seconds} másodperc múlva kérhetsz új linket. Várj egy kicsit, majd próbáld újra.",
+      "googleAlreadyLinked": "Ez a Google fiók már egy másik Brixa fiókhoz van társítva. Jelentkezz be azzal a fiókkal, vagy használj másik bejelentkezési módot."
     },
     "loginTitle": "Bejelentkezés",
     "signupTitle": "Regisztráció",
@@ -165,7 +166,6 @@
   "settings": {
     "title": "Beállítások",
     "description": "Állítsd be az előfizetést, a Moxie kapcsolatot, a számlázót és az ütemezést egy helyen.",
-    "accountSection": "Fiók",
     "moxie": "Moxie kapcsolat",
     "billing": "Számlázó",
     "subscription": "Előfizetés",
@@ -178,29 +178,7 @@
     "dataHandling": "Adatkezelés",
     "dataHandlingParagraph1": "Csak a szolgáltatás működéséhez elengedhetetlenül szükséges sütiket használunk: munkamenet és hitelesítés, biztonság, valamint (ha számlázót használsz) a fizetéssel kapcsolatos sütik. Nem használunk analitikai vagy marketing sütiket, és nem követünk nyomon más oldalakon. Ezért nem jelenítünk meg süti hozzájárulási ablakot.",
     "dataHandlingParagraph2": "Az adataid kezelésének teljes leírásáért, jogaidról és az adatmegőrzési időkről lásd az adatkezelési tájékoztatónkat.",
-    "dataHandlingLinkText": "Adatkezelési tájékoztató",
-    "signInMethods": "Bejelentkezési módok",
-    "signInMethodsHelp": "A csatolt módokkal ugyanabba a fiókba tudsz belépni.",
-    "signInMethodsPrimary": "Fő",
-    "signInMethodsLinked": "Csatolva",
-    "emailMagicLink": "Email (Magic Link)",
-    "googleProvider": "Google",
-    "connected": "Csatolva",
-    "addGoogle": "Google hozzáadása",
-    "removeLink": "Eltávolítás",
-    "removeLinkConfirm": "A csatolt belépés eltávolítva ebből a fiókból. Továbbra is be tudsz lépni a többi móddal.",
-    "removeLinkConfirmGoogle": "A Google belépés eltávolítva ebből a fiókból. Továbbra is be tudsz lépni az email címeddel.",
-    "linkGoogleSuccess": "A Google fiók hozzáadva. Mostantól ezzel is be tudsz lépni.",
-    "linkGoogleAlreadyUsed": "Ez a Google fiók már egy másik Brixa fiókhoz van társítva.",
-    "atLeastOneMethodRequired": "Legalább egy bejelentkezési mód szükséges.",
-    "linkExistingTitle": "Már van Brixa fiókod? Csatold ehhez a Google belépést.",
-    "linkExistingDescription": "Ha korábban Magic Linkkel regisztráltál, add meg azt az email címet. Oda ellenőrző linket küldünk; a linkre kattintva a Google belépésed a meglévő fiókodhoz kapcsolódik.",
-    "linkExistingEmailPlaceholder": "email@pelda.hu",
-    "linkExistingSubmit": "Ellenőrző link küldése",
-    "linkExistingSuccess": "Ellenőrző linket küldtünk a megadott emailre.",
-    "linkExistingNoAccount": "Nincs ilyen fiók.",
-    "linkExistingDone": "A Google belépésed összekapcsolva a meglévő fiókoddal. Mostantól mindkét móddal be tudsz lépni.",
-    "linkExistingRemovedDuplicate": "A másik fiók eltávolítva. Add hozzá a Google belépést alább ehhez a fiókhoz."
+    "dataHandlingLinkText": "Adatkezelési tájékoztató"
   },
   "deleteAccount": {
     "title": "Fiók végleges törlése?",
