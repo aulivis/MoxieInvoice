@@ -23,7 +23,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const tOnboarding = await getTranslations('onboarding');
 
   const resolvedParams = await Promise.resolve(searchParams);
-  const initialTab = resolvedParams?.tab === 'dataHandling' ? 'dataHandling' : undefined;
+  const tabParam = resolvedParams?.tab;
+  const initialTab =
+    tabParam === 'dataHandling' ? 'dataHandling' : tabParam === 'account' ? 'account' : undefined;
 
   let allSetupDone = false;
   if (orgId) {

@@ -273,6 +273,7 @@ export default function LoginPage() {
                 <p className="text-sm text-text-secondary mb-6">{t('emailHint')}</p>
 
                 <form action={formAction} className="space-y-4">
+                  <input type="hidden" name="language" value={locale} />
                   <Input
                     id="login-email"
                     type="email"

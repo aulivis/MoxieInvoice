@@ -31,12 +31,15 @@ export async function loginAction(
   if (!email) {
     return { error: 'AUTH_EMAIL_REQUIRED' };
   }
+  const lang = String(formData.get('language') ?? '').trim();
+  const language = lang === 'en' ? 'en' : 'hu';
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
       shouldCreateUser: true,
       emailRedirectTo: getRedirectUrl(),
+      data: { language },
     },
   });
   if (error) {

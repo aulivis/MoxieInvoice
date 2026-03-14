@@ -1,17 +1,85 @@
-# MoxieInvoice
+# Brixa
 
-> **Automatikus számlakészítő híd Moxie és a magyar számlázóprogramok között.**
+> **Automatikus számlakészítő híd a Moxie és a magyar számlázóprogramok között.**
 
-A MoxieInvoice egy előfizetéses SaaS alkalmazás, amely összeköti a [Moxie](https://withmoxie.com) projektmenedzsment platformot a Billingo és a Számlázz.hu számlázórendszerekkel. Amikor a Moxie-ban egy számlát „Elküldve" állapotba állítasz, a MoxieInvoice automatikusan elkészíti a hivatalos számlát a kiválasztott számlázóprogramban, csatolja a PDF-et vissza Moxie-hoz, majd fizetés esetén szinkronizálja a fizetési állapotot is. A teljes folyamat emberi beavatkozás nélkül zajlik.
+*A repository neve: MoxieInvoice.*
 
-**Miért hasznos?**
-Moxie kiválóan kezeli az ügyfeleket és a projekteket, de nincs közvetlen integráció a magyar számviteli rendszerekkel. A MoxieInvoice ezt a hiányt tölti be: Moxie-ban rögzíted az üzleti adatokat, a számlát pedig a törvénynek megfelelő hazai számlázóprogram állítja ki – automatikusan.
+---
+
+## Az alkalmazásról
+
+A **Brixa** egy előfizetéses SaaS alkalmazás, amely összeköti a [Moxie](https://withmoxie.com) projektmenedzsment platformot a **Billingo** és a **Számlázz.hu** számlázórendszerekkel.
+
+**A probléma:** A Moxie kiválóan kezeli az ügyfeleket és a projekteket, de nincs közvetlen integráció a magyar számviteli rendszerekkel. A számlákat külön kellene másolni, feltölteni, és a fizetési állapotot kézzel szinkronizálni.
+
+**A megoldás:** Amikor a Moxie-ban egy számlát „Elküldve” állapotba állítasz, a Brixa automatikusan elkészíti a hivatalos számlát a kiválasztott számlázóprogramban, csatolja a PDF-et vissza Moxie-hoz, majd fizetés esetén szinkronizálja a fizetési állapotot is. A teljes folyamat emberi beavatkozás nélkül zajlik: Moxie-ban rögzíted az üzleti adatokat, a számlát pedig a törvénynek megfelelő hazai számlázóprogram állítja ki.
+
+---
+
+## Célközönség
+
+A Brixa azoknak a **magyar vállalkozóknak és ügynökségeknek** szól, akik:
+
+- A **Moxie**-t használják projekt- és ügyfélkezelésre,
+- **Billingot** vagy **Számlázz.hu**-t használnak hivatalos számlakiállításra,
+- Szeretnék automatizálni a számlakiállítást és a fizetés visszaigazolását a két rendszer között.
+
+---
+
+## Architektúra
+
+A Brixa központi szerepet tölt be: a Moxie webhookja és a számlázó szolgáltatások között hídként működik. Az alkalmazás Next.js API-n, üzenetsoron (queue) és Vercel Cron jobokon fut; az auth és az adat Supabase-ben, az előfizetés Stripe-ban van kezelve.
+
+```mermaid
+flowchart LR
+  subgraph external [Külső rendszerek]
+    Moxie[Moxie PM]
+    Billingo[Billingo / Számlázz.hu]
+  end
+  subgraph brixa [Brixa]
+    API[Next.js API]
+    Queue[Számla queue]
+    Cron[Vercel Cron]
+    DB[(Supabase)]
+  end
+  Moxie -->|InvoiceSent webhook| API
+  API --> Queue
+  Cron --> Queue
+  Queue --> API
+  API --> DB
+  API --> Billingo
+  Billingo -->|PDF, fizetés állapot| API
+  API -->|PDF csatolás, Apply Payment| Moxie
+```
+
+---
+
+## Fő adatfolyamok
+
+### Automatikus számla (Moxie → Brixa → számlázó → Moxie)
+
+1. A Moxie-ban egy számlát „Elküldve” (Sent) állapotba állítasz.
+2. A Moxie **InvoiceSent** webhookot küld a Brixa API-nak (org + secret paraméterekkel).
+3. A Brixa validálja a kérést, ellenőrzi az előfizetést; opcionálisan ütemezés szerint (munkanap / munkaidő) a sorba teszi a feladatot.
+4. A queue feldolgozása (cron vagy azonnal) meghívja a Billingo vagy Számlázz.hu API-t, és létrehozza a hivatalos számlát.
+5. A kapott PDF URL-t a Brixa visszaküldi a Moxie-nak (`attachFileFromUrl`), így a számla a Moxie-ban is megjelenik.
+6. Fizetés esetén a Brixa (Billingo webhook vagy napi sync cron) szinkronizálja a fizetési állapotot, és Moxie-ban **Apply Payment** értesítést küld.
+
+### Manuális számla
+
+A Brixa Beállításokból vagy a menüből elérhető „Új számla” űrlap ugyanazt az orchestrator logikát használja: a megadott adatokból a választott számlázóban létrehozza a számlát, és (ha Moxie adatok is vannak) csatolja a PDF-et.
+
+### Fizetés szinkronizáció
+
+- **Billingo webhook:** Fizetési esemény érkezik a Brixa webhook endpointjára → a Brixa frissíti a belső állapotot és Moxie-ban Apply Payment-ot küld.
+- **Cron (sync-billingo-payments):** Naponta egyszer a Brixa lekéri a Billingo/Számlázz.hu fizetési állapotokat, és a fizetett számlákhoz Moxie Apply Payment-ot triggerel.
 
 ---
 
 ## Funkciók
 
 ### Számlázás
+
 - **Automatikus számlakiállítás** Moxie webhook alapján (`InvoiceSent` esemény)
 - **Manuális számla** létrehozása webes űrlapon keresztül
 - **Billingo v3** és **Számlázz.hu** (Számla Agent XML API) támogatás
@@ -19,28 +87,32 @@ Moxie kiválóan kezeli az ügyfeleket és a projekteket, de nincs közvetlen in
 - Sikertelen számlák mentése hibaüzenettel, piros státusszal
 
 ### Fizetési szinkronizáció
+
 - Billingo / Számlázz.hu fizetési állapot lekérése (Frissítés gomb + cron)
 - Fizetett számla esetén Moxie `Apply Payment` értesítés
 - Billingo webhook fogadása fizetési eseményekhez
 
 ### Beállítások
-- **Moxie kapcsolat**: API kulcs, webhook URL generálása + másolása, kapcsolat teszt
-- **Számlázóprogram**: Billingo vagy Számlázz.hu kiválasztása, titkosított hitelesítő adatok
-- **Számla alapértékek**: alapértelmezett számlatömb (Billingo), nyelv, fizetési mód
-- **Eladó adatok**: cég neve, adószám, cím – ezek kerülnek a számlákra
-- **EUR → HUF árfolyam**: fix árfolyam vagy napi MNB középárfolyam (MNB API)
-- **Mező megfeleltetés**: Moxie custom field → számlázó mező (pl. számlatípus, áfakulcs), értékmapping
-- **Ütemezés**: számlázás csak munkanapokon / munkaidőben (timezone, start/end time), queue + Vercel Cron
-- **Billingo e-mail küldés**: számla automatikus elküldése emailben a vevőnek
+
+- **Moxie kapcsolat:** API kulcs, webhook URL generálása + másolása, kapcsolat teszt
+- **Számlázóprogram:** Billingo vagy Számlázz.hu kiválasztása, titkosított hitelesítő adatok
+- **Számla alapértékek:** alapértelmezett számlatömb (Billingo), nyelv, fizetési mód
+- **Eladó adatok:** cég neve, adószám, cím – ezek kerülnek a számlákra
+- **EUR / USD → HUF árfolyam:** fix árfolyam vagy napi MNB középárfolyam (MNB API), opcionálisan manuális EUR/USD
+- **Mező megfeleltetés:** Moxie custom field → számlázó mező (pl. számlatípus, áfakulcs), értékmapping
+- **Ütemezés:** számlázás csak munkanapokon / munkaidőben (timezone, start/end time), queue + Vercel Cron
+- **Billingo e-mail küldés:** számla automatikus elküldése emailben a vevőnek
 
 ### Dashboard
-- Kinnlévő összeg (ki nem fizetett nyitott számlák)
+
+- Kinnlévő összeg (ki nem fizetett nyitott számlák), devizanként
 - Bevétel az elmúlt 30 napban
-- Sikertelen számlák száma
+- Sikertelen számlák száma / sikeresség
 - Legutóbbi 5 számla gyors áttekintése
 - 3 lépéses onboarding vezető (előfizetés → Moxie → számlázó)
 
 ### Számlalista
+
 - Állapot szerint szűrhető lista (Létrehozva / Moxie-ba szinkronizálva / Sikertelen)
 - Vevő neve, számlaszám, összeg, fizetési állapot
 - Külső link: számla megnyitása Billingo / Számlázz.hu felületén
@@ -49,13 +121,15 @@ Moxie kiválóan kezeli az ügyfeleket és a projekteket, de nincs közvetlen in
 - Hibaüzenet kibontható részletes nézettel
 
 ### Előfizetés és auth
+
 - **Magic Link** alapú bejelentkezés (jelszó nélkül), Supabase PKCE
 - **Stripe** előfizetés: Checkout, Customer Portal, webhook kezelés
 - Aktív/próba előfizetés ellenőrzése minden webhook kérésnél
 - Titkosított API kulcsok tárolása (AES-256-GCM)
 
 ### Egyéb
-- **HU/EN kétnyelvűség** (next-intl, default: magyar)
+
+- **HU/EN kétnyelvűség** (next-intl, alapértelmezett: magyar)
 - Rate limiting webhookhoz (60 req/perc/kliens)
 - Vercel Cron: számlasor feldolgozása + fizetési szinkron
 - Vitest egységtesztek
@@ -64,15 +138,27 @@ Moxie kiválóan kezeli az ügyfeleket és a projekteket, de nincs közvetlen in
 
 ## Tech stack
 
-| Réteg | Technológia |
-|-------|-------------|
+| Réteg    | Technológia |
+|----------|-------------|
 | Frontend | Next.js 16 (App Router, Turbopack), React 19, TypeScript 5.6 |
-| Stílus | Tailwind CSS 3.4, egyedi design rendszer |
-| Auth + DB | Supabase (Magic Link PKCE, PostgreSQL, RLS) |
-| Fizetés | Stripe (Checkout, Customer Portal, webhooks) |
-| i18n | next-intl 4.8 (hu alapértelmezett, en) |
-| Tesztelés | Vitest |
-| Deploy | Vercel (App + Cron Jobs) |
+| Stílus   | Tailwind CSS 3.4, egyedi design rendszer |
+| Auth + DB| Supabase (Magic Link PKCE, PostgreSQL, RLS) |
+| Fizetés  | Stripe (Checkout, Customer Portal, webhooks) |
+| i18n     | next-intl 4.8 (hu alapértelmezett, en) |
+| Tesztelés| Vitest |
+| Deploy   | Vercel (App + Cron Jobs) |
+
+---
+
+## Projektstruktúra (rövid áttekintés)
+
+| Útvonal / mappa | Jelentése |
+|------------------|-----------|
+| `src/app` | Next.js App Router: `[locale]/(auth)` (login/signup), `(app)` (dashboard, számlák, beállítások), `(wizard)` (onboarding) |
+| `src/app/api` | API útvonalak: `webhooks/moxie`, `webhooks/billingo`, `cron/process-invoice-queue`, `cron/sync-billingo-payments`, `stripe/*`, `invoices/*`, `settings/*` |
+| `src/lib` | Üzleti logika: `invoices` (orchestrator, billingo, szamlazz, validáció, árfolyam), `moxie`, `crypto`, `rate-limit`, `supabase` |
+| `src/components` | UI: dashboard, számlalista, beállítások tabok, onboarding wizard, közös komponensek |
+| `supabase/migrations` | PostgreSQL migrációk (táblák, RLS, policy-k) |
 
 ---
 
@@ -109,19 +195,23 @@ Futtasd a migrációkat sorrendben (Supabase CLI: `supabase db push`, vagy Supab
 
 ```
 supabase/migrations/
-├── 20250101000001_initial_schema.sql          – táblák, RLS, policy-k
-├── 20250102000001_rls_and_search_path_fix.sql – RLS finomítás
-├── 20250103000001_create_org_on_signup.sql    – org létrehozása regisztrációkor
-├── 20250310000001_moxie_last_tested_at.sql    – Moxie kapcsolat tesztelési ideje
-├── 20260310000001_stripe_idempotency.sql      – Stripe idempotencia + job retry
-├── 20260310000002_schedule_type.sql           – Ütemezés típusa (all_days, hours)
-├── 20260310000003_invoices_total_amount.sql   – Számla összeg mező
-├── 20260310000004_invoice_defaults.sql        – Alapértelmezett számlázási beállítások
-├── 20260310000005_invoices_payment_status.sql – Fizetési állapot mező
-├── 20260310000006_billingo_send_email.sql     – Billingo e-mail küldés beállítás
-├── 20260310000007_invoices_invoice_number.sql – Számlaszám mező
-├── 20260310000008_invoices_pdf_token.sql      – PDF proxy token
-└── 20260311000001_invoices_moxie_uuid.sql     – Moxie számla UUID
+├── 20250101000001_initial_schema.sql                    – táblák, RLS, policy-k
+├── 20250102000001_rls_and_search_path_fix.sql           – RLS finomítás
+├── 20250103000001_create_org_for_user.sql               – org létrehozása regisztrációkor
+├── 20250310000001_moxie_last_tested_at.sql              – Moxie kapcsolat tesztelési ideje
+├── 20260310000001_stripe_idempotency_and_job_retries.sql – Stripe idempotencia + job retry
+├── 20260310000002_schedule_type_all_days_hours.sql      – Ütemezés típusa (all_days, hours)
+├── 20260310000003_invoices_total_amount.sql            – Számla összeg mező
+├── 20260310000004_invoice_defaults_org_settings.sql     – Alapértelmezett számlázási beállítások
+├── 20260310000005_invoices_payment_status.sql          – Fizetési állapot mező
+├── 20260310000006_billingo_send_invoice_by_email.sql    – Billingo e-mail küldés beállítás
+├── 20260310000007_invoices_invoice_number.sql          – Számlaszám mező
+├── 20260310000008_invoices_pdf_token.sql               – PDF proxy token
+├── 20260311000001_invoices_moxie_uuid.sql               – Moxie számla UUID
+├── 20260312000001_default_moxie_project_name.sql       – Alapértelmezett Moxie projekt neve
+├── 20260312000002_currency_inv_currency_mnb_manual.sql – Deviza, MNB/manuális árfolyam
+├── 20260313000001_profiles_deletion_requested_at.sql    – Fiók törlés kérés
+├── 20260313000002_manual_usd_eur.sql                    – Manuális USD/EUR árfolyam
 ```
 
 ### 4. Supabase – Auth (Magic Link)
@@ -129,11 +219,11 @@ supabase/migrations/
 A bejelentkezés **Magic Link** alapú (email link, jelszó nélkül). Supabase Dashboard-on:
 
 - **Authentication → URL Configuration**
-  - **Site URL**: `NEXT_PUBLIC_APP_URL` értéke (pl. `http://localhost:3000`)
-  - **Redirect URLs**: adj hozzá callback URL-t:
+  - **Site URL:** `NEXT_PUBLIC_APP_URL` értéke (pl. `http://localhost:3000`)
+  - **Redirect URLs:** adj hozzá callback URL-t:
     - Dev: `http://localhost:3000/auth/callback`
     - Prod: `https://<domain>/auth/callback`
-- **Authentication → Providers → Email**: legyen engedélyezve (alapból az)
+- **Authentication → Providers → Email:** legyen engedélyezve (alapból az)
 
 ### 5. Stripe
 
@@ -153,7 +243,9 @@ npm run dev
 
 ---
 
-## Moxie webhook beállítása
+## Konfiguráció
+
+### Moxie webhook beállítása
 
 A Moxie platformon regisztráld a webhook URL-t az alábbi formátumban:
 
@@ -161,11 +253,9 @@ A Moxie platformon regisztráld a webhook URL-t az alábbi formátumban:
 https://<APP_URL>/api/webhooks/moxie?org=<ORGANIZATION_UUID>&secret=<WEBHOOK_SECRET>
 ```
 
-Az `ORGANIZATION_UUID` és a `WEBHOOK_SECRET` a MoxieInvoice Beállítások → Moxie kapcsolat oldalán található (automatikusan generált). A webhook az `InvoiceSent` eseményt figyeli.
+Az `ORGANIZATION_UUID` és a `WEBHOOK_SECRET` a **Brixa Beállítások → Moxie kapcsolat** oldalán található (automatikusan generált). A webhook az **InvoiceSent** eseményt figyeli.
 
----
-
-## Vercel Cron
+### Vercel Cron
 
 A `vercel.json`-ban konfigurált cron job-ok:
 
@@ -192,8 +282,6 @@ git push -u origin main
 
 ## Környezeti változók platformonként (Vercel, Supabase)
 
-Az alábbi env-eket hol kell beállítani:
-
 ### Vercel (Next.js app + API + Cron)
 
 A **Project → Settings → Environment Variables** alatt add meg az összes változót (Production, Preview, Development szükség szerint):
@@ -217,9 +305,9 @@ Változó módosítás után **Redeploy** (Vercel automatikusan használja a leg
 
 Supabase-ban **csak** azok a dolgok kellenek, amit a Dashboard vagy a szolgáltatás kezel:
 
-- **Project Settings → API**: itt kapsz `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon key), `SUPABASE_SECRET_KEY` (service_role). Ezeket másold be a **Vercel** env-be (és lokálisan `.env.local`-ba).
-- **Authentication → URL Configuration**: Site URL és Redirect URLs (lásd fentebb, Magic Link).
-- **Database**: a migrációkat lokálisan vagy CI-ből futtatod (`supabase db push`), nem kell Supabase-hoz külön env.
+- **Project Settings → API:** itt kapsz `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon key), `SUPABASE_SECRET_KEY` (service_role). Ezeket másold be a **Vercel** env-be (és lokálisan `.env.local`-ba).
+- **Authentication → URL Configuration:** Site URL és Redirect URLs (lásd fentebb, Magic Link).
+- **Database:** a migrációkat lokálisan vagy CI-ből futtatod (`supabase db push`), nem kell Supabase-hoz külön env.
 
 Tehát: **Supabase-en nem kell env változókat „beállítani”** — a titkokat és az app URL-t a Vercel (és a lokális `.env`) tárolja; a Supabase csak az adatbázis és az Auth konfigját tartalmazza a Dashboardon.
 

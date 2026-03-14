@@ -15,7 +15,7 @@ import { HeaderAuth } from '@/components/HeaderAuth';
 import { SignInMethods } from '@/components/SignInMethods';
 import { DeleteAccountDialog } from '@/components/DeleteAccountDialog';
 
-type TabKey = 'subscription' | 'moxie' | 'billing' | 'currency' | 'schedule' | 'dataHandling';
+type TabKey = 'subscription' | 'moxie' | 'billing' | 'currency' | 'schedule' | 'account' | 'dataHandling';
 
 interface SettingsTabsProps {
   hasSubscription: boolean;
@@ -67,6 +67,15 @@ function ScheduleIcon() {
   );
 }
 
+function AccountIcon() {
+  return (
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  );
+}
+
 function DataHandlingIcon() {
   return (
     <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -106,6 +115,7 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
     billing: billingConfigured,
     currency: false,
     schedule: false,
+    account: false,
     dataHandling: false,
   };
 
@@ -115,6 +125,7 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
     { key: 'billing', labelKey: 'billing', Icon: BillingIcon },
     { key: 'currency', labelKey: 'currency', Icon: CurrencyIcon },
     { key: 'schedule', labelKey: 'schedule', Icon: ScheduleIcon },
+    { key: 'account', labelKey: 'accountSection', Icon: AccountIcon },
     { key: 'dataHandling', labelKey: 'dataHandling', Icon: DataHandlingIcon },
   ];
 
@@ -186,6 +197,19 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
             <ScheduleForm hasSubscription={hasSubscription} />
           </Card>
         )}
+        {activeTab === 'account' && (
+          <Card>
+            <div className="space-y-4">
+              <SignInMethods />
+              <div className="pt-4 border-t border-border-light">
+                <LanguageSwitcher />
+              </div>
+              <div className="pt-2">
+                <HeaderAuth />
+              </div>
+            </div>
+          </Card>
+        )}
         {activeTab === 'dataHandling' && (
           <Card>
             <div className="space-y-6">
@@ -227,16 +251,6 @@ export function SettingsTabs({ hasSubscription, initialTab }: SettingsTabsProps)
             </div>
           </Card>
         )}
-      </div>
-
-      {/* Mobile-only: sign-in methods, language + logout (desktop has these in sidebar) */}
-      <div className="mt-8 pt-6 border-t border-border-light md:hidden">
-        <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{t('accountSection')}</p>
-        <div className="space-y-2">
-          <SignInMethods />
-          <LanguageSwitcher />
-          <HeaderAuth />
-        </div>
       </div>
 
       <DeleteAccountDialog

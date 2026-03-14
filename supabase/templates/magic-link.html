@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="{{ if eq .Data.language "en" }}en{{ else }}hu{{ end }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brixa – Bejelentkezési link</title>
+  <title>{{ if eq .Data.language "en" }}Brixa – Sign-in link{{ else }}Brixa – Bejelentkezési link{{ end }}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#F5F4F1;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
 
@@ -27,12 +27,21 @@
           <tr>
             <td style="padding:40px 40px 36px;">
 
+              {{ if eq .Data.language "en" }}
+              <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#1C1917;line-height:1.3;">
+                Sign-in link
+              </h1>
+              <p style="margin:0 0 8px;font-size:15px;color:#6B6560;line-height:1.6;">
+                You requested a one-time sign-in link to the following email address:
+              </p>
+              {{ else }}
               <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#1C1917;line-height:1.3;">
                 Bejelentkezési link
               </h1>
               <p style="margin:0 0 8px;font-size:15px;color:#6B6560;line-height:1.6;">
                 Kérted, hogy küldünk egy egyszer használatos bejelentkezési linket a következő e-mail-címre:
               </p>
+              {{ end }}
               <p style="margin:0 0 32px;font-size:15px;font-weight:600;color:#1C1917;">
                 {{ .Email }}
               </p>
@@ -43,7 +52,7 @@
                   <td style="border-radius:8px;background-color:#E8893A;">
                     <a href="{{ .ConfirmationURL }}"
                        style="display:inline-block;padding:14px 32px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:8px;letter-spacing:0.1px;">
-                      Bejelentkezés a Brixába
+                      {{ if eq .Data.language "en" }}Sign in to Brixa{{ else }}Bejelentkezés a Brixába{{ end }}
                     </a>
                   </td>
                 </tr>
@@ -51,7 +60,7 @@
 
               <!-- Expiry note -->
               <p style="margin:24px 0 0;font-size:13px;color:#9E9690;line-height:1.5;">
-                ⏱ A link <strong>1 óráig érvényes</strong>, és csak egyszer használható.
+                {{ if eq .Data.language "en" }}⏱ This link is <strong>valid for 1 hour</strong> and can only be used once.{{ else }}⏱ A link <strong>1 óráig érvényes</strong>, és csak egyszer használható.{{ end }}
               </p>
 
               <!-- Divider -->
@@ -59,7 +68,7 @@
 
               <!-- Fallback link -->
               <p style="margin:0 0 6px;font-size:13px;color:#9E9690;line-height:1.5;">
-                Ha a gomb nem működik, másold be ezt a linket a böngésző címsorába:
+                {{ if eq .Data.language "en" }}If the button doesn’t work, copy this link into your browser’s address bar:{{ else }}Ha a gomb nem működik, másold be ezt a linket a böngésző címsorába:{{ end }}
               </p>
               <p style="margin:0;font-size:12px;word-break:break-all;line-height:1.5;">
                 <a href="{{ .ConfirmationURL }}" style="color:#E8893A;text-decoration:none;">{{ .ConfirmationURL }}</a>
@@ -72,10 +81,10 @@
           <tr>
             <td style="background-color:#FAF9F7;padding:24px 40px;border-top:1px solid #F0EFEC;">
               <p style="margin:0 0 4px;font-size:12px;color:#9E9690;line-height:1.5;">
-                Ha nem te kérted ezt az e-mailt, hagyd figyelmen kívül – semmilyen teendőd nincs.
+                {{ if eq .Data.language "en" }}If you didn’t request this email, you can ignore it – no action needed.{{ else }}Ha nem te kérted ezt az e-mailt, hagyd figyelmen kívül – semmilyen teendőd nincs.{{ end }}
               </p>
               <p style="margin:0;font-size:12px;color:#B8B5B0;line-height:1.5;">
-                © 2026 Brixa · <a href="{{ .SiteURL }}" style="color:#B8B5B0;text-decoration:none;">{{ .SiteURL }}</a> · Erre az e-mailre ne válaszolj.
+                © 2026 Brixa · <a href="{{ .SiteURL }}" style="color:#B8B5B0;text-decoration:none;">{{ .SiteURL }}</a> · {{ if eq .Data.language "en" }}Do not reply to this email.{{ else }}Erre az e-mailre ne válaszolj.{{ end }}
               </p>
             </td>
           </tr>
