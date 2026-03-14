@@ -3,6 +3,7 @@
  * Used when request.targetCurrency !== request.currency to convert amounts before issuing.
  */
 
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getMnbRate } from '@/lib/mnb';
 
 export interface CurrencyOrgSettings {
@@ -23,12 +24,14 @@ function isSupported(c: string): c is (typeof SUPPORTED)[number] {
 /**
  * Get exchange rate: 1 unit of `from` = rate units of `to`.
  * E.g. from=EUR, to=HUF => rate = HUF per 1 EUR.
+ * When conversion_source is mnb_daily, pass supabase to use cached rates first.
  */
 export async function getExchangeRate(
   from: string,
   to: string,
   date: string,
-  orgSettings: CurrencyOrgSettings | null
+  orgSettings: CurrencyOrgSettings | null,
+  supabase?: SupabaseClient
 ): Promise<number> {
   const fromNorm = from.toUpperCase();
   const toNorm = to.toUpperCase();
@@ -74,20 +77,26 @@ export async function getExchangeRate(
     }
   }
 
-  // MNB: rates are "1 unit = X HUF"
-  const eurPerHuf = (): Promise<number> => getMnbRate('EUR', date).then((r) => 1 / r);
-  const usdPerHuf = (): Promise<number> => getMnbRate('USD', date).then((r) => 1 / r);
+  // MNB: rates are "1 unit = X HUF" (cache first when supabase provided)
+  const eurPerHuf = (): Promise<number> => getMnbRate('EUR', date, supabase).then((r) => 1 / r);
+  const usdPerHuf = (): Promise<number> => getMnbRate('USD', date, supabase).then((r) => 1 / r);
 
-  if (fromNorm === 'EUR' && toNorm === 'HUF') return getMnbRate('EUR', date);
+  if (fromNorm === 'EUR' && toNorm === 'HUF') return getMnbRate('EUR', date, supabase);
   if (fromNorm === 'HUF' && toNorm === 'EUR') return eurPerHuf();
-  if (fromNorm === 'USD' && toNorm === 'HUF') return getMnbRate('USD', date);
+  if (fromNorm === 'USD' && toNorm === 'HUF') return getMnbRate('USD', date, supabase);
   if (fromNorm === 'HUF' && toNorm === 'USD') return usdPerHuf();
   if (fromNorm === 'EUR' && toNorm === 'USD') {
-    const [eurHuf, usdHuf] = await Promise.all([getMnbRate('EUR', date), getMnbRate('USD', date)]);
+    const [eurHuf, usdHuf] = await Promise.all([
+      getMnbRate('EUR', date, supabase),
+      getMnbRate('USD', date, supabase),
+    ]);
     return eurHuf / usdHuf;
   }
   if (fromNorm === 'USD' && toNorm === 'EUR') {
-    const [eurHuf, usdHuf] = await Promise.all([getMnbRate('EUR', date), getMnbRate('USD', date)]);
+    const [eurHuf, usdHuf] = await Promise.all([
+      getMnbRate('EUR', date, supabase),
+      getMnbRate('USD', date, supabase),
+    ]);
     return usdHuf / eurHuf;
   }
 

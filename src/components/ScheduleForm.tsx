@@ -332,87 +332,88 @@ export function ScheduleForm({ hasSubscription = true }: { hasSubscription?: boo
           </div>
         </div>
 
-        {/* Time window dimension */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">
-                {t('timeWindowLabel')}
-              </p>
-              <p className="text-xs text-text-tertiary mt-0.5">{t('timeWindowHint')}</p>
-            </div>
-            {/* Toggle switch */}
-            <button
-              type="button"
-              role="switch"
-              aria-checked={hasWindow}
-              onClick={() => !disabled && setHasWindow((v) => !v)}
-              className={[
-                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent',
-                'transition-colors duration-200 ease-in-out outline-none',
-                'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                disabled ? 'cursor-not-allowed opacity-60' : '',
-                hasWindow ? 'bg-primary' : 'bg-border-medium',
-              ].join(' ')}
-              disabled={disabled}
-            >
-              <span
+        {/* Időkorlát szekció + időzóna: 2 oszlop egymás mellett */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Időkorlát (time window) – bal oszlop */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">
+                  {t('timeWindowLabel')}
+                </p>
+                <p className="text-xs text-text-tertiary mt-0.5">{t('timeWindowHint')}</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={hasWindow}
+                onClick={() => !disabled && setHasWindow((v) => !v)}
                 className={[
-                  'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm',
-                  'transform transition duration-200 ease-in-out',
-                  hasWindow ? 'translate-x-5' : 'translate-x-0',
+                  'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent',
+                  'transition-colors duration-200 ease-in-out outline-none',
+                  'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                  disabled ? 'cursor-not-allowed opacity-60' : '',
+                  hasWindow ? 'bg-primary' : 'bg-border-medium',
                 ].join(' ')}
-              />
-            </button>
+                disabled={disabled}
+              >
+                <span
+                  className={[
+                    'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm',
+                    'transform transition duration-200 ease-in-out',
+                    hasWindow ? 'translate-x-5' : 'translate-x-0',
+                  ].join(' ')}
+                />
+              </button>
+            </div>
+            {hasWindow && (
+              <div className="space-y-3 p-4 rounded-xl bg-surface-50 border border-border-light">
+                <div className="flex items-center gap-2 text-xs font-medium text-text-secondary">
+                  <ClockIcon />
+                  {t('timeRange')}
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <label className="text-xs text-text-tertiary mb-1 block">{t('startTime')}</label>
+                    <input
+                      type="time"
+                      name="start_time"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className={`${inputClass} w-full`}
+                      disabled={disabled}
+                    />
+                  </div>
+                  <span className="text-text-tertiary mt-5">–</span>
+                  <div className="flex-1">
+                    <label className="text-xs text-text-tertiary mb-1 block">{t('endTime')}</label>
+                    <input
+                      type="time"
+                      name="end_time"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className={`${inputClass} w-full`}
+                      disabled={disabled}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {hasWindow && (
-            <div className="space-y-3 p-4 rounded-xl bg-surface-50 border border-border-light">
-              <div className="flex items-center gap-2 text-xs font-medium text-text-secondary">
-                <ClockIcon />
-                {t('timeRange')}
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <label className="text-xs text-text-tertiary mb-1 block">{t('startTime')}</label>
-                  <input
-                    type="time"
-                    name="start_time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className={`${inputClass} w-full`}
-                    disabled={disabled}
-                  />
-                </div>
-                <span className="text-text-tertiary mt-5">–</span>
-                <div className="flex-1">
-                  <label className="text-xs text-text-tertiary mb-1 block">{t('endTime')}</label>
-                  <input
-                    type="time"
-                    name="end_time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className={`${inputClass} w-full`}
-                    disabled={disabled}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Timezone searchable dropdown */}
-        <div>
-          <label className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-1.5 block">
-            {t('timezone')}
-          </label>
-          <TimezoneCombobox
-            value={timezone}
-            onChange={setTimezone}
-            placeholder={t('timezonePlaceholder')}
-            disabled={disabled}
-            inputClass={`${inputClass} w-full`}
-          />
+          {/* Időzóna – jobb oszlop */}
+          <div>
+            <label className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-1.5 block">
+              {t('timezone')}
+            </label>
+            <TimezoneCombobox
+              value={timezone}
+              onChange={setTimezone}
+              placeholder={t('timezonePlaceholder')}
+              disabled={disabled}
+              inputClass={`${inputClass} w-full`}
+            />
+          </div>
         </div>
 
         <Button type="submit" variant="primary" disabled={disabled || !fetched}>

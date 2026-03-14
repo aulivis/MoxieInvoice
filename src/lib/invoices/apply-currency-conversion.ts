@@ -1,14 +1,17 @@
 /**
  * Apply currency conversion when request.targetCurrency differs from request.currency.
  * Fetches rate (MNB or manual from org settings), multiplies item amounts, sets request.currency = targetCurrency.
+ * Pass supabase so MNB rates are read from cache when available.
  */
 
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { NormalizedInvoiceRequest } from './types';
 import { getExchangeRate, type CurrencyOrgSettings } from './exchange-rate';
 
 export async function applyCurrencyConversion(
   request: NormalizedInvoiceRequest,
-  orgSettings: CurrencyOrgSettings | null
+  orgSettings: CurrencyOrgSettings | null,
+  supabase?: SupabaseClient
 ): Promise<NormalizedInvoiceRequest> {
   const target = request.targetCurrency;
   if (!target || target === request.currency) return request;
@@ -17,7 +20,8 @@ export async function applyCurrencyConversion(
     request.currency,
     target,
     request.fulfillmentDate,
-    orgSettings
+    orgSettings,
+    supabase
   );
 
   const items = request.items.map((item) => ({

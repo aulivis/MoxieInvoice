@@ -1,82 +1,61 @@
 import { NextResponse } from 'next/server';
-import http from 'node:http';
+import { createClient } from '@/lib/supabase/server';
 
-// The MNB SOAP endpoint runs on HTTP (not HTTPS).
-// Response contains HTML-encoded XML; we parse rates and the rate date (Day element).
-function fetchMnbRates(): Promise<{ eur: number | null; usd: number | null; rateDate: string | null }> {
-  return new Promise((resolve) => {
-    const soapBody = Buffer.from(
-      `<?xml version="1.0" encoding="utf-8"?>` +
-        `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">` +
-        `<soap:Body>` +
-        `<GetCurrentExchangeRates xmlns="http://www.mnb.hu/webservices/">` +
-        `</GetCurrentExchangeRates>` +
-        `</soap:Body>` +
-        `</soap:Envelope>`,
-      'utf-8'
-    );
+const BUDAPEST_TZ = 'Europe/Budapest';
 
-    const req = http.request(
-      {
-        hostname: 'www.mnb.hu',
-        path: '/arfolyamok.asmx',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/xml; charset=utf-8',
-          SOAPAction: 'http://www.mnb.hu/webservices/GetCurrentExchangeRates',
-          'Content-Length': soapBody.byteLength,
-        },
-        timeout: 8000,
-      },
-      (res) => {
-        const chunks: Buffer[] = [];
-        res.on('data', (chunk: Buffer) => chunks.push(chunk));
-        res.on('end', () => {
-          const text = Buffer.concat(chunks).toString('utf-8');
-          let rateDate: string | null = null;
-          // Day element: <Day date="2024-01-15"> or &lt;Day&gt;2024.01.15&lt;/Day&gt;
-          const dayDateAttr = text.match(/&lt;Day\s+date="([^"]+)"|Day\s+date="([^"]+)"/);
-          if (dayDateAttr) {
-            const d = dayDateAttr[1] ?? dayDateAttr[2];
-            if (d) rateDate = d.replace(/\./g, '-');
-          }
-          if (!rateDate) {
-            const dayContent = text.match(/&lt;Day&gt;([^&]+)&lt;\/Day&gt;/);
-            if (dayContent) {
-              const d = dayContent[1].trim().replace(/\./g, '-');
-              if (/^\d{4}-\d{2}-\d{2}$/.test(d)) rateDate = d;
-            }
-          }
-          const parseRate = (currency: string): number | null => {
-            const re = new RegExp(`curr="${currency}"&gt;([^&]+)&lt;/Rate&gt;`);
-            const m = text.match(re);
-            if (!m) return null;
-            const rate = parseFloat(m[1].replace(',', '.'));
-            return Number.isNaN(rate) ? null : rate;
-          };
-          resolve({
-            eur: parseRate('EUR'),
-            usd: parseRate('USD'),
-            rateDate,
-          });
-        });
-        res.on('error', () => resolve({ eur: null, usd: null, rateDate: null }));
-      }
-    );
-
-    req.on('error', () => resolve({ eur: null, usd: null, rateDate: null }));
-    req.on('timeout', () => {
-      req.destroy();
-      resolve({ eur: null, usd: null, rateDate: null });
-    });
-    req.write(soapBody);
-    req.end();
+function getEffectiveRateDate(now: Date): string {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: BUDAPEST_TZ,
+    weekday: 'short',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   });
+  const parts = formatter.formatToParts(now);
+  const weekday = parts.find((p) => p.type === 'weekday')?.value ?? '';
+  const year = parts.find((p) => p.type === 'year')?.value ?? '';
+  const month = parts.find((p) => p.type === 'month')?.value ?? '';
+  const day = parts.find((p) => p.type === 'day')?.value ?? '';
+  const d = new Date(Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)));
+  if (weekday === 'Sat') d.setUTCDate(d.getUTCDate() - 1);
+  else if (weekday === 'Sun') d.setUTCDate(d.getUTCDate() - 2);
+  return d.toISOString().slice(0, 10);
 }
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Returns cached MNB rates from DB. On weekdays uses today (or latest available);
+ * on weekend returns Friday's rate. No live MNB call – data is filled by cron.
+ */
 export async function GET() {
-  const { eur, usd, rateDate } = await fetchMnbRates();
-  return NextResponse.json({ rate: eur, eur, usd, rateDate });
+  const supabase = await createClient();
+  const effectiveDate = getEffectiveRateDate(new Date());
+
+  const { data: rows, error } = await supabase
+    .from('mnb_exchange_rates')
+    .select('rate_date, currency, rate')
+    .lte('rate_date', effectiveDate)
+    .order('rate_date', { ascending: false })
+    .limit(10);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (!rows?.length) {
+    return NextResponse.json({ eur: null, usd: null, rateDate: null, rate: null });
+  }
+
+  const latestDate = rows[0].rate_date;
+  const forDate = rows.filter((r) => r.rate_date === latestDate);
+  const eur = forDate.find((r) => r.currency === 'EUR')?.rate ?? null;
+  const usd = forDate.find((r) => r.currency === 'USD')?.rate ?? null;
+
+  return NextResponse.json({
+    rate: eur,
+    eur,
+    usd,
+    rateDate: latestDate,
+  });
 }

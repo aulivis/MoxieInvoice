@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
   let finalRequest: NormalizedInvoiceRequest;
   try {
-    finalRequest = await applyCurrencyConversion(mergedRequest, orgSettings ?? null);
+    finalRequest = await applyCurrencyConversion(mergedRequest, orgSettings ?? null, supabase);
   } catch (err) {
     logError(err, { orgId, step: 'apply_currency_conversion' });
     return NextResponse.json(

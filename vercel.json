@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/sync-billingo-payments",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-mnb-rates",
+      "schedule": "0 11,23 * * 1-5"
     }
   ]
 }

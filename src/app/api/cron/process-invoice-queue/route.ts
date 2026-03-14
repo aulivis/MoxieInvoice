@@ -98,7 +98,7 @@ export async function GET(request: Request) {
 
     let finalRequest: NormalizedInvoiceRequest;
     try {
-      finalRequest = await applyCurrencyConversion(rawRequest, orgSettings ?? null);
+      finalRequest = await applyCurrencyConversion(rawRequest, orgSettings ?? null, supabase);
     } catch (err) {
       logError(err instanceof Error ? err : new Error(String(err)), { jobId: job.id, step: 'apply_currency_conversion' });
       await supabase
