@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { hasActiveSubscription } from '@/lib/subscription';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import {
   BILLINGO_PAYMENT_METHODS,
   BILLINGO_LANGUAGES,
@@ -13,7 +14,9 @@ import {
  * so the user can choose from these (same idea as billingo-blocks).
  * Only available when Billingo is configured for the org.
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-billing-billingo-options');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const {
     data: { user },

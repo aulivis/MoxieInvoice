@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import { syncBillingoPaymentsForOrg } from '@/lib/invoices/sync-billingo-payments';
 
 /**
@@ -7,7 +8,9 @@ import { syncBillingoPaymentsForOrg } from '@/lib/invoices/sync-billingo-payment
  * Pull payment status from Billingo or Számlázz.hu for the current org's open invoices and update DB + Moxie.
  * Used by the Invoice list "Refresh" button.
  */
-export async function POST() {
+export async function POST(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-invoices-sync-billingo');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const {
     data: { user },

@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { requireAuthAndSubscription } from '@/lib/api-auth';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import { billingProviderBodySchema, validate, validationErrorResponse } from '@/lib/schemas';
 import { encrypt } from '@/lib/crypto';
 import { logError } from '@/lib/logger';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-billing');
+  if (rateLimited) return rateLimited;
   const auth = await requireAuthAndSubscription();
   if (!auth.ok) return auth.response;
   const { supabase, orgId } = auth;
@@ -25,6 +28,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-billing-post');
+  if (rateLimited) return rateLimited;
   const auth = await requireAuthAndSubscription();
   if (!auth.ok) return auth.response;
   const { supabase, orgId } = auth;

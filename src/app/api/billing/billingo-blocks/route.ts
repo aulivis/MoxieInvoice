@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { hasActiveSubscription } from '@/lib/subscription';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import { decrypt } from '@/lib/crypto';
 import { listBillingoBlocks } from '@/lib/invoices/billingo';
 
@@ -21,7 +22,9 @@ async function decryptCredentials(raw: unknown): Promise<Record<string, unknown>
  * Returns list of Billingo document blocks (számlatömbök) for the current org.
  * Uses stored Billingo API key; only available when provider is billingo and credentials are set.
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-billing-billingo-blocks');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const {
     data: { user },

@@ -56,6 +56,35 @@ export function checkRateLimit(
   return { ok: true };
 }
 
+/** Default limit for auth and data-modifying API routes (per client, per minute). */
+export const API_RATE_LIMIT_PER_MINUTE = 60;
+
+/**
+ * If the request is over the rate limit, returns a 429 Response with Retry-After.
+ * Otherwise returns null (caller should proceed).
+ */
+export function rateLimitResponse(
+  request: Request,
+  identifierPrefix: string,
+  limitPerMinute: number = API_RATE_LIMIT_PER_MINUTE
+): Response | null {
+  const id = getClientIdentifier(request);
+  const result = checkRateLimit(`${identifierPrefix}:${id}`, limitPerMinute);
+  if (!result.ok) {
+    return new Response(
+      JSON.stringify({ error: 'Too many requests', retryAfter: result.retryAfter }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': String(result.retryAfter),
+        },
+      }
+    );
+  }
+  return null;
+}
+
 /** Clean old entries periodically to avoid unbounded memory growth. */
 function prune() {
   const now = Date.now();

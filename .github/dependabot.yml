@@ -1,0 +1,20 @@
+# Dependabot: automated dependency and Actions updates.
+# PRs are created per schedule; consider enabling auto-merge for security-only updates in repo settings.
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      security-npm:
+        patterns: ["*"]
+        update-types: ["security"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3

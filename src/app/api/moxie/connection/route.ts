@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto'; // randomBytes only (no cipher streams)
 import { requireAuthAndSubscription } from '@/lib/api-auth';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import { moxieConnectionBodySchema, validate } from '@/lib/schemas';
 import { encrypt } from '@/lib/crypto';
 import { logError } from '@/lib/logger';
@@ -10,7 +11,9 @@ const json = (body: object, status = 200) =>
     headers: { 'Content-Type': 'application/json' },
   });
 
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-moxie-connection');
+  if (rateLimited) return rateLimited;
   const auth = await requireAuthAndSubscription();
   if (!auth.ok) return auth.response;
   const { supabase, orgId } = auth;
@@ -40,6 +43,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-moxie-connection-post');
+  if (rateLimited) return rateLimited;
   const auth = await requireAuthAndSubscription();
   if (!auth.ok) return auth.response;
   const { supabase, orgId } = auth;

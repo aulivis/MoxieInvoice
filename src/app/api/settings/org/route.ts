@@ -1,8 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { hasActiveSubscription } from '@/lib/subscription';
+import { rateLimitResponse } from '@/lib/rate-limit';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-settings-org');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

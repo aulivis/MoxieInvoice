@@ -1,10 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { hasActiveSubscription } from '@/lib/subscription';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import { createMoxieClient } from '@/lib/moxie/client';
 import { decrypt } from '@/lib/crypto';
 
-export async function POST() {
+export async function POST(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-moxie-test');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

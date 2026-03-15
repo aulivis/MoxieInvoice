@@ -1,9 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { hasActiveSubscription } from '@/lib/subscription';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import { fieldMappingBodySchema, validate, validationErrorResponse } from '@/lib/schemas';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-settings-field-mappings');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -25,6 +28,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-settings-field-mappings-post');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

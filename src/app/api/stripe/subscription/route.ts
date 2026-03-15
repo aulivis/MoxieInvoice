@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
 import { formatStripePrice } from '@/lib/stripe-format';
+import { rateLimitResponse } from '@/lib/rate-limit';
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -21,7 +22,9 @@ export type SubscriptionDetailsDTO = {
   cancelAt: number | null;
 };
 
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-stripe-subscription');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {

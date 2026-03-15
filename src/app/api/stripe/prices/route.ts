@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import { formatStripePrice } from '@/lib/stripe-format';
 
 function getStripe() {
@@ -16,7 +17,9 @@ export type PriceInfo = {
   formatted: string;
 };
 
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-stripe-prices');
+  if (rateLimited) return rateLimited;
   const priceIdMonthly = process.env.STRIPE_PRICE_ID_MONTHLY;
   const priceIdYearly = process.env.STRIPE_PRICE_ID_YEARLY;
   const allowedIds = [priceIdMonthly, priceIdYearly].filter(Boolean);

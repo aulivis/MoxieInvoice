@@ -30,13 +30,12 @@ describe('encrypt / decrypt', () => {
     expect(await decrypt(await encrypt(text))).toBe(text);
   });
 
-  it('produces ciphertext in iv:authTag:data hex format', async () => {
+  it('produces ciphertext in iv:ciphertextWithAuthTag hex format', async () => {
     const encrypted = await encrypt('test');
     const parts = encrypted.split(':');
-    expect(parts).toHaveLength(3);
-    expect(parts[0]).toMatch(/^[0-9a-f]{32}$/i); // 16-byte IV = 32 hex chars
-    expect(parts[1]).toMatch(/^[0-9a-f]{32}$/i); // 16-byte auth tag = 32 hex chars
-    expect(parts[2]).toMatch(/^[0-9a-f]+$/i);    // ciphertext
+    expect(parts).toHaveLength(2);
+    expect(parts[0]).toMatch(/^[0-9a-f]{24}$/i);   // 12-byte IV = 24 hex chars
+    expect(parts[1]).toMatch(/^[0-9a-f]{32,}$/i); // ciphertext + 16-byte GCM auth tag
   });
 
   it('produces different ciphertext each call (random IV)', async () => {

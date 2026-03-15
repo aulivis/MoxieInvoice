@@ -11,8 +11,25 @@
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { decrypt } from '@/lib/crypto';
+import { rateLimitResponse } from '@/lib/rate-limit';
 import { downloadBillingoPdf } from '@/lib/invoices/billingo';
 import { getSzamlazzPdf, type SzamlazzCredentials } from '@/lib/invoices/szamlazz';
+
+/** Allowed hosts for PDF fetches (SSRF mitigation). Only billing provider origins. */
+const PDF_FETCH_ALLOWED_HOSTS = new Set([
+  'www.szamlazz.hu',
+  'szamlazz.hu',
+]);
+
+/** Returns true if url is safe to fetch (same-origin to allowed billing hosts). */
+function isAllowedPdfUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' && PDF_FETCH_ALLOWED_HOSTS.has(u.hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
 
 /** Extract keyman access key from a Számlázz.hu printpreview URL. */
 function extractSzamlazzKeyman(pdfUrl: string): string | null {
@@ -40,6 +57,8 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const rateLimited = rateLimitResponse(request, 'api-invoices-pdf');
+  if (rateLimited) return rateLimited;
   const { id } = await params;
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
@@ -162,8 +181,8 @@ export async function GET(
         }
       }
 
-      // Option B: fallback – fetch printpreview with Accept: application/pdf
-      if (invoice.pdf_url) {
+      // Option B: fallback – fetch printpreview with Accept: application/pdf (SSRF: allowlist only)
+      if (invoice.pdf_url && isAllowedPdfUrl(invoice.pdf_url)) {
         let fallbackRes: Response;
         try {
           fallbackRes = await fetch(invoice.pdf_url, {

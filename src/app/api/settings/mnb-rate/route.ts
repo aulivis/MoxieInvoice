@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { rateLimitResponse } from '@/lib/rate-limit';
 
 const BUDAPEST_TZ = 'Europe/Budapest';
 
@@ -28,7 +29,9 @@ export const dynamic = 'force-dynamic';
  * Returns cached MNB rates from DB. On weekdays uses today (or latest available);
  * on weekend returns Friday's rate. No live MNB call – data is filled by cron.
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimited = rateLimitResponse(request, 'api-settings-mnb-rate');
+  if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const effectiveDate = getEffectiveRateDate(new Date());
 
