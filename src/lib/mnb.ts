@@ -25,6 +25,27 @@ export async function getMnbRateFromDb(
   return Number.isNaN(rate) ? null : rate;
 }
 
+/**
+ * Get rate for the latest rate_date <= date (last saved business day). Returns null if none.
+ */
+export async function getLastAvailableMnbRateFromDb(
+  supabase: SupabaseClient,
+  currency: string,
+  date: string
+): Promise<number | null> {
+  const { data, error } = await supabase
+    .from('mnb_exchange_rates')
+    .select('rate')
+    .eq('currency', currency.toUpperCase())
+    .lte('rate_date', date)
+    .order('rate_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error || data == null) return null;
+  const rate = Number(data.rate);
+  return Number.isNaN(rate) ? null : rate;
+}
+
 /** Result of GetCurrentExchangeRates (MNB SOAP). Used by cron and optional API fallback. */
 export interface MnbCurrentRates {
   eur: number | null;
@@ -133,7 +154,9 @@ async function fetchMnbRateFromApi(currency: string, date: string): Promise<numb
 }
 
 /**
- * Get MNB rate for date (1 unit = rate HUF). If supabase given, uses cache first, then MNB API fallback.
+ * Get MNB rate for date (1 unit = rate HUF). If supabase given: exact date from cache,
+ * else last saved business day (max rate_date <= date) from DB, then MNB API. If API
+ * has no rate for that day, uses last available rate from DB.
  */
 export async function getMnbRate(
   currency: string,
@@ -143,6 +166,16 @@ export async function getMnbRate(
   if (supabase) {
     const cached = await getMnbRateFromDb(supabase, currency, date);
     if (cached != null) return cached;
+    const lastAvailable = await getLastAvailableMnbRateFromDb(supabase, currency, date);
+    if (lastAvailable != null) return lastAvailable;
   }
-  return fetchMnbRateFromApi(currency, date);
+  try {
+    return await fetchMnbRateFromApi(currency, date);
+  } catch {
+    if (supabase) {
+      const fallback = await getLastAvailableMnbRateFromDb(supabase, currency, '9999-12-31');
+      if (fallback != null) return fallback;
+    }
+    throw new Error(`MNB: no rate for ${currency} on ${date} and no cached rate in DB`);
+  }
 }

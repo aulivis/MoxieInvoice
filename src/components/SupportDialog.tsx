@@ -102,6 +102,8 @@ export function SupportDialog({ open, onClose }: SupportDialogProps) {
             id={IFRAME_ID}
             src={iframeSrc}
             allowTransparency
+            allow="fullscreen"
+            referrerPolicy="strict-origin-when-cross-origin"
             className="block w-full min-w-full border-0"
             style={{ minHeight: 500 }}
             title="Support"

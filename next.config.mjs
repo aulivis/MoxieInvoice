@@ -17,7 +17,7 @@ function getSecurityHeaders() {
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
         "connect-src 'self' https: *.supabase.co wss: *.supabase.co",
-        "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+        "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://hello.withmoxie.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",

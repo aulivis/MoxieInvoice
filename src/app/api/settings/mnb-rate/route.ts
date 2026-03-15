@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { rateLimitResponse } from '@/lib/rate-limit';
+import { fetchMnbCurrentRates } from '@/lib/mnb';
 
 const BUDAPEST_TZ = 'Europe/Budapest';
 
@@ -26,8 +27,8 @@ function getEffectiveRateDate(now: Date): string {
 export const dynamic = 'force-dynamic';
 
 /**
- * Returns cached MNB rates from DB. On weekdays uses today (or latest available);
- * on weekend returns Friday's rate. No live MNB call – data is filled by cron.
+ * Returns MNB rates: from DB (last saved business day on or before effective date).
+ * If DB has no rows, falls back to live MNB GetCurrentExchangeRates so the UI always gets a rate.
  */
 export async function GET(request: Request) {
   const rateLimited = rateLimitResponse(request, 'api-settings-mnb-rate');
@@ -46,19 +47,24 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  if (!rows?.length) {
-    return NextResponse.json({ eur: null, usd: null, rateDate: null, rate: null });
+  if (rows?.length) {
+    const latestDate = rows[0].rate_date;
+    const forDate = rows.filter((r) => r.rate_date === latestDate);
+    const eur = forDate.find((r) => r.currency === 'EUR')?.rate ?? null;
+    const usd = forDate.find((r) => r.currency === 'USD')?.rate ?? null;
+    return NextResponse.json({
+      rate: eur,
+      eur,
+      usd,
+      rateDate: latestDate,
+    });
   }
 
-  const latestDate = rows[0].rate_date;
-  const forDate = rows.filter((r) => r.rate_date === latestDate);
-  const eur = forDate.find((r) => r.currency === 'EUR')?.rate ?? null;
-  const usd = forDate.find((r) => r.currency === 'USD')?.rate ?? null;
-
+  const { eur, usd, rateDate } = await fetchMnbCurrentRates();
   return NextResponse.json({
-    rate: eur,
-    eur,
-    usd,
-    rateDate: latestDate,
+    rate: eur ?? null,
+    eur: eur ?? null,
+    usd: usd ?? null,
+    rateDate: rateDate ?? null,
   });
 }

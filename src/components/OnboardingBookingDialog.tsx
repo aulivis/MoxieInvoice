@@ -120,6 +120,8 @@ export function OnboardingBookingDialog({ open, onClose }: OnboardingBookingDial
             id={IFRAME_ID}
             src={iframeSrc}
             allowTransparency
+            allow="fullscreen"
+            referrerPolicy="strict-origin-when-cross-origin"
             className="block w-full min-w-full border-0"
             style={{ minHeight: 460 }}
             title="Book onboarding call"
