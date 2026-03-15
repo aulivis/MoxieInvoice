@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { StepIndicator } from './StepIndicator';
 import { StepProgressBar } from './StepProgressBar';
+import { OnboardingBookingDialog } from '@/components/OnboardingBookingDialog';
 import type { WizardStep } from './StepIndicator';
 
 interface WizardLayoutProps {
@@ -18,6 +20,7 @@ interface WizardLayoutProps {
 export function WizardLayout({ steps, currentStep, completedSteps, children, helpPanel, showSkip = true }: WizardLayoutProps) {
   const t = useTranslations('onboarding');
   const router = useRouter();
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   const currentIndex = steps.findIndex((s) => s.id === currentStep);
   const activeStepLabel = steps[currentIndex]?.label ?? '';
@@ -107,9 +110,25 @@ export function WizardLayout({ steps, currentStep, completedSteps, children, hel
                 completedSteps={completedSteps}
               />
             </div>
+
+            {/* ── Help us set you up (secondary CTA) ── */}
+            <div className="px-3 pb-4 pt-1 border-t border-border-light">
+              <button
+                type="button"
+                onClick={() => setBookingOpen(true)}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-medium text-text-secondary bg-surface-50 border border-border-light hover:bg-background-hover hover:text-text-primary hover:border-border-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              >
+                <svg className="w-4 h-4 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {t('helpUsSetYouUp')}
+              </button>
+            </div>
           </div>
         </div>
       </aside>
+
+      <OnboardingBookingDialog open={bookingOpen} onClose={() => setBookingOpen(false)} />
 
       {/* ── Center panel – main content ── */}
       <div className="flex-1 flex flex-col min-h-screen md:min-h-0 bg-surface-50 min-w-0">

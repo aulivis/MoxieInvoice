@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 import { headers } from 'next/headers';
+import Script from 'next/script';
 import { getAppLayoutContext } from '@/lib/auth';
 import { SubscriptionGuard } from '@/components/SubscriptionGuard';
 import { AppShell } from '@/components/AppShell';
@@ -34,14 +35,20 @@ export default async function AppLayout({
   const skipGuard = isOnboarding || isPendingDeletionPage;
 
   return (
-    <AppShell>
-      {skipGuard ? (
-        children
-      ) : (
-        <SubscriptionGuard hasSubscription={ctx.hasSubscription}>
-          {children}
-        </SubscriptionGuard>
-      )}
-    </AppShell>
+    <>
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.10/iframeResizer.min.js"
+        strategy="lazyOnload"
+      />
+      <AppShell>
+        {skipGuard ? (
+          children
+        ) : (
+          <SubscriptionGuard hasSubscription={ctx.hasSubscription}>
+            {children}
+          </SubscriptionGuard>
+        )}
+      </AppShell>
+    </>
   );
 }

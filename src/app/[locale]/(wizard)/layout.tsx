@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
+import Script from 'next/script';
 import { getAppLayoutContext } from '@/lib/auth';
 import { AppShell } from '@/components/AppShell';
 
@@ -15,5 +16,13 @@ export default async function WizardLayout({
     const locale = await getLocale();
     redirect(`/${locale}/login`);
   }
-  return <AppShell>{children}</AppShell>;
+  return (
+    <>
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.10/iframeResizer.min.js"
+        strategy="lazyOnload"
+      />
+      <AppShell>{children}</AppShell>
+    </>
+  );
 }

@@ -7,6 +7,8 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { HeaderAuth } from '@/components/HeaderAuth';
 import { ConnectionStatusBadge } from '@/components/ui/ConnectionStatusBadge';
 import { BrixaLogoMark } from '@/components/BrixaLogoMark';
+import { SupportDialog } from '@/components/SupportDialog';
+import { isSupportAvailable } from '@/lib/supportHours';
 
 const navLinks = [
   { href: '/', key: 'dashboard' as const },
@@ -48,6 +50,16 @@ function SettingsIcon({ active }: { active: boolean }) {
   );
 }
 
+function SupportIcon() {
+  return (
+    <svg className="w-[18px] h-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round"
+        d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
+      />
+    </svg>
+  );
+}
+
 const SIDEBAR_ICON_SIZE = 31;
 function SidebarLogo() {
   return (
@@ -72,8 +84,11 @@ export function Sidebar() {
   const pathname = usePathname();
   const t = useTranslations('nav');
   const tMoxie = useTranslations('moxie');
+  const tSupport = useTranslations('support');
   const [moxieLive, setMoxieLive] = useState(false);
   const [billingConfigured, setBillingConfigured] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
+  const supportAvailable = isSupportAvailable();
 
   useEffect(() => {
     Promise.all([
@@ -160,12 +175,39 @@ export function Sidebar() {
         style={{ borderColor: 'rgba(255,255,255,0.06)' }}
       >
         <div className="px-2">
+          <button
+            type="button"
+            onClick={() => setSupportOpen(true)}
+            className={[
+              'sidebar-nav-link flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-[40px] w-full text-left text-sm font-medium outline-none',
+              'transition-colors duration-150',
+              'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1628]',
+            ].join(' ')}
+            aria-label={t('support') + ' – ' + (supportAvailable ? tSupport('available') : tSupport('outsideHours'))}
+            title={supportAvailable ? tSupport('available') : tSupport('outsideHours')}
+          >
+            <SupportIcon />
+            <span>{t('support')}</span>
+            <span
+              className="ml-auto shrink-0 w-1.5 h-1.5 rounded-full"
+              style={{
+                backgroundColor: supportAvailable
+                  ? 'var(--ds-status-success)'
+                  : 'var(--ds-status-warning)',
+              }}
+              aria-hidden
+            />
+          </button>
+        </div>
+        <div className="px-2">
           <LanguageSwitcher dark />
         </div>
         <div className="px-2">
           <HeaderAuth dark />
         </div>
       </div>
+
+      <SupportDialog open={supportOpen} onClose={() => setSupportOpen(false)} />
     </aside>
   );
 }

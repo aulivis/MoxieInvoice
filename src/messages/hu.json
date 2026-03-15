@@ -23,7 +23,12 @@
     "newInvoice": "Új számla",
     "signOut": "Kijelentkezés",
     "login": "Bejelentkezés",
-    "signup": "Regisztráció"
+    "signup": "Regisztráció",
+    "support": "Support"
+  },
+  "support": {
+    "available": "Elérhető",
+    "outsideHours": "Munkaidőn kívül"
   },
   "auth": {
     "errors": {
@@ -50,7 +55,7 @@
     "heroDescription": "Nincs több kézi másolgatás. A Brixa a Moxie-ban tárolt adatokból automatikusan generál számlát a választott számlázó rendszerben.",
     "emailHint": "Írd be az e-mail-címed, és küldünk egy bejelentkezési linket.",
     "linkSent": "Link elküldve!",
-    "copyright": "© 2026 Brixa",
+    "copyright": "© 2026 Brixa.hu",
     "cookieNoticePrefix": "Csak a szolgáltatás működéséhez elengedhetetlenül szükséges sütiket használunk. Részletek: ",
     "privacyPolicyLinkText": "Adatkezelési tájékoztató",
     "cookieNoticeSuffix": ".",
@@ -90,6 +95,7 @@
     "setupStep3": "Számlázó beállítása",
     "wizardCta": "Beállítás indítása",
     "wizardCtaContinue": "Beállítás folytatása",
+    "helpUsSetYouUp": "Segítünk beállítani",
     "chartTitle": "Számlák generálása",
     "chartViewDaily": "Napi",
     "chartViewWeekly": "Heti",
@@ -129,7 +135,7 @@
     "pdf": "PDF",
     "details": "Részletek",
     "refresh": "Frissítés",
-    "refreshSyncing": "Szinkronizáljuk a Billingót…",
+    "refreshSyncing": "Szinkronizálás…",
     "refreshNoUpdate": "Nincs nyitott számla az alkalmazásban.",
     "refreshNoUpdateChecked": "{count} nyitott számla ellenőrizve, nincs új fizetés.",
     "refreshSuccess": "{updated} számla frissítve, Moxie értesítve: {moxieNotified}",
@@ -495,6 +501,8 @@
     "completeGoSettings": "Részletes beállítások",
     "imageSoon": "Kép hamarosan",
     "helpPanelTitle": "Segítség",
+    "helpUsSetYouUp": "Segítünk beállítani",
+    "bookingDialogTitle": "Időpont foglalása – segítünk beállítani",
     "stepSubscription": "Előfizetés",
     "stepMoxie": "Moxie",
     "stepBilling": "Számlázó",

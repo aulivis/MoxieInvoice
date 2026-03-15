@@ -23,7 +23,12 @@
     "newInvoice": "New invoice",
     "signOut": "Sign out",
     "login": "Log in",
-    "signup": "Sign up"
+    "signup": "Sign up",
+    "support": "Support"
+  },
+  "support": {
+    "available": "Available",
+    "outsideHours": "Outside business hours"
   },
   "auth": {
     "errors": {
@@ -50,7 +55,7 @@
     "heroDescription": "No more manual copying. Brixa automatically generates invoices in your chosen billing system from data stored in Moxie.",
     "emailHint": "Enter your email and we'll send you a sign-in link.",
     "linkSent": "Link sent!",
-    "copyright": "© 2026 Brixa",
+    "copyright": "© 2026 Brixa.hu",
     "cookieNoticePrefix": "We only use cookies that are strictly necessary for the operation of the service. See our ",
     "privacyPolicyLinkText": "Privacy Policy",
     "cookieNoticeSuffix": ".",
@@ -90,6 +95,7 @@
     "setupStep3": "Configure billing provider",
     "wizardCta": "Start setup",
     "wizardCtaContinue": "Continue setup",
+    "helpUsSetYouUp": "Help us set you up",
     "chartTitle": "Invoices generated",
     "chartViewDaily": "Daily",
     "chartViewWeekly": "Weekly",
@@ -129,7 +135,7 @@
     "pdf": "PDF",
     "details": "Details",
     "refresh": "Refresh",
-    "refreshSyncing": "Syncing with Billingo…",
+    "refreshSyncing": "Syncing…",
     "refreshNoUpdate": "No open invoices in the app.",
     "refreshNoUpdateChecked": "{count} open invoice(s) checked, no new payments.",
     "refreshSuccess": "{updated} invoice(s) updated, Moxie notified: {moxieNotified}",
@@ -495,6 +501,8 @@
     "completeGoSettings": "Advanced settings",
     "imageSoon": "Image coming soon",
     "helpPanelTitle": "Help",
+    "helpUsSetYouUp": "Help us set you up",
+    "bookingDialogTitle": "Book a call – we'll help you set up",
     "stepSubscription": "Subscription",
     "stepMoxie": "Moxie",
     "stepBilling": "Billing",
