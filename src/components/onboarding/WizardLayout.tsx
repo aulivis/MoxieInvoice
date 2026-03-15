@@ -112,7 +112,7 @@ export function WizardLayout({ steps, currentStep, completedSteps, children, hel
             </div>
 
             {/* ── Help us set you up (secondary CTA) ── */}
-            <div className="px-3 pb-4 pt-1 border-t border-border-light">
+            <div className="px-3 pb-3 pt-1">
               <button
                 type="button"
                 onClick={() => setBookingOpen(true)}
